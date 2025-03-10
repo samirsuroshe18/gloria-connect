@@ -183,48 +183,86 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   }
 
   Widget _buildDetailHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.report_problem_outlined,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.data?['data'].category ?? 'NA',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.data?['data'].subCategory ?? 'NA',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: Row(
+      children: [
+        InkWell(
+          onTap: () {
+            if (widget.data?['data'].imageUrl != null &&
+                widget.data?['data'].imageUrl is String) {
+              _showImageDialog(widget.data?['data'].imageUrl!);
+            }
+          },
+          borderRadius: BorderRadius.circular(24), // To match the image shape
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Image.network(
+              widget.data?['data'].imageUrl!,
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.report_problem_outlined,
+                );
+              },
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.data?['data'].category ?? 'NA',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                widget.data?['data'].subCategory ?? 'NA',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+void _showImageDialog(String imageUrl) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.black.withOpacity(0.8), // Dark background like WhatsApp
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context), // Close when tapped
+          child: InteractiveViewer(
+            panEnabled: true, // Allow panning
+            minScale: 0.5,
+            maxScale: 3.0,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildDetailContent() {
     return Padding(

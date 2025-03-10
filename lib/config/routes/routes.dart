@@ -48,6 +48,11 @@ import 'package:gloria_connect/features/administration/screens/resident_approval
 import 'package:gloria_connect/features/auth/screens/complete_profile_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/other_preapprove_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/otp_banner.dart';
+import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+import 'package:gloria_connect/features/notice_board/screens/create_notice_page.dart';
+import 'package:gloria_connect/features/notice_board/screens/genral_notice_board_page.dart';
+import 'package:gloria_connect/features/notice_board/screens/notice_board_page.dart';
+import 'package:gloria_connect/features/notice_board/screens/notice_detail_page.dart';
 import 'package:gloria_connect/features/resident_profile/screens/apartment_members_screen.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:gloria_connect/features/setting/screens/change_password_screen.dart';
@@ -267,6 +272,18 @@ class AppRoutes {
         }else{
           return _materialRoute(const ComplaintDetailsScreen(), name: '/complaint-details-screen');
         }
+      case '/notice-board-screen':
+        return _materialRoute(const NoticeBoardPage(), name: '/notice-board-screen');
+      case '/notice-board-details-screen':
+        if (args != null && args is NoticeBoardModel) {
+          return _materialRoute(NoticeDetailPage(data: args), name: '/notice-board-details-screen');
+        }else{
+          return _materialRoute(NoticeDetailPage(data: NoticeBoardModel(/* default values */)), name: '/notice-board-details-screen');
+        }
+      case '/create-notice-board-screen':
+        return _materialRoute(const CreateNoticePage(), name: '/create-notice-board-screen');
+      case '/general-notice-board-screen':
+        return _materialRoute(const GeneralNoticeBoardPage(), name: '/general-notice-board-screen');
       default:
         return _materialRoute(const SplashScreen(), name: '/');
     }

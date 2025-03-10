@@ -10,6 +10,7 @@ import 'package:gloria_connect/features/guard_profile/bloc/guard_profile_bloc.da
 import 'package:gloria_connect/features/guard_waiting/bloc/guard_waiting_bloc.dart';
 import 'package:gloria_connect/features/invite_visitors/bloc/invite_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
+import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
 import 'package:gloria_connect/features/resident_profile/bloc/resident_profile_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/init_dependencies.dart';
@@ -72,6 +73,9 @@ void main() async {
             ),
             BlocProvider(
               create: (_) => serviceLocator<SettingBloc>(),
+            ),
+            BlocProvider(
+              create: (_) => serviceLocator<NoticeBoardBloc>(),
             ),
           ],
           child: const MyApp()

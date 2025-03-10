@@ -144,20 +144,24 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildQuickActionItem(
-                  Icons.add_alert_rounded,
-                  'New Alert',
+                  Icons.settings,
+                  'Maintainance',
                   Colors.red,
-                    (){}
+                    (){
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The feature is under development")));
+                    }
                 ),
                 _buildQuickActionItem(
                   Icons.announcement_rounded,
-                  'Broadcast',
+                  'Notice',
                   Colors.blue,
-                    (){}
+                    (){
+                      Navigator.pushNamed(context, '/notice-board-screen');
+                    }
                 ),
                 _buildQuickActionItem(
-                  Icons.assessment_rounded,
-                  'Reports',
+                  Icons.report,
+                  'Complaints',
                   Colors.green,
                     (){
                     Navigator.pushNamed(context, '/complaint-screen', arguments: true);
