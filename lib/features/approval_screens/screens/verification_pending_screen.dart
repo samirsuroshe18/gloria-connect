@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../auth/bloc/auth_bloc.dart';
 
 class VerificationPendingScreen extends StatefulWidget {
@@ -181,9 +182,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     const SizedBox(height: 32),
                     // Support Section
                     OutlinedButton(
-                      onPressed: () {
-                        // Handle support action
-                      },
+                      onPressed: _contactSupport,
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -408,6 +407,23 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
           (Route<dynamic> route) => false,
     );
   }
+
+  void _contactSupport() async {
+  final Uri emailUri = Uri(
+    scheme: 'mailto',
+    path: 'support@example.com', // Replace with your support email
+    queryParameters: {
+      'subject': 'Support Request',
+      'body': 'Hello, I need help with...',
+    },
+  );
+
+  if (await canLaunchUrl(emailUri)) {
+    await launchUrl(emailUri);
+  } else {
+    debugPrint('Could not launch email app');
+  }
+}
 }
 
 

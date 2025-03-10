@@ -166,6 +166,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
             icon: const Icon(Icons.notifications_outlined, color: Colors.white),
             onPressed: () {
               // Handle notifications
+              Navigator.pushNamed(context, '/general-notice-board-screen');
             },
           ),
           const SizedBox(width: 8),

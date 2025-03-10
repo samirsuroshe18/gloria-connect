@@ -112,7 +112,8 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              _showSnackBar("This feature is under development", Colors.blueGrey);
+              // _showSnackBar("This feature is under development", Colors.blueGrey);
+              Navigator.pushNamed(context, '/general-notice-board-screen');
             },
           ),
         ],

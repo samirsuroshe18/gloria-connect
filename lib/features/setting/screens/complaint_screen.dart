@@ -309,6 +309,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
               if (state is SettingGetComplaintSuccess) {
                 data = state.response;
                 _filteredData = data;
+                print(data[0].toJson());
                 _isLoading = false;
                 _isError = false;
               }

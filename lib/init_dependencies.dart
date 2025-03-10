@@ -16,6 +16,8 @@ import 'package:gloria_connect/features/invite_visitors/bloc/invite_visitors_blo
 import 'package:gloria_connect/features/invite_visitors/repository/invite_visitors_repository.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/repository/my_visitors_repository.dart';
+import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
+import 'package:gloria_connect/features/notice_board/repository/notice_board_repository.dart';
 import 'package:gloria_connect/features/resident_profile/bloc/resident_profile_bloc.dart';
 import 'package:gloria_connect/features/resident_profile/repository/resident_profile_repository.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
@@ -36,6 +38,7 @@ Future<void> initDependencies()async {
   _initGuardProfile();
   _initResidentProfile();
   _initSetting();
+  _initNoticeBoard();
 }
 
 void _initAuth(){
@@ -91,4 +94,9 @@ void _initResidentProfile(){
 void _initSetting(){
   serviceLocator.registerLazySingleton<SettingRepository>(() => SettingRepository());
   serviceLocator.registerLazySingleton(()=> SettingBloc(settingRepository: serviceLocator()));
+}
+
+void _initNoticeBoard(){
+  serviceLocator.registerLazySingleton<NoticeBoardRepository>(() => NoticeBoardRepository());
+  serviceLocator.registerLazySingleton(()=> NoticeBoardBloc(noticeBoardRepository: serviceLocator()));
 }
