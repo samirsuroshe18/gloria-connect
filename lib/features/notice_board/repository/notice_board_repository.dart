@@ -69,8 +69,7 @@ class NoticeBoardRepository {
       request.fields['title'] = title;
       request.fields['description'] = description;
       if (image != null) request.fields['image'] = image;
-      if (file != null)
-        request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      if (file != null) request.files.add(await http.MultipartFile.fromPath('file', file.path));
 
       // Send the request
       var streamedResponse = await request.send();
@@ -109,7 +108,6 @@ class NoticeBoardRepository {
         },
       );
       final jsonBody = jsonDecode(response.body);
-      print(jsonBody);
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)

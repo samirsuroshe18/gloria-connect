@@ -261,6 +261,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
         'icon': Icons.settings,
         'color': Colors.grey,
         'route': '/setting-screen',
+        'arguments': data,
       },
       {
         'title': 'Logout',
@@ -314,7 +315,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
               color: Colors.grey,
             ),
             onTap: action['onTap'] ??
-                    () => Navigator.pushNamed(context, action['route']),
+                    () => Navigator.pushNamed(context, action['route'], arguments: action['arguments']),
           );
         },
       ),

@@ -487,4 +487,34 @@ class AuthRepository {
       }
     }
   }
+
+  Future<Map<String, dynamic>> getContactEmail() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      const apiUrl = 'https://invite.iotsense.in/api/v1/users/get-contact-email';
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return jsonBody['data'];
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
 }

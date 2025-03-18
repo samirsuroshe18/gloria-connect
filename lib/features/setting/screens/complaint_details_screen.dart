@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
+import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:intl/intl.dart';
+
+import '../../auth/bloc/auth_bloc.dart';
 
 class ComplaintDetailsScreen extends StatefulWidget {
   final Map<String, dynamic>? data;
@@ -16,19 +19,34 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   final TextEditingController _messageController = TextEditingController();
   bool isResolved = false;
   final ScrollController _scrollController = ScrollController();
-  List messages = [];
+  List<Response>? messages = [];
+  late ComplaintModel complaintModel;
+  late String userId;
 
   @override
   void initState() {
     super.initState();
-    messages = widget.data?['data'].toJson()['responses'];
-    isResolved = widget.data?['data']?.status != 'pending';
+    final complaintBloc = context.read<AuthBloc>();
+    final currentState = complaintBloc.state;
+    if(currentState is AuthGetUserSuccess){
+      userId = currentState.response.id!;
+    }
+    complaintModel = widget.data?['data'] != null
+        ? widget.data!['data']  // Ensure proper conversion
+        : ComplaintModel.fromJson(widget.data!);
+
+    // messages = widget.data?['data'].toJson()['responses'];
+    messages = complaintModel.responses;
+
+
+    // isResolved = widget.data?['data']?.status != 'pending';
+    isResolved = complaintModel.status != 'pending';
   }
 
   void _sendMessage() {
     if (_messageController.text.trim().isNotEmpty) {
       context.read<SettingBloc>().add(SettingAddResponse(
-          id: widget.data?['data'].complaintId,
+          id: complaintModel.complaintId!,
           message: _messageController.text));
       _messageController.clear();
     }
@@ -37,19 +55,19 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   void _onIsResolved() {
     context
         .read<SettingBloc>()
-        .add(SettingResolve(id: widget.data?['data'].complaintId));
+        .add(SettingResolve(id: complaintModel.complaintId!));
   }
 
   void _onReopen() {
     context
         .read<SettingBloc>()
-        .add(SettingReopen(id: widget.data?['data'].complaintId));
+        .add(SettingReopen(id: complaintModel.complaintId!));
   }
 
   Future<void> _onRefreshResponse() async {
     context
         .read<SettingBloc>()
-        .add(SettingGetResponse(id: widget.data?['data'].complaintId));
+        .add(SettingGetResponse(id: complaintModel.complaintId!));
   }
 
   @override
@@ -63,7 +81,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Complaint #${widget.data?['data'].complaintId}',
+              'Complaint #${complaintModel.complaintId}',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -72,7 +90,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
             ),
             Text(
               DateFormat('MMMM d, yyyy')
-                  .format(widget.data?['data'].date ?? DateTime.now()),
+                  .format(complaintModel.date ?? DateTime.now()),
               style: TextStyle(
                 color: Colors.white.withOpacity(0.8),
                 fontSize: 12,
@@ -82,7 +100,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context, widget.data?['data']),
+          onPressed: () => Navigator.pop(context, complaintModel),
         ),
         actions: [
           _buildStatusChip(),
@@ -108,10 +126,10 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => _buildMessageBubble(
-                              messages[index],
+                              messages![index].toJson(),
                               widget.data,
                             ),
-                            childCount: messages.length,
+                            childCount: messages?.length,
                           ),
                         ),
                       ),
@@ -189,16 +207,16 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
       children: [
         InkWell(
           onTap: () {
-            if (widget.data?['data'].imageUrl != null &&
-                widget.data?['data'].imageUrl is String) {
-              _showImageDialog(widget.data?['data'].imageUrl!);
+            if (complaintModel.imageUrl != null &&
+                complaintModel.imageUrl is String) {
+              _showImageDialog(complaintModel.imageUrl!);
             }
           },
           borderRadius: BorderRadius.circular(24), // To match the image shape
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: Image.network(
-              widget.data?['data'].imageUrl!,
+              complaintModel.imageUrl!,
               width: 50,
               height: 50,
               fit: BoxFit.cover,
@@ -216,7 +234,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.data?['data'].category ?? 'NA',
+                complaintModel.category ?? 'NA',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -224,7 +242,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                widget.data?['data'].subCategory ?? 'NA',
+                complaintModel.subCategory ?? 'NA',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -273,19 +291,19 @@ void _showImageDialog(String imageUrl) {
           _buildDetailItem(
             icon: Icons.location_on_outlined,
             title: 'Location',
-            content: widget.data?['data'].area ?? 'NA',
+            content: complaintModel.area ?? 'NA',
           ),
           const SizedBox(height: 16),
           _buildDetailItem(
             icon: Icons.description_outlined,
             title: 'Description',
-            content: widget.data?['data'].description ?? 'NA',
+            content: complaintModel.description ?? 'NA',
           ),
           const SizedBox(height: 16),
           _buildDetailItem(
             icon: Icons.message_outlined,
             title: 'Responses',
-            content: '${messages.length} messages',
+            content: '${messages?.length} messages',
           ),
         ],
       ),
@@ -329,7 +347,8 @@ void _showImageDialog(String imageUrl) {
 
   Widget _buildMessageBubble(
       Map<String, dynamic> message, Map<String, dynamic>? data) {
-    final isMe = data?['user'].id == message['responseBy']['_id'];
+    // complaintModel.responses?[0].id
+    final isMe = userId == message['responseBy']['_id'];
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -545,11 +564,9 @@ void _showImageDialog(String imageUrl) {
 
     if (state is SettingAddResponseSuccess) {
       if (state.response.responses!.isNotEmpty) {
-        messages.add(state
-            .response.responses![state.response.responses!.length - 1]
-            .toJson());
+        messages?.add(state.response.responses![state.response.responses!.length - 1]);
 
-        widget.data?['data'] = state.response;
+        complaintModel = state.response;
 
         // Scroll to bottom after adding new message
         Future.delayed(const Duration(milliseconds: 100), () {
@@ -574,7 +591,7 @@ void _showImageDialog(String imageUrl) {
       setState(() {
         isResolved = state.response.status == 'resolved';
       });
-      widget.data?['data'] = state.response;
+      complaintModel = state.response;
     }
 
     if (state is SettingResolveFailure) {
@@ -589,7 +606,7 @@ void _showImageDialog(String imageUrl) {
       setState(() {
         isResolved = state.response.status == 'resolved';
       });
-      widget.data?['data'] = state.response;
+      complaintModel = state.response;
     }
 
     if (state is SettingReopenFailure) {
@@ -599,7 +616,7 @@ void _showImageDialog(String imageUrl) {
     if (state is SettingGetResponseSuccess) {
       messages = state.response.toJson()['responses'];
       isResolved = state.response.status == 'resolved';
-      widget.data?['data'] = state.response;
+      complaintModel = state.response;
     }
 
     if (state is SettingGetResponseFailure) {

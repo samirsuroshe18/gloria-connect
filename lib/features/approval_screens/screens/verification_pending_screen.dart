@@ -15,9 +15,11 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
   String status = 'pending';
   String? profileImg;
   late SharedPreferences _prefs;
+  String? contactEmail;
 
   Future<void> _refresh() async {
     context.read<AuthBloc>().add(AuthGetUser());
+    context.read<AuthBloc>().add(AuthGetContactEmail());
   }
 
   @override
@@ -30,6 +32,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     _prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     context.read<AuthBloc>().add(AuthGetUser());
+    context.read<AuthBloc>().add(AuthGetContactEmail());
   }
 
   @override
@@ -71,6 +74,10 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                 Navigator.pushReplacementNamed(context, '/resident-home');
               }
             }
+          }
+
+          if(state is AuthGetContactEmailSuccess){
+            contactEmail = state.response['contactEmail'];
           }
         },
         builder: (context, state) {
@@ -411,7 +418,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
   void _contactSupport() async {
   final Uri emailUri = Uri(
     scheme: 'mailto',
-    path: 'support@example.com', // Replace with your support email
+    path: contactEmail ?? 'support@example.com', // Replace with your support email
     queryParameters: {
       'subject': 'Support Request',
       'body': 'Hello, I need help with...',

@@ -136,7 +136,6 @@ class GuardProfileRepository{
 
       // Handle the response
       final jsonResponse = jsonDecode(response.body);
-      print(jsonResponse);
 
       if (response.statusCode == 200) {
         return GatePassBanner.fromJson(jsonResponse['data']);

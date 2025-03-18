@@ -184,3 +184,18 @@ final class AuthSocietyDetailsFailure extends AuthState{
 
   AuthSocietyDetailsFailure( {required this.message, this.status});
 }
+
+/// Get contact email
+final class AuthGetContactEmailLoading extends AuthState{}
+
+final class AuthGetContactEmailSuccess extends AuthState{
+  final Map<String, dynamic> response;
+  AuthGetContactEmailSuccess({required this.response});
+}
+
+final class AuthGetContactEmailFailure extends AuthState{
+  final String message;
+  final int? status;
+
+  AuthGetContactEmailFailure( {required this.message, this.status});
+}

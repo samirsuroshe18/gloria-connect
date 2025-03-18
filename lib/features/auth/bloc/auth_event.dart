@@ -96,3 +96,5 @@ final class AuthUpdateFCM extends AuthEvent {
 }
 
 final class AuthSocietyDetails extends AuthEvent {}
+
+final class AuthGetContactEmail extends AuthEvent {}

@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
+import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -91,7 +92,8 @@ class NotificationController {
   }
 
   Future<void> handleNotification(RemoteMessage message, String from) async {
-    Map<String, String?> stringPayload = Map<String, String?>.from(jsonDecode(message.data['payload'])?.map((key, value) => MapEntry(key.toString(), value?.toString())));
+
+    Map<String, String?> stringPayload = Map<String, String?>.from(jsonDecode(message.data['payload'])?.map((key, value) => MapEntry(key.toString(), jsonEncode(value))));
 
     if (message.data['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
       residentVerifyNotification(stringPayload);
@@ -119,7 +121,19 @@ class NotificationController {
       notifyRoleVerification(stringPayload);
     } else if (message.data['action'] == 'GUARD_REJECT') {
       notifyRoleVerification(stringPayload);
-    } else if (message.data['action'] == 'CANCEL') {
+    }else if (message.data['action'] == 'NOTIFY_NOTICE_CREATED') {
+      notifyNoticeCreated(message.data['payload']);
+    }else if (message.data['action'] == 'NOTIFY_COMPLAINT_CREATED') {
+      notifyComplaintCreated(message.data['payload']);
+    }else if (message.data['action'] == 'NOTIFY_RESIDENT_REPLIED') {
+      notifyResidentReplied(message.data['payload']);
+    }else if (message.data['action'] == 'NOTIFY_ADMIN_REPLIED') {
+      notifyAdminReplied(message.data['payload']);
+    }else if (message.data['action'] == 'NOTIFY_COMPLAINT_REOPENED') {
+      notifyComplaintReopened(message.data['payload']);
+    }else if (message.data['action'] == 'NOTIFY_COMPLAINT_RESOLVED') {
+      notifyComplaintResolved(message.data['payload']);
+    }else if (message.data['action'] == 'CANCEL') {
       await AwesomeNotifications().cancel(int.parse(stringPayload['notificationId']!));
     }
   }
@@ -191,6 +205,14 @@ class NotificationController {
         currentState?.pushNamedAndRemoveUntil('/delivery-approval-screen', (route) => route.isFirst, arguments: receivedAction.payload);
 
       }
+    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED' && isInForeground == true) {
+      currentState?.pushNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));
+    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED' && isInForeground == true) {
+      currentState?.pushNamed('/complaint-details-screen', arguments: jsonDecode(receivedAction.payload!['data']!));
+    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED' && isInForeground == true) {
+      currentState?.pushNamed('/complaint-details-screen', arguments: jsonDecode(receivedAction.payload!['data']!));
+    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED' && isInForeground == true) {
+      currentState?.pushNamed('/complaint-details-screen', arguments: jsonDecode(receivedAction.payload!['data']!));
     }
   }
 

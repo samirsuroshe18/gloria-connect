@@ -129,8 +129,6 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
               data = [];
               _filteredData = [];
               _isLoading = false;
-              
-              print(state.message);
               _isError = true;
             });
           }
