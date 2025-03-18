@@ -212,7 +212,7 @@ class _ResidentProfileScreenState extends State<ResidentProfileScreen> {
                                   size: 16,
                                   color: Color(0xFF5B5B5B),),
                                 onTap: () {
-                                  Navigator.pushNamed(context, '/setting-screen',);
+                                  Navigator.pushNamed(context, '/setting-screen', arguments: data);
                                 },
                               ),
                             ),

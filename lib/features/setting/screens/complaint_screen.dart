@@ -63,8 +63,11 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
     return _filteredData.where((complaint) => complaint.status == status).toList();
   }
 
-  void _raiseComplaint(BuildContext context) {
-    Navigator.pushNamed(context, '/complaint-form-screen');
+  Future<void> _raiseComplaint(BuildContext context) async {
+    final data = await Navigator.pushNamed(context, '/complaint-form-screen');
+    if(data is Map<String, dynamic>){
+      _filteredData.add(ComplaintModel.fromJson(data));
+    }
   }
 
   Future<void> _cardOnTap(ComplaintModel complaint) async {
@@ -309,7 +312,6 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
               if (state is SettingGetComplaintSuccess) {
                 data = state.response;
                 _filteredData = data;
-                print(data[0].toJson());
                 _isLoading = false;
                 _isError = false;
               }

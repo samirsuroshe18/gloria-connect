@@ -131,8 +131,6 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
               data = state.response;
               _filteredData = List.from(data);
               _isLoading = false;
-              
-              print("hello");
               _isError = false;
             });
           }

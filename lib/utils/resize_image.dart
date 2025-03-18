@@ -30,7 +30,7 @@ Future<File?> resizeImage(File? imageFile,
     }
   } catch (e) {
     if (kDebugMode) {
-      print("Error resizing image: $e");
+      debugPrint("Error resizing image: $e");
     }
   }
   return null;

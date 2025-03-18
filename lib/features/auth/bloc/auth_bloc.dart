@@ -224,6 +224,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       }
     });
+
+    on<AuthGetContactEmail>((event, emit) async {
+      emit(AuthGetContactEmailLoading());
+      try {
+        final Map<String, dynamic> response =
+        await _authRepository.getContactEmail();
+        emit(AuthGetContactEmailSuccess(response: response));
+      } catch (e) {
+        if (e is ApiError) {
+          emit(AuthGetContactEmailFailure(
+              message: e.message.toString(), status: e.statusCode));
+        } else {
+          emit(AuthGetContactEmailFailure(message: e.toString()));
+        }
+      }
+    });
   }
 
   AuthState getLatestState() {

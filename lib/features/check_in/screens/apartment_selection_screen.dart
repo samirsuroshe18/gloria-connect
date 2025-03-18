@@ -58,8 +58,6 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('Form data ${widget.formData}');
-    print('Number of screens in stack: ${routeObserver.routeStack.length}');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue, // Change AppBar color here

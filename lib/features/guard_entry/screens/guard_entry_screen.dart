@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/guard_entry/bloc/guard_entry_bloc.dart';
+import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+import 'package:gloria_connect/utils/notification_service.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../check_in/bloc/check_in_bloc.dart';
@@ -20,6 +25,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
   String _guardName = '...';
   String? _otp;
   bool _isLoading = false;
+  ReceivedAction? initialAction;
 
   @override
   void didChangeDependencies() {
@@ -27,19 +33,44 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
     _navigator = Navigator.of(context);
   }
 
+  void getInitialAction() async {
+    initialAction = NotificationController.initialAction;
+    if (mounted) {
+      if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/notice-board-details-screen', (route) => route.isFirst,
+            arguments: NoticeBoardModel.fromJson(jsonDecode(initialAction!.payload!['data']!)));
+      }else if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/complaint-details-screen', (route) => route.isFirst,
+            arguments: jsonDecode(initialAction!.payload!['data']!));
+      }else if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/complaint-details-screen', (route) => route.isFirst,
+            arguments: jsonDecode(initialAction!.payload!['data']!));
+      }else if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/complaint-details-screen', (route) => route.isFirst,
+            arguments: jsonDecode(initialAction!.payload!['data']!));
+      } else {
+        context.read<AuthBloc>().add(AuthGetUser());
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _fetchUser();
+    getInitialAction();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  void _fetchUser() {
-    if(mounted) context.read<AuthBloc>().add(AuthGetUser());
   }
 
   @override

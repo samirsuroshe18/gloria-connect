@@ -97,12 +97,12 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                 backgroundColor: Colors.green,
               ),
             );
-            Navigator.pop(context);
+            Navigator.pop(context, state.response);
           } else if (state is SettingSubmitComplaintFailure) {
             setState(() => isLoading = false);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Failed to submit complaint'),
+              SnackBar(
+                content: Text(state.message),
                 backgroundColor: Colors.red,
               ),
             );
@@ -265,11 +265,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
             ),
           ],
         ),
-        child: DropdownButtonFormField<String>(
+        child: DropdownButtonFormField(
+          isExpanded: true,  // Forces the dropdown to take the full width
           value: selectedSubCategory,
           decoration: InputDecoration(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -281,16 +281,15 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                 color: Color(0xFF3498DB)),
           ),
           items: categories[selectedCategory]!.map((String subCategory) {
-            return DropdownMenuItem<String>(
+            return DropdownMenuItem(
               value: subCategory,
-              child: Text(subCategory),
+              child: Text(subCategory, overflow: TextOverflow.ellipsis), // Avoids text overflow
             );
           }).toList(),
           onChanged: (String? newValue) {
             setState(() => selectedSubCategory = newValue);
           },
-          validator: (value) =>
-              value == null ? 'Please select a sub-category' : null,
+          validator: (value) => value == null ? 'Please select a sub-category' : null,
         ),
       ),
     );

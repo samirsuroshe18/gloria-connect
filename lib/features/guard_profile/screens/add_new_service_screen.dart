@@ -660,21 +660,6 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         endDate == null ||
         startTime == null ||
         endTime == null) {
-      print(serviceLogo);
-
-      print(_image == null);
-      print(name.text.isEmpty);
-      print(proofImage == null);
-    print(mobileNo.text.isEmpty);
-    print(address.text.isEmpty);
-    print(serviceName == null);
-    print(serviceLogo == null);
-    print(selectedGender.isEmpty);
-    print(selectedFlats.isEmpty);
-    print(startDate == null);
-    print(endDate == null);
-    print(startTime == null);
-    print(endTime == null);
 
       String errorMessage = 'Please fill in all required fields:';
       if (_image == null) errorMessage += '\n- Profile photo';

@@ -129,7 +129,7 @@ class Response {
     responseBy: json["responseBy"] == null ? null : By.fromJson(json["responseBy"]),
     message: json["message"],
     id: json["_id"],
-    date: json["date"] == null ? null : DateTime.parse(json["date"]),
+    date: json["date"] == null ? null : DateTime.parse(json["date"]).toLocal(),
   );
 
   Map<String, dynamic> toJson() => {

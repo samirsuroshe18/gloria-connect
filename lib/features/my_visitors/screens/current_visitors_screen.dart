@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/visitor_current_card.dart';
+import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
 import 'package:lottie/lottie.dart';
 
@@ -45,6 +48,26 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
         Navigator.pushNamedAndRemoveUntil(
             context, '/delivery-approval-screen', (route) => route.isFirst,
             arguments: initialAction?.payload);
+      }else if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/notice-board-details-screen', (route) => route.isFirst,
+            arguments: NoticeBoardModel.fromJson(jsonDecode(initialAction!.payload!['data']!)));
+      }else if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/complaint-details-screen', (route) => route.isFirst,
+            arguments: jsonDecode(initialAction!.payload!['data']!));
+      }else if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/complaint-details-screen', (route) => route.isFirst,
+            arguments: jsonDecode(initialAction!.payload!['data']!));
+      }else if (initialAction != null &&
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/complaint-details-screen', (route) => route.isFirst,
+            arguments: jsonDecode(initialAction!.payload!['data']!));
       } else {
         context.read<MyVisitorsBloc>().add(GetServiceRequest());
       }
