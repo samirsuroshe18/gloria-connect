@@ -12,7 +12,7 @@ class FlatRow extends StatelessWidget {
     // Check if the phone number is valid
     if (phoneNo == null || phoneNo.isEmpty) {
       // Optionally show an error message to the user
-      print('Invalid phone number');
+      debugPrint('Invalid phone number');
       return;
     }
 
@@ -25,12 +25,12 @@ class FlatRow extends StatelessWidget {
         await launchUrl(url);
       } catch (e) {
         // Handle any errors during launch
-        print('Error launching URL: $e');
+        debugPrint('Error launching URL: $e');
         // Optionally show an error message
       }
     } else {
       // Inform the user the action isn't supported
-      print('Could not launch $url');
+      debugPrint('Could not launch $url');
       // Optionally show a dialog or snackbar
     }
   }
@@ -40,10 +40,10 @@ class FlatRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.all(Radius.circular(13))
+          borderRadius: const BorderRadius.all(Radius.circular(13))
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

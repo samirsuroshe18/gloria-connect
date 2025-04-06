@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 import '../bloc/invite_visitors_bloc.dart';
@@ -93,7 +94,7 @@ class _FrequentlyTabState extends State<FrequentlyTab> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'Set up recurring access for regular visitors',
                       style: TextStyle(
                         fontSize: 16,
@@ -102,7 +103,7 @@ class _FrequentlyTabState extends State<FrequentlyTab> {
                     ),
                     const SizedBox(height: 32),
 
-                    Text(
+                    const Text(
                       'Pass Duration',
                       style: TextStyle(
                         fontSize: 18,
@@ -421,7 +422,7 @@ class _FrequentlyTabState extends State<FrequentlyTab> {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.white70,
@@ -450,13 +451,13 @@ class _FrequentlyTabState extends State<FrequentlyTab> {
                   Expanded(
                     child: Text(
                       value,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
                       ),
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.arrow_forward_ios_rounded,
                     color: Colors.white70,
                     size: 16,

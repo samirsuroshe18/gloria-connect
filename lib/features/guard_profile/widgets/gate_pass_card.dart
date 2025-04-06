@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:gloria_connect/features/guard_profile/models/GatePassBanner.dart';
+import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class GatePassCard extends StatelessWidget {
@@ -299,7 +300,7 @@ class GatePassCard extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white70,
             fontWeight: FontWeight.w500,
           ),

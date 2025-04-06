@@ -30,7 +30,7 @@ import 'package:gloria_connect/features/check_in/screens/mobile_no_screen.dart';
 import 'package:gloria_connect/features/guard_entry/screens/guest_approval_profile.dart';
 import 'package:gloria_connect/features/guard_entry/screens/other_approval_profile.dart';
 import 'package:gloria_connect/features/guard_entry/screens/other_more_option.dart';
-import 'package:gloria_connect/features/guard_profile/models/GatePassBanner.dart';
+import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
 import 'package:gloria_connect/features/guard_profile/screens/gate_pass_list_screen.dart';
 import 'package:gloria_connect/features/guard_profile/screens/add_new_service_screen.dart';
 import 'package:gloria_connect/features/guard_profile/screens/checkout_history_screen.dart';

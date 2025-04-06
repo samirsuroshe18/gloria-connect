@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gloria_connect/main.dart';
 import 'package:lottie/lottie.dart';
 
 import '../bloc/check_in_bloc.dart';
@@ -147,7 +146,7 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Chip(
                             backgroundColor: Colors.black.withOpacity(0.2),
-                            label: Text(selectedFlats[index], style: TextStyle(color: Colors.white70),),
+                            label: Text(selectedFlats[index], style: const TextStyle(color: Colors.white70),),
                             onDeleted: () {
                               // context.read().add(RemoveFlat(blockName: blockName!, flatName: selectedFlats[index]));
                               toggleFlatSelection(selectedFlats[index]);

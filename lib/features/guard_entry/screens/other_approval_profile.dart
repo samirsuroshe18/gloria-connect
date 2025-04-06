@@ -202,7 +202,7 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     prefixIcon: const Icon(Icons.phone, color: Colors.white70),
                     hintText: 'Enter Phone Number',
-                    hintStyle: TextStyle(color: Colors.white60),
+                    hintStyle: const TextStyle(color: Colors.white60),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -223,7 +223,7 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     prefixIcon: const Icon(Icons.person, color: Colors.white70),
                     hintText: 'Enter Name',
-                    hintStyle: TextStyle(color: Colors.white60),
+                    hintStyle: const TextStyle(color: Colors.white60),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),

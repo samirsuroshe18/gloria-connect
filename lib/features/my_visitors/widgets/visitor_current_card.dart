@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../guard_waiting/models/entry.dart';
@@ -12,7 +13,7 @@ class VisitorCurrentCard extends StatelessWidget {
     // Check if the phone number is valid
     if (phoneNo == null || phoneNo.isEmpty) {
       // Optionally show an error message to the user
-      print('Invalid phone number');
+      debugPrint('Invalid phone number');
       return;
     }
 
@@ -25,12 +26,12 @@ class VisitorCurrentCard extends StatelessWidget {
         await launchUrl(url);
       } catch (e) {
         // Handle any errors during launch
-        print('Error launching URL: $e');
+        debugPrint('Error launching URL: $e');
         // Optionally show an error message
       }
     } else {
       // Inform the user the action isn't supported
-      print('Could not launch $url');
+      debugPrint('Could not launch $url');
       // Optionally show a dialog or snackbar
     }
   }
@@ -593,6 +594,7 @@ class VisitorCurrentCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(50),
                       child: Container(
                         padding: const EdgeInsets.all(8),
+                        // ignore: prefer_const_constructors
                         decoration: BoxDecoration(
                           color: Colors.black26,
                           shape: BoxShape.circle,

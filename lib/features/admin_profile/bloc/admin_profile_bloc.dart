@@ -6,7 +6,9 @@ part 'admin_profile_event.dart';
 part 'admin_profile_state.dart';
 
 class AdminProfileBloc extends Bloc<AdminProfileEvent, AdminProfileState>{
+  // ignore: unused_field
   final AdminProfileRepository _adminProfileRepository;
+  // ignore: empty_constructor_bodies
   AdminProfileBloc({required AdminProfileRepository adminProfileRepository}) : _adminProfileRepository=adminProfileRepository, super (AdminProfileInitial()){
 
   }

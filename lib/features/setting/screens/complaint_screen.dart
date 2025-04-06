@@ -5,6 +5,7 @@ import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
 import 'package:lottie/lottie.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 import '../../administration/models/admin_complaint_model.dart';

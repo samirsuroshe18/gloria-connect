@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/visitor_expected_card.dart';
-import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 
 class ExpectedVisitorsScreen extends StatefulWidget {

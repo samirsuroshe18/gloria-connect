@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -158,34 +159,6 @@ class VisitorPastCard extends StatelessWidget {
         ),
       ),
     );
-    // return Container(
-    //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    //   decoration: BoxDecoration(
-    //     color: _getTypeColor(),
-    //     borderRadius: BorderRadius.circular(20),
-    //   ),
-    //   child: Text(
-    //     data.entryType ?? data.profileType ?? 'Visitor',
-    //     style: const TextStyle(
-    //       color: Colors.white,
-    //       fontSize: 12,
-    //       fontWeight: FontWeight.w600,
-    //     ),
-    //   ),
-    // );
-  }
-
-  Color _getTypeColor() {
-    switch (data.entryType ?? data.profileType) {
-      case 'service':
-        return Colors.blue;
-      case 'delivery':
-        return Colors.green;
-      case 'guest':
-        return Colors.purple;
-      default:
-        return Colors.orange;
-    }
   }
 
   Widget _buildTimingInfo() {

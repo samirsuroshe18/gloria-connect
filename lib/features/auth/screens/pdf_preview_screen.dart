@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 
 class PdfPreviewScreen extends StatefulWidget {

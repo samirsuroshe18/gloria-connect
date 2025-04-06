@@ -6,14 +6,14 @@ class RouteObserverWithStack extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     routeStack.add(route);
-    print('Stack after push: ${routeStack.map((r) => r.settings.name).toList()}');
+    debugPrint('Stack after push: ${routeStack.map((r) => r.settings.name).toList()}');
     super.didPush(route, previousRoute);
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     routeStack.remove(route);
-    print('Stack after pop: ${routeStack.map((r) => r.settings.name).toList()}');
+    debugPrint('Stack after pop: ${routeStack.map((r) => r.settings.name).toList()}');
     super.didPop(route, previousRoute);
   }
 }

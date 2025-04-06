@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:lottie/lottie.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
@@ -209,19 +210,6 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
   }
 
   Widget _buildNoticeCard(NoticeBoardModel notice) {
-    // Function to get category color
-    Color getCategoryColor(String category) {
-      switch (category.toLowerCase()) {
-        case 'important':
-          return const Color(0xFFE74C3C);
-        case 'event':
-          return const Color(0xFF9B59B6);
-        case 'maintenance':
-          return const Color(0xFFE67E22);
-        default:
-          return const Color(0xFF3498DB);
-      }
-    }
 
     // Function to get category icon
     IconData getCategoryIcon(String category) {

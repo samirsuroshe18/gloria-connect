@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gloria_connect/features/guard_profile/models/GatePassBanner.dart';
+import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
 import 'package:gloria_connect/features/guard_profile/models/checkout_history.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:gloria_connect/utils/gradient_color.dart';
 import '../bloc/auth_bloc.dart';
 import '../widgets/auth_btn.dart';
 import '../widgets/text_form_field.dart';

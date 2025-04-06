@@ -19,7 +19,6 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.data?.societyDetails!.societyApartments?[0].members);
     return Scaffold(
         appBar: AppBar(
           title: const Text(

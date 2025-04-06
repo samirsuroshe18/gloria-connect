@@ -13,10 +13,12 @@ import 'dart:io';
 // So in case of intl and path package importing working fine beacause another packages dependent on them
 // intl : awesome_notifications (direct dependency) timeago (indirect dependency)
 // path :flutter_launcher_icons, flutter_native_splash, hive_generator, json_serializable
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dotted_border/dotted_border.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 import 'package:file_picker/file_picker.dart';
 

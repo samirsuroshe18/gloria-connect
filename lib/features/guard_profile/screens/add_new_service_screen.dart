@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import 'package:gloria_connect/features/guard_profile/bloc/guard_profile_bloc.dart';
@@ -302,9 +302,11 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error picking image: $e')),
       );
+      }
     }
   }
 
@@ -322,7 +324,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             color: Colors.white70,
             fontWeight: FontWeight.w500,
@@ -415,7 +417,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                         ],
                       ),
                     ),
-                    Icon(Icons.arrow_forward_ios,
+                    const Icon(Icons.arrow_forward_ios,
                         size: 16, color: Colors.white70),
                   ],
                 ),
@@ -498,7 +500,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                             const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: Row(
                               children: [
-                                Text(selectedFlats[index], style: TextStyle(color: Colors.white70),),
+                                Text(selectedFlats[index], style: const TextStyle(color: Colors.white70),),
                                 const SizedBox(width: 8),
                                 InkWell(
                                   onTap: () {
@@ -911,14 +913,14 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.access_time,
+                const Icon(Icons.access_time,
                     size: 20, color: Colors.white70,),
                 const SizedBox(width: 8),
                 Text(
                   selectedTime != null
                       ? selectedTime.format(context)
                       : 'Select Time',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white70,
                   ),
                 ),
