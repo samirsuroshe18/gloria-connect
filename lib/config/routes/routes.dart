@@ -54,7 +54,7 @@ import 'package:gloria_connect/features/invite_visitors/screens/other_preapprove
 import 'package:gloria_connect/features/invite_visitors/screens/otp_banner.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/features/notice_board/screens/create_notice_page.dart';
-import 'package:gloria_connect/features/notice_board/screens/genral_notice_board_page.dart';
+import 'package:gloria_connect/features/notice_board/screens/general_notice_board_page.dart';
 import 'package:gloria_connect/features/notice_board/screens/notice_board_page.dart';
 import 'package:gloria_connect/features/notice_board/screens/notice_detail_page.dart';
 import 'package:gloria_connect/features/resident_profile/screens/apartment_members_screen.dart';
