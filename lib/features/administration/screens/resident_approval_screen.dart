@@ -33,12 +33,13 @@ class _ResidentApprovalScreenState extends State<ResidentApprovalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text(
           'Resident Approval',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blue.withOpacity(0.2),
       ),
       body: BlocConsumer<AdministrationBloc, AdministrationState>(
         listener: (context, state) {

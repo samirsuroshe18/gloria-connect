@@ -70,7 +70,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
   Widget _buildProfileSection() {
     return Card(
       margin: const EdgeInsets.all(16),
-      elevation: 4,
+      color: Colors.black.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -82,6 +82,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.white70
               ),
             ),
             const SizedBox(height: 16),
@@ -93,18 +94,11 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                     height: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey[100],
+                      color: Colors.white.withOpacity(0.2),
                       border: Border.all(
                         color: Theme.of(context).primaryColor.withOpacity(0.2),
                         width: 2,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
                     child: _image != null
                         ? ClipOval(
@@ -160,7 +154,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
   Widget _buildFormSection() {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 4,
+      color: Colors.black.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -172,6 +166,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.white70
               ),
             ),
             const SizedBox(height: 24),
@@ -214,6 +209,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                   ),
                 ),
                 Card(
+                  color: Colors.white.withOpacity(0.2),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -249,8 +245,8 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                               child: const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.add_photo_alternate, size: 50),
-                                  Text('Upload Ownership Document'),
+                                  Icon(Icons.add_photo_alternate, size: 50, color: Colors.white70,),
+                                  Text('Upload Ownership Document', style: TextStyle(color: Colors.white70),),
                                 ],
                               ),
                             ),
@@ -328,7 +324,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: Colors.white70,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -340,7 +336,8 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: Icon(icon, color: Theme.of(context).primaryColor,),
+            hintStyle: const TextStyle(color: Colors.white60),
+            prefixIcon: Icon(icon, color: Colors.white70,),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey[300]!),
@@ -354,7 +351,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               borderSide: BorderSide(color: Theme.of(context).primaryColor),
             ),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: Colors.white.withOpacity(0.2),
           ),
         ),
       ],
@@ -364,7 +361,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
   Widget _buildServiceSection() {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 4,
+      color: Colors.black.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -376,6 +373,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.white70
               ),
             ),
             const SizedBox(height: 24),
@@ -384,7 +382,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -399,28 +397,26 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Service Type',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: Colors.white70,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             serviceName ?? 'Select service type',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
-                              color: serviceName != null
-                                  ? Colors.black
-                                  : Colors.grey[400],
+                              color: Colors.white70,
                             ),
                           ),
                         ],
                       ),
                     ),
                     Icon(Icons.arrow_forward_ios,
-                        size: 16, color: Colors.grey[400]),
+                        size: 16, color: Colors.white70),
                   ],
                 ),
               ),
@@ -431,6 +427,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
+                color: Colors.white70
               ),
             ),
             const SizedBox(height: 8),
@@ -465,15 +462,16 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
+                        color: Colors.white70
                       ),
                     ),
                     TextButton.icon(
                       onPressed: _addFlats,
-                      icon: const Icon(Icons.add, color: Colors.blue),
+                      icon: const Icon(Icons.add, color: Colors.white70),
                       label: const Text(
                         'Add',
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: Colors.white70,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -489,6 +487,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                       itemCount: selectedFlats.length,
                       itemBuilder: (context, index) {
                         return Card(
+                          color: Colors.white.withOpacity(0.2),
                           margin: const EdgeInsets.only(right: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -499,7 +498,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                             const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: Row(
                               children: [
-                                Text(selectedFlats[index], style: TextStyle(color: Theme.of(context).primaryColor),),
+                                Text(selectedFlats[index], style: TextStyle(color: Colors.white70),),
                                 const SizedBox(width: 8),
                                 InkWell(
                                   onTap: () {
@@ -511,8 +510,8 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                                       // context.read<CheckInBloc>().add(RemoveFlat(flatName: selectedFlats[index]));
                                     });
                                   },
-                                  child: Icon(Icons.close,
-                                      size: 20, color: Theme.of(context).primaryColor),
+                                  child: const Icon(Icons.close,
+                                      size: 20, color: Colors.white70),
                                 ),
                               ],
                             ),
@@ -564,7 +563,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
           ),
           borderRadius: BorderRadius.circular(12),
           color: isSelected
-              ? Theme.of(context).primaryColor.withOpacity(0.1)
+              ? Colors.white.withOpacity(0.2)
               : Colors.transparent,
         ),
         child: Row(
@@ -574,15 +573,13 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               icon,
               color: isSelected
                   ? Theme.of(context).primaryColor
-                  : Colors.grey[600],
+                  : Colors.white70,
             ),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                color: isSelected
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey[600],
+                color: Colors.white70,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -598,7 +595,8 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _submitForm,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white70,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -688,7 +686,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
   Widget _buildDurationSection() {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 4,
+      color: Colors.black.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -700,6 +698,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.white70
               ),
             ),
             const SizedBox(height: 16),
@@ -733,8 +732,8 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? Theme.of(context).primaryColor
-              : Colors.grey[100],
+              ? Colors.white.withOpacity(0.2)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
@@ -745,7 +744,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         child: Text(
           option.label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: Colors.white70,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -767,8 +766,8 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? Theme.of(context).primaryColor
-              : Colors.grey[100],
+              ? Colors.white.withOpacity(0.2)
+              : Colors.blue.withOpacity(0.4),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
@@ -779,7 +778,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         child: Text(
           'Custom',
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: Colors.white70,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -848,9 +847,9 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 8),
@@ -859,20 +858,21 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
               border: Border.all(color: Colors.grey[300]!),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today,
-                    size: 20, color: Theme.of(context).primaryColor),
+                const Icon(Icons.calendar_today,
+                    size: 20, color: Colors.white60),
                 const SizedBox(width: 8),
                 Text(
                   selectedDate != null
                       ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
                       : 'Select Date',
-                  style: TextStyle(
-                    color: selectedDate != null ? Colors.black87 : Colors.grey,
+                  style: const TextStyle(
+                    color: Colors.white60,
                   ),
                 ),
               ],
@@ -894,9 +894,9 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 8),
@@ -907,18 +907,19 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey[300]!),
               borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withOpacity(0.2)
             ),
             child: Row(
               children: [
                 Icon(Icons.access_time,
-                    size: 20, color: Theme.of(context).primaryColor),
+                    size: 20, color: Colors.white70,),
                 const SizedBox(width: 8),
                 Text(
                   selectedTime != null
                       ? selectedTime.format(context)
                       : 'Select Time',
                   style: TextStyle(
-                    color: selectedTime != null ? Colors.black87 : Colors.grey,
+                    color: Colors.white70,
                   ),
                 ),
               ],
@@ -932,6 +933,25 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2), // Change AppBar color here
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.read<CheckInBloc>().add(ClearFlat());
+            Navigator.pop(context);
+          },
+          color: Colors.white70,
+        ),
+        title: const Text(
+          'Add new gate pass',
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.white70,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: BlocConsumer<CheckInBloc, CheckInState>(
         listener: (context, state) {
           if (state is FlatState) {
@@ -965,26 +985,6 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
               return CustomScrollView(
                 controller: _scrollController,
                 slivers: [
-                  SliverAppBar(
-                    pinned: true, // Keeps the AppBar visible at the top while scrolling
-                    floating: false, // Set to true if you want the AppBar to appear on scroll
-                    backgroundColor: Colors.blue, // Change AppBar color here
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        context.read<CheckInBloc>().add(ClearFlat());
-                        Navigator.pop(context);
-                      },
-                    ),
-                    title: const Text(
-                      'Add new gate pass',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                   SliverToBoxAdapter(child: _buildProfileSection()),
                   SliverToBoxAdapter(child: _buildFormSection()),
                   SliverToBoxAdapter(child: _buildServiceSection()),

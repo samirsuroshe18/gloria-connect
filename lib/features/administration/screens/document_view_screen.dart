@@ -152,9 +152,9 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: Text(widget.title!, style: const TextStyle(color: Colors.white),),
         actions: [
           // Download button with loading indicator

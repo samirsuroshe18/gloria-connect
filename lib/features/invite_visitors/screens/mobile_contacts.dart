@@ -117,10 +117,10 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
               style: const TextStyle(color: Colors.black),
               decoration: InputDecoration(
                 hintText: 'Search by name or mobile number',
-                hintStyle: const TextStyle(color: Colors.grey),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintStyle: const TextStyle(color: Colors.white70),
+                prefixIcon: const Icon(Icons.search, color: Colors.white70),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Colors.white.withOpacity(0.2),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide.none,
@@ -158,43 +158,51 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
                   final phoneNumber = contact.phones.isNotEmpty
                       ? formatPhoneNumber(contact.phones.first.number)
                       : 'No phone number';
-                  return ListTile(
-                    onTap: () {
-                      if (contact.phones.isNotEmpty) {
-                        widget.onContactSelected(
-                            contact.displayName,
-                            contact.phones.first.number
-                        );
-                      }
-                    },
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey[200],
-                      ),
-                      child: contact.photo != null
-                          ? ClipOval(
-                        child: Image.memory(
-                          contact.photo!,
-                          fit: BoxFit.cover,
-                          width: 40,
-                          height: 40,
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(15)
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        if (contact.phones.isNotEmpty) {
+                          widget.onContactSelected(
+                              contact.displayName,
+                              contact.phones.first.number
+                          );
+                        }
+                      },
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.2),
                         ),
-                      )
-                          : const Icon(Icons.person, color: Colors.grey),
-                    ),
-                    title: Text(
-                      contact.displayName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
+                        child: contact.photo != null
+                            ? ClipOval(
+                          child: Image.memory(
+                            contact.photo!,
+                            fit: BoxFit.cover,
+                            width: 40,
+                            height: 40,
+                          ),
+                        )
+                            : const Icon(Icons.person, color: Colors.grey),
                       ),
-                    ),
-                    subtitle: Text(
-                      phoneNumber,
-                      style: TextStyle(
-                        color: Colors.grey[600],
+                      title: Text(
+                        contact.displayName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white70
+                        ),
+                      ),
+                      subtitle: Text(
+                        phoneNumber,
+                        style: TextStyle(
+                          color: Colors.white60,
+                        ),
                       ),
                     ),
                   );

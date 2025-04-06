@@ -86,9 +86,9 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
       appBar: AppBar(
         title: const Text(
           'Add Entry',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: BlocConsumer<CheckInBloc, CheckInState>(
         listener: (context, state) {
@@ -156,7 +156,7 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.blue, // Border color
+                  color: Colors.white70, // Border color
                   width: 2.5, // Border width
                 ),
               ),
@@ -200,8 +200,9 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
                   // maxLength: 10,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    prefixIcon: const Icon(Icons.phone, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.phone, color: Colors.white70),
                     hintText: 'Enter Phone Number',
+                    hintStyle: const TextStyle(color: Colors.white60),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -253,7 +254,7 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xB3000000)),
+                  color: Colors.white70),
             ),
             Row(
               children: [
@@ -270,7 +271,7 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
                 ),
                 Text(
                   accompanyingGuests.toString(),
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18, color: Colors.white70),
                 ),
                 IconButton(
                   icon:
@@ -290,11 +291,11 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
-            color: Colors.blue.shade100,
+            color: Colors.white.withOpacity(0.2),
           ),
           child: Text(
             getGuestText(),
-            style: const TextStyle(fontSize: 16, color: Color(0xB3000000)),
+            style: const TextStyle(fontSize: 16, color: Colors.white70),
           ),
         ),
       ],
@@ -307,7 +308,7 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
       children: [
         const Text(
           'Vehicle Details',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
         ),
         const SizedBox(height: 10),
         GridView.count(
@@ -346,7 +347,7 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
               const Text(
                 'Enter Vehicle Number.',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.black54),
+                    fontWeight: FontWeight.bold, color: Colors.white70),
               ),
               const SizedBox(height: 10),
               PinCodeTextField(
@@ -390,7 +391,7 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
                 textStyle: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black, // Black text for visibility
+                  color: Colors.white70, // Black text for visibility
                 ),
               )
             ],

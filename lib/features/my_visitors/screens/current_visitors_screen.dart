@@ -30,21 +30,21 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
     initialAction = NotificationController.initialAction;
     if (mounted) {
       if (initialAction != null &&
-          initialAction?.payload?['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/resident-approval',
           (route) => route.isFirst,
         );
       } else if (initialAction != null &&
-          initialAction?.payload?['action'] == 'VERIFY_GUARD_PROFILE_TYPE') {
+          jsonDecode(initialAction!.payload!['data']!)['action'] == 'VERIFY_GUARD_PROFILE_TYPE') {
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/guard-approval',
           (route) => route.isFirst,
         );
       } else if (initialAction != null &&
-          initialAction?.payload?['action'] == 'VERIFY_DELIVERY_ENTRY') {
+          initialAction?.payload?['action'] == '"VERIFY_DELIVERY_ENTRY"') {
         Navigator.pushNamedAndRemoveUntil(
             context, '/delivery-approval-screen', (route) => route.isFirst,
             arguments: initialAction?.payload);

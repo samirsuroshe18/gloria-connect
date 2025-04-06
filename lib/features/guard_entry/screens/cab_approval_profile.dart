@@ -83,10 +83,10 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Add Delivery',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          'Add Cab',
+          style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: BlocConsumer<CheckInBloc, CheckInState>(
         listener: (context, state) {
@@ -160,7 +160,7 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.blue, // Border color
+                  color: Colors.white70, // Border color
                   width: 2.5, // Border width
                 ),
               ),
@@ -204,8 +204,9 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
                   // maxLength: 10,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    prefixIcon: const Icon(Icons.phone, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.phone, color: Colors.white70),
                     hintText: 'Enter Phone Number',
+                    hintStyle: TextStyle(color: Colors.white60),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -224,8 +225,9 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
                   controller: cabNameController,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    prefixIcon: const Icon(Icons.person, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.person, color: Colors.white70),
                     hintText: 'Enter Name',
+                    hintStyle: TextStyle(color: Colors.white60),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -251,7 +253,7 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
       children: [
         const Text('Coming From (Company)',
             style:
-                TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+                TextStyle(fontWeight: FontWeight.bold, color: Colors.white70)),
         const SizedBox(height: 10),
         GridView.count(
           crossAxisCount: 3,
@@ -314,7 +316,7 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
       children: [
         const Text(
           'Vehicle Details',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
         ),
         const SizedBox(height: 10),
         GridView.count(
@@ -354,7 +356,7 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
               const Text(
                 'Enter Vehicle Number.',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.black54),
+                    fontWeight: FontWeight.bold, color: Colors.white70),
               ),
               const SizedBox(height: 10),
               PinCodeTextField(
@@ -400,7 +402,7 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
                 textStyle: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black, // Black text for visibility
+                  color: Colors.white70, // Black text for visibility
                 ),
               )
             ],

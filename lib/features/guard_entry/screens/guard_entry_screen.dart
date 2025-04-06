@@ -135,13 +135,13 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
               '${_gateName.toUpperCase()}  $_guardName',
               style: const TextStyle(
                 fontSize: 20,
-                color: Colors.white,
+                color: Colors.white70,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications, color: Colors.white70,),
             onPressed: () {
               // _showSnackBar("This feature is under development", Colors.blueGrey);
               Navigator.pushNamed(context, '/general-notice-board-screen');
@@ -149,7 +149,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           ),
         ],
       ),
-      backgroundColor: const Color(0xff448EE4),
+      backgroundColor: Colors.black.withOpacity(0.2),
     );
   }
 
@@ -168,17 +168,17 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
       children: [
         const Row(
           children: [
-            Icon(Icons.phone_android, size: 30, color: Color(0xff448EE4)),
+            Icon(Icons.phone_android, size: 30, color: Colors.white70),
             SizedBox(width: 10),
-            Text('Check-in by Code', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Check-in by Code', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white70)),
           ],
         ),
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Enter verification code', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-            TextButton(onPressed: _clearPinCode, child: const Text('Clear'))
+            const Text('Enter verification code', style: TextStyle(color: Colors.white60, fontWeight: FontWeight.bold)),
+            TextButton(onPressed: _clearPinCode, child: const Text('Clear', style: TextStyle(color: Colors.white60),))
           ],
         ),
         const SizedBox(height: 10),
@@ -203,8 +203,6 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
         backgroundColor: const Color(0xff448EE4),
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        elevation: 10,
-        shadowColor: Colors.blueGrey.shade200,
       ),
       child: Center(
         child: _isLoading
@@ -212,24 +210,16 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           valueColor: const AlwaysStoppedAnimation<Color>(Colors.blueAccent),
           backgroundColor: Colors.grey[200],
           strokeWidth: 5.0,)
-            : const Text('SUBMIT', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+            : const Text('SUBMIT', style: TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.bold)),
       ),
     );
   }
 
   Container _build3DLine() {
     return Container(
-      height: 2,
+      height: 1,
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [Colors.grey.shade300, Colors.grey.shade600, Colors.grey.shade300]),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade500,
-            offset: const Offset(1, 1),
-            blurRadius: 1,
-            spreadRadius: 0.5,
-          ),
-        ],
       ),
     );
   }
@@ -271,7 +261,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           color: Colors.black.withOpacity(0.1),
         ),
       ],
-      cursorColor: Colors.blue,
+      cursorColor: Colors.white70,
       animationType: AnimationType.fade,
       animationDuration: const Duration(milliseconds: 300),
       enablePinAutofill: true,
@@ -279,7 +269,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
       textStyle: TextStyle(
         fontSize: MediaQuery.of(context).size.width * 0.05, // Responsive font size
         fontWeight: FontWeight.bold,
-        color: Colors.black,
+        color: Colors.white70,
       ),
     );
   }
@@ -288,9 +278,9 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Check-in without Code', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('Check-in without Code', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white70)),
         const SizedBox(height: 10),
-        const Text('Pick by category', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+        const Text('Pick by category', style: TextStyle(color: Colors.white60, fontWeight: FontWeight.bold)),
         const SizedBox(height: 20),
         _buildCategoryGrid(),
       ],
@@ -319,17 +309,17 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
       child: Column(
         children: [
           Material(
+            color: Colors.transparent,
             elevation: 8,
             shape: const CircleBorder(),
-            shadowColor: Colors.blueGrey.shade200,
             child: CircleAvatar(
               radius: 30,
-              backgroundColor: const Color(0xff448EE4),
-              child: Icon(icon, size: 30, color: Colors.white),
+              backgroundColor: Colors.white.withOpacity(0.2),
+              child: Icon(icon, size: 30, color: Colors.white70),
             ),
           ),
           const SizedBox(height: 10),
-          Text(title, style: const TextStyle(fontSize: 16)),
+          Text(title, style: const TextStyle(fontSize: 16, color: Colors.white60)),
         ],
       ),
     );

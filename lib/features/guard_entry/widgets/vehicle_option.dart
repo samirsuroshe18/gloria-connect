@@ -24,18 +24,18 @@ class VehicleOption extends StatelessWidget {
             color: isSelected ? Colors.blue : Colors.grey,
           ),
           borderRadius: BorderRadius.circular(10),
-          color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.white,
+          color: isSelected ? Colors.white.withOpacity(0.2) : Colors.black.withOpacity(0.2),
         ),
         padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: isSelected ? Colors.blue : Colors.grey),
+            Icon(icon, color: Colors.white70),
             const SizedBox(height: 8),
             Text(
               label,
-              style: TextStyle(
-                color: isSelected ? Colors.blue : Colors.grey,
+              style: const TextStyle(
+                color: Colors.white70,
                 fontWeight: FontWeight.bold,
               ),
             ),

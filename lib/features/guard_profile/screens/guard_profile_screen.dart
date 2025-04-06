@@ -27,7 +27,6 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthGetUserLoading) {
@@ -53,12 +52,8 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
-                          ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.2),
                         ),
                         child: SafeArea(
                           child: Column(
@@ -70,7 +65,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: Colors.white,
+                                      color: Colors.white70,
                                       width: 4,
                                     ),
                                   ),
@@ -88,7 +83,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: Colors.white70,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -96,7 +91,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                                 data?.email ?? "NA",
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  color: Colors.white70,
+                                  color: Colors.white60,
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -109,8 +104,8 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.blue,
+                                  backgroundColor: Colors.white.withOpacity(0.2),
+                                  foregroundColor: Colors.white70,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 24,
                                     vertical: 12,
@@ -139,7 +134,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                             title: 'Gate Assignment',
                             content: data?.gateAssign?.toUpperCase() ?? "NA",
                             icon: Icons.door_sliding_outlined,
-                            color: Colors.blue,
+                            color: Colors.white70,
                           ),
                           const SizedBox(height: 16),
                           // Passcode Card
@@ -147,7 +142,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                             title: 'Guard Passcode',
                             content: data?.checkInCode ?? "NA",
                             icon: Icons.lock,
-                            color: Colors.green,
+                            color: Colors.white70,
                           ),
                           const SizedBox(height: 16),
                           // Quick Actions
@@ -184,15 +179,8 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -214,13 +202,14 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                   title,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.grey,
+                    color: Colors.white70,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   content,
                   style: const TextStyle(
+                    color: Colors.white60,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -238,19 +227,19 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
       {
         'title': 'View Checkout History',
         'icon': Icons.history,
-        'color': Colors.indigo,
+        'color': Colors.white70,
         'route': '/checkout-history-screen',
       },
       {
         'title': 'View Gate Pass',
         'icon': Icons.visibility,
-        'color': Colors.orange,
+        'color': Colors.white70,
         'route': '/gate-pass-list-screen',
       },
       {
         'title': 'Add Gate Pass',
         'icon': Icons.add_circle,
-        'color': Colors.green,
+        'color': Colors.white70,
         'onTap': () {
           context.read<CheckInBloc>().add(ClearFlat());
           Navigator.pushNamed(context, '/add-service-screen');
@@ -259,31 +248,25 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
       {
         'title': 'Settings',
         'icon': Icons.settings,
-        'color': Colors.grey,
+        'color': Colors.white70,
         'route': '/setting-screen',
         'arguments': data,
       },
       {
         'title': 'Logout',
         'icon': Icons.logout,
-        'color': Colors.red,
+        'color': Colors.redAccent,
         'onTap': _logoutUser,
       },
     ];
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: ListView.separated(
+        padding: EdgeInsets.only(top: 0),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: actions.length,
@@ -305,7 +288,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
             title: Text(
               action['title'],
               style: TextStyle(
-                color: action['title'] == 'Logout' ? Colors.red : Colors.black87,
+                color: action['title'] == 'Logout' ? Colors.redAccent : Colors.white70,
                 fontWeight: FontWeight.w500,
               ),
             ),

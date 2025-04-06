@@ -13,26 +13,27 @@ class MyVisitorsScreen extends StatefulWidget {
 
 class _MyVisitorsScreenState extends State<MyVisitorsScreen> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
+    return DefaultTabController(
       length: 4,
       child: Scaffold(
         body: Column(
           children: [
-            TabBar(
-              tabs: [
-                Tab(text: 'Current'),
-                Tab(text: 'Expected'),
-                Tab(text: 'Past'),
-                Tab(text: 'Denied'),
-              ],
+            Container(
+              color: Colors.black.withOpacity(0.2),
+              child: const TabBar(
+                labelColor: Colors.white70, // Text color for selected tab
+                unselectedLabelColor: Colors.white60, // Text color for unselected tabs
+                indicatorColor: Colors.blue, // Indicator color
+                tabs: [
+                  Tab(text: 'Current'),
+                  Tab(text: 'Expected'),
+                  Tab(text: 'Past'),
+                  Tab(text: 'Denied'),
+                ],
+              ),
             ),
-            Expanded(
+            const Expanded(
               child: TabBarView(
                 children: [
                   CurrentVisitorsScreen(),

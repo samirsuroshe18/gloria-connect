@@ -58,16 +58,8 @@ class VisitorDeniedCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -78,7 +70,7 @@ class VisitorDeniedCard extends StatelessWidget {
             children: [
               // Header with status banner
               Container(
-                color: Colors.red.shade50,
+                color: Colors.white.withOpacity(0.2),
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
@@ -146,6 +138,7 @@ class VisitorDeniedCard extends StatelessWidget {
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: Colors.white70
                                       ),
                                     ),
                                   ),
@@ -172,8 +165,8 @@ class VisitorDeniedCard extends StatelessWidget {
                               const SizedBox(height: 8),
                               Text(
                                 'Denied by: ${data.societyDetails?.societyApartments?[0].entryStatus?.rejectedBy?.userName ?? 'Unknown'}',
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
+                                style: const TextStyle(
+                                  color: Colors.white60,
                                   fontSize: 14,
                                 ),
                               ),
@@ -226,17 +219,17 @@ class VisitorDeniedCard extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () => _makePhoneCall(context),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
+                            backgroundColor: Colors.blue,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          icon: const Icon(Icons.phone_outlined, color: Colors.white),
+                          icon: const Icon(Icons.phone_outlined, color: Colors.white70),
                           label: const Text(
                             'Contact Visitor',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.white70,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -263,10 +256,10 @@ class VisitorDeniedCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 20, color: Colors.grey.shade700),
+          child: Icon(icon, size: 20, color: Colors.white60),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -275,9 +268,9 @@ class VisitorDeniedCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: Colors.white60,
                 ),
               ),
               const SizedBox(height: 2),
@@ -285,6 +278,7 @@ class VisitorDeniedCard extends StatelessWidget {
                 value,
                 style: const TextStyle(
                   fontSize: 14,
+                  color: Colors.white60,
                   fontWeight: FontWeight.w500,
                 ),
               ),

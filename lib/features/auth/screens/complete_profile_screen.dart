@@ -3,11 +3,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/auth/models/society_model.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
 // Even though you didn’t manually install intl, it's likely available because another package depends on it. That’s why importing it works without errors.
 // So in case of intl and path package importing working fine beacause another packages dependent on them
 // intl : awesome_notifications (direct dependency) timeago (indirect dependency)
@@ -101,13 +102,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Future<void> _initialize() async {
     _prefs = await SharedPreferences.getInstance();
-    if(!mounted) return;
+    if (!mounted) return;
     context.read<AuthBloc>().add(AuthSocietyDetails());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSocietyDetailsLoading) {
@@ -144,193 +146,202 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           }
 
           if (state is AuthCompleteProfileFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.redAccent,
-            ));
+            CustomSnackbar.show(
+              context: context,
+              message: state.message,
+              type: SnackbarType.error,
+            );
             _isLoading = false;
           }
         },
         builder: (context, state) {
-          return CustomScrollView(
-            slivers: [
-              // Modern App Bar with Gradient
-              SliverAppBar(
-                expandedHeight: 200.0,
-                floating: false,
-                pinned: true,
-                backgroundColor: Colors.blue,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        colors: [
-                          Theme.of(context).primaryColor,
-                          Colors.blue.shade800,
+          return SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                // Modern App Bar with Gradient
+                SliverAppBar(
+                  expandedHeight: 200.0,
+                  floating: false,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.2),
+                        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(45), bottomRight: Radius.circular(45))
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.apartment_rounded,
+                            size: 60,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Complete Your Profile',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
                         ],
                       ),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.apartment_rounded,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Complete Your Profile',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.red),
+                      onPressed: _logoutUser,
                     ),
-                  ),
+                  ],
                 ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.logout, color: Colors.red),
-                    onPressed: _logoutUser,
-                  ),
-                ],
-              ),
 
-              // Main Content
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Profile Type Selection Cards
-                        Text(
-                          'Select Profile Type',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildProfileTypeCard(
-                                'Resident',
-                                Icons.home_rounded,
-                                profileType == 'Resident',
-                              ),
+                // Main Content
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Profile Type Selection Cards
+                          const Text(
+                            'Select Profile Type',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _buildProfileTypeCard(
-                                'Security',
-                                Icons.security_rounded,
-                                profileType == 'Security',
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildProfileTypeCard(
+                                  'Resident',
+                                  Icons.home_rounded,
+                                  profileType == 'Resident',
+                                ),
                               ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildProfileTypeCard(
+                                  'Security',
+                                  Icons.security_rounded,
+                                  profileType == 'Security',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Contact Information Section
+                          _buildSectionHeader('Contact Information'),
+                          _buildModernTextField(
+                            controller: mobileController,
+                            label: 'Mobile Number',
+                            icon: Icons.phone_rounded,
+                            keyboardType: TextInputType.number,
+                            maxLength: 10,
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Society Details Section
+                          if (profileType != null) ...[
+                            _buildSectionHeader('Society Details'),
+                            _buildModernDropdown(
+                              value: societyName,
+                              items: societyItems,
+                              label: 'Select Society',
+                              onChanged: societyOnChanged,
+                              icon: Icons.location_city_rounded,
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 32),
 
-                        // Contact Information Section
-                        _buildSectionHeader('Contact Information'),
-                        _buildModernTextField(
-                          controller: mobileController,
-                          label: 'Mobile Number',
-                          icon: Icons.phone_rounded,
-                          keyboardType: TextInputType.number,
-                          maxLength: 10,
-                        ),
-                        const SizedBox(height: 32),
-
-                        // Society Details Section
-                        if (profileType != null) ...[
-                          _buildSectionHeader('Society Details'),
-                          _buildModernDropdown(
-                            value: societyName,
-                            items: societyItems,
-                            label: 'Select Society',
-                            onChanged: societyOnChanged,
-                            icon: Icons.location_city_rounded,
-                          ),
-                        ],
-
-                        // Resident-specific fields
-                        if (profileType == 'Resident' && societyName != null) ...[
-                          const SizedBox(height: 24),
-                          _buildModernDropdown(
-                            value: blockName,
-                            items: blockItems,
-                            label: 'Select Block',
-                            onChanged: blockOnChanged,
-                            icon: Icons.business_rounded,
-                          ),
-                          if (blockName != null) ...[
+                          // Resident-specific fields
+                          if (profileType == 'Resident' &&
+                              societyName != null) ...[
                             const SizedBox(height: 24),
                             _buildModernDropdown(
-                              value: apartment,
-                              items: apartmentItems,
-                              label: 'Select Apartment',
-                              onChanged: apartmentOnChanged,
-                              icon: Icons.apartment_rounded,
+                              value: blockName,
+                              items: blockItems,
+                              label: 'Select Block',
+                              onChanged: blockOnChanged,
+                              icon: Icons.business_rounded,
+                            ),
+                            if (blockName != null) ...[
+                              const SizedBox(height: 24),
+                              _buildModernDropdown(
+                                value: apartment,
+                                items: apartmentItems,
+                                label: 'Select Apartment',
+                                onChanged: apartmentOnChanged,
+                                icon: Icons.apartment_rounded,
+                              ),
+                            ],
+                          ],
+
+                          // Security-specific fields
+                          if (profileType == 'Security' &&
+                              societyName != null) ...[
+                            const SizedBox(height: 24),
+                            _buildModernDropdown(
+                              value: gateName,
+                              items: gateItems,
+                              label: 'Select Gate',
+                              onChanged: gateOnChanged,
+                              icon: Icons.door_front_door_rounded,
                             ),
                           ],
-                        ],
 
-                        // Security-specific fields
-                        if (profileType == 'Security' && societyName != null) ...[
-                          const SizedBox(height: 24),
-                          _buildModernDropdown(
-                            value: gateName,
-                            items: gateItems,
-                            label: 'Select Gate',
-                            onChanged: gateOnChanged,
-                            icon: Icons.door_front_door_rounded,
-                          ),
-                        ],
+                          // Ownership Status Section
+                          if (profileType == 'Resident' &&
+                              apartment != null) ...[
+                            const SizedBox(height: 32),
+                            _buildSectionHeader('Ownership Details'),
+                            _buildOwnershipSelection(),
+                            if (ownershipStatus != null)
+                              _buildVerificationSection(),
+                          ],
 
-                        // Ownership Status Section
-                        if (profileType == 'Resident' && apartment != null) ...[
-                          const SizedBox(height: 32),
-                          _buildSectionHeader('Ownership Details'),
-                          _buildOwnershipSelection(),
-                          if (ownershipStatus != null)
-                            _buildVerificationSection(),
-                        ],
-
-                        // Submit Button
-                        const SizedBox(height: 40),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _onProfilePressed,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                          // Submit Button
+                          const SizedBox(height: 40),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _onProfilePressed,
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                backgroundColor: Colors.white.withOpacity(0.8),
+                                foregroundColor: Colors.black, // Text color
                               ),
-                            ),
-                            child: _isLoading
-                                ? const CircularProgressIndicator()
-                                : const Text(
-                              'Complete Profile',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
+                                      'Complete Profile',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -344,9 +355,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         Text(
           title,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.bold,
-          ),
+                color: Colors.white70,
+                fontWeight: FontWeight.bold,
+              ),
         ),
         const SizedBox(height: 16),
       ],
@@ -355,13 +366,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Widget _buildProfileTypeCard(String type, IconData icon, bool isSelected) {
     return Card(
-      elevation: isSelected ? 4 : 1,
+      color: isSelected ? Colors.white.withOpacity(0.5) : Colors.white.withOpacity(0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: isSelected ? Theme.of(context).primaryColor : Colors.grey.shade300,
-          width: isSelected ? 2 : 1,
-        ),
       ),
       child: InkWell(
         onTap: () => setState(() => profileType = type),
@@ -374,14 +381,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               Icon(
                 icon,
                 size: 40,
-                color: isSelected ? Theme.of(context).primaryColor : Colors.grey,
+                color: isSelected ? const Color(0xFFFFA000) : const Color(0xFFBDBDBD),
               ),
               const SizedBox(height: 8),
               Text(
                 type,
                 style: TextStyle(
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Theme.of(context).primaryColor : Colors.black87,
+                  color: isSelected ? Colors.white : const Color(0xFFEEEEEE),
                 ),
               ),
             ],
@@ -391,10 +398,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildModernTextField({required TextEditingController controller, required String label, required IconData icon, TextInputType? keyboardType, int? maxLength,}) {
+  Widget _buildModernTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+    int? maxLength,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blue,
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextFormField(
@@ -403,10 +415,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         maxLength: maxLength,
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(
+            color: Colors.white70
+          ),
           prefixIcon: Icon(icon),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+            // borderSide: BorderSide.none,
           ),
           filled: true,
           counterText: '',
@@ -421,10 +436,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildModernDropdown({required String? value, required List<String> items, required String label, required Function(String?) onChanged, required IconData icon,}) {
+  Widget _buildModernDropdown({
+    required String? value,
+    required List<String> items,
+    required String label,
+    required Function(String?) onChanged,
+    required IconData icon,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButtonFormField<String>(
@@ -438,12 +458,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(color: Colors.white70),
           prefixIcon: Icon(icon),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+            // borderSide: BorderSide.none,
           ),
           filled: true,
+          fillColor: Colors.white.withOpacity(0.2)
         ),
       ),
     );
@@ -451,24 +473,40 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Widget _buildOwnershipSelection() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center, // Center align
       children: ownershipItems.map((status) {
         bool isSelected = ownershipStatus == status;
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: ChoiceChip(
-              label: Text(status),
+              label: Text(
+                status,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87, // Better contrast
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  fontSize: 16,
+                ),
+              ),
               selected: isSelected,
               onSelected: (selected) {
                 if (selected) {
                   setState(() => ownershipStatus = status);
                 }
               },
-              selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
-              labelStyle: TextStyle(
-                color: isSelected ? Theme.of(context).primaryColor : Colors.black87,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              selectedColor: Theme.of(context).primaryColor.withOpacity(0.5),
+              backgroundColor: Colors.grey.shade300, // Neutral light grey
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Comfortable touch area
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30), // Smooth pill shape
+                side: BorderSide(
+                  color: isSelected
+                      ? Theme.of(context).primaryColor
+                      : Colors.grey.shade400,
+                  width: isSelected ? 2 : 1, // Thicker border when selected
+                ),
               ),
+              elevation: isSelected ? 4 : 1, // Slight shadow when selected
             ),
           ),
         );
@@ -483,19 +521,21 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         const SizedBox(height: 24),
         if (ownershipStatus == 'Owner')
           _buildDocumentUploadCard(
-            title: 'Upload Ownership Document',
-            subtitle: 'Please provide your Index2 or Resident Smart card photo',
-            file: ownershipDocument,
-            onUpload: () => _showDocumentPickerOptions(true),
-            onRemove: () => setState(() => ownershipDocument = null),
-            isOwner: ownershipStatus == 'owner'
-          )
+              title: 'Upload Ownership Document',
+              subtitle:
+                  'Please provide your Index2 or Resident Smart card photo',
+              file: ownershipDocument,
+              onUpload: () => _showDocumentPickerOptions(true),
+              onRemove: () => setState(() => ownershipDocument = null),
+              isOwner: ownershipStatus == 'owner')
         else if (ownershipStatus == 'Tenant')
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Agreement Duration'),
-              const SizedBox(height: 5,),
+              const SizedBox(
+                height: 10,
+              ),
               Row(
                 children: [
                   Expanded(
@@ -530,10 +570,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildDatePickerField({required TextEditingController controller, required String label, required VoidCallback onTap,}) {
+  Widget _buildDatePickerField({
+    required TextEditingController controller,
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: Colors.grey.shade100.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextFormField(
@@ -542,10 +586,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         onTap: onTap,
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(
+            color: Colors.white70
+          ),
           prefixIcon: const Icon(Icons.calendar_today_rounded),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
           ),
           filled: true,
         ),
@@ -553,10 +599,18 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildDocumentUploadCard({required String title, required String subtitle, required File? file, required VoidCallback onUpload, required VoidCallback onRemove, required bool isOwner,}) {
+  Widget _buildDocumentUploadCard({
+    required String title,
+    required String subtitle,
+    required File? file,
+    required VoidCallback onUpload,
+    required VoidCallback onRemove,
+    required bool isOwner,
+  }) {
     String? fileType = isOwner ? ownershipDocumentType : tenantAgreementType;
 
     return Card(
+      color: Colors.black.withOpacity(0.2),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -569,16 +623,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           children: [
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
+                color: Colors.white70
               ),
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
+                    color: Colors.white60,
+                  ),
             ),
             const SizedBox(height: 16),
             if (file != null)
@@ -610,30 +665,30 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: Colors.grey.shade100.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Column(
+                      child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.upload_file_rounded,
                             size: 48,
-                            color: Theme.of(context).primaryColor,
+                            color: Colors.white70,
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
                             'Upload Document',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: Colors.white70,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             'Tap to upload image or PDF',
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: Colors.white60,
                               fontSize: 12,
                             ),
                           ),
@@ -657,14 +712,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         child: Container(
           height: 200,
           width: double.infinity,
-          color: Colors.grey.shade100,
+          color: Colors.grey.shade100.withOpacity(0.2),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.picture_as_pdf,
                 size: 64,
-                color: Theme.of(context).primaryColor,
+                color: Colors.white70,
               ),
               const SizedBox(height: 8),
               Text(
@@ -677,10 +732,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 'Tap to preview PDF',
                 style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.white70,
                   fontSize: 12,
                 ),
               ),
@@ -724,31 +779,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   void _showPDFPreview(File file) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.blue,
-            title: Text(path.basename(file.path), style: const TextStyle(color: Colors.white),),
-          ),
-          body: PDFView(
-            filePath: file.path,
-            enableSwipe: true,
-            swipeHorizontal: false,
-            autoSpacing: true,
-            pageSnap: true,
-            onError: (error) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error loading PDF: $error'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
+    Navigator.pushNamed(context, '/pdf-preview-screen', arguments: file);
   }
 
   Future<void> _logoutUser() async {
@@ -788,7 +819,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   return TextButton(
                     child: Text(
                       'Logout',
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.error),
                     ),
                     onPressed: () {
                       context.read<AuthBloc>().add(AuthLogout());
@@ -808,16 +840,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     await _prefs.remove("refreshMode");
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Logged out successfully'),
-        behavior: SnackBarBehavior.floating,
-      ),
+    CustomSnackbar.show(
+      context: context,
+      message: "Logged out successfully",
+      type: SnackbarType.info,
     );
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/login',
-          (Route<dynamic> route) => false,
+      (Route<dynamic> route) => false,
     );
   }
 
@@ -854,7 +885,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     setState(() {
       societyName = newValue;
       final society =
-      response.firstWhere((society) => society.societyName == societyName);
+          response.firstWhere((society) => society.societyName == societyName);
       blockItems = society.societyBlocks ?? [];
       gateItems = society.societyGates ?? [];
     });
@@ -864,7 +895,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     setState(() {
       blockName = newValue;
       final society =
-      response.firstWhere((society) => society.societyName == societyName);
+          response.firstWhere((society) => society.societyName == societyName);
       final apartments = society.societyApartments
           ?.where((apartment) => apartment.societyBlock == blockName)
           .toList();
@@ -916,29 +947,27 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           apartment != null &&
           ownershipStatus != null) {
         if (ownershipStatus == 'Owner' && ownershipDocument == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Ownership document is required'),
-            ),
+          CustomSnackbar.show(
+            context: context,
+            message: "Ownership document is required",
+            type: SnackbarType.error,
           );
           return;
         }
         if (ownershipStatus == 'Tenant') {
           if (tenantAgreement == null || startDate == null || endDate == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('All fields are required. from tenant agreement'),
-              ),
+            CustomSnackbar.show(
+              context: context,
+              message: "All fields are required. from tenant agreement",
+              type: SnackbarType.error,
             );
             return;
           } else {
             if (!checkDates(startDate!, endDate!)) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'End date must be at least 3 months greater than the start date.',
-                  ),
-                ),
+              CustomSnackbar.show(
+                context: context,
+                message: "End date must be at least 3 months greater than the start date.",
+                type: SnackbarType.error,
               );
               return;
             }
@@ -946,37 +975,34 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         }
 
         context.read<AuthBloc>().add(
-          AuthCompleteProfile(
-              phoneNo: mobileController.text,
-              profileType: '$profileType',
-              societyName: '$societyName',
-              blockName: '$blockName',
-              apartment: '$apartment',
-              ownershipStatus: '$ownershipStatus',
-              startDate: startDate?.toIso8601String(),
-              endDate: endDate?.toIso8601String(),
-              tenantAgreement: tenantAgreement,
-              ownershipDocument: ownershipDocument
-          ),
-        );
+              AuthCompleteProfile(
+                  phoneNo: mobileController.text,
+                  profileType: '$profileType',
+                  societyName: '$societyName',
+                  blockName: '$blockName',
+                  apartment: '$apartment',
+                  ownershipStatus: '$ownershipStatus',
+                  startDate: startDate?.toIso8601String(),
+                  endDate: endDate?.toIso8601String(),
+                  tenantAgreement: tenantAgreement,
+                  ownershipDocument: ownershipDocument),
+            );
       } else if (profileType == 'Security' &&
           societyName != null &&
           gateName != null) {
         context.read<AuthBloc>().add(
-          AuthCompleteProfile(
-            phoneNo: mobileController.text,
-            profileType: '$profileType',
-            societyName: '$societyName',
-            gateName: '$gateName',
-          ),
-        );
+              AuthCompleteProfile(
+                phoneNo: mobileController.text,
+                profileType: '$profileType',
+                societyName: '$societyName',
+                gateName: '$gateName',
+              ),
+            );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'All fields are required',
-            ),
-          ),
+        CustomSnackbar.show(
+          context: context,
+          message: "All fields are required.",
+          type: SnackbarType.error,
         );
       }
     }
@@ -1065,25 +1091,33 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Future<void> _pickPDF(bool isOwner) async {
     try {
-      // Use a more reliable method to pick files on platforms
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
         allowMultiple: false,
-        withData: true,
-        onFileLoading: (FilePickerStatus status) => log('FilePicker status: $status'),
+        withData: true, // Ensures file bytes are available
+        onFileLoading: (FilePickerStatus status) =>
+            log('FilePicker status: $status'),
       );
 
       if (result != null) {
+        final fileBytes = result.files.single.bytes;
+        final fileSize = result.files.single.size; // Get file size in bytes
+        final fileName = result.files.single.name;
         final path = result.files.single.path;
+
+        // Check if file size exceeds 2MB (2097152 bytes)
+        if (fileSize > 1048576) {
+          _showErrorSnackBar('File size should not exceed 1MB');
+          return;
+        }
+
         if (path == null) {
           // Handle web platform or when path is not available
-          if (result.files.first.bytes != null) {
-            // Handle the bytes directly for web platform
-            final bytes = result.files.first.bytes!;
+          if (fileBytes != null) {
             final tempDir = await getTemporaryDirectory();
-            final file = File('${tempDir.path}/${result.files.first.name}');
-            await file.writeAsBytes(bytes);
+            final file = File('${tempDir.path}/$fileName');
+            await file.writeAsBytes(fileBytes);
 
             setState(() {
               if (isOwner) {
@@ -1121,8 +1155,16 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   Future<void> _pickImage(ImageSource source, bool isOwner) async {
     try {
       final XFile? image = await _picker.pickImage(source: source);
+
       if (image != null) {
-        String fileExtension = path.extension(image.path).toLowerCase();
+        final int fileSize = await File(image.path).length(); // Get file size in bytes
+        final String fileExtension = path.extension(image.path).toLowerCase();
+
+        // Check if file size exceeds 1MB (1048576 bytes)
+        if (fileSize > 1048576) {
+          _showErrorSnackBar('Image size should not exceed 1MB');
+          return;
+        }
 
         if (supportedImageTypes.contains(fileExtension)) {
           setState(() {
@@ -1144,11 +1186,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+    CustomSnackbar.show(
+      context: context,
+      message: message,
+      type: SnackbarType.error,
     );
   }
 }

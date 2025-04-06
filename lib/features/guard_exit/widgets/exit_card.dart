@@ -15,16 +15,8 @@ class ExitCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -85,6 +77,7 @@ class ExitCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: Colors.white70
                 ),
               ),
               const SizedBox(height: 4),
@@ -101,7 +94,7 @@ class ExitCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -181,7 +174,7 @@ class ExitCard extends StatelessWidget {
         Text(
           DateFormat('hh:mm a').format(data.entryTime ?? DateTime.now()),
           style: TextStyle(
-            color: Colors.grey[600],
+            color: Colors.white70,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -189,7 +182,7 @@ class ExitCard extends StatelessWidget {
         Text(
           'Checked In',
           style: TextStyle(
-            color: Colors.grey[500],
+            color: Colors.white70,
             fontSize: 12,
           ),
         ),
@@ -202,7 +195,7 @@ class ExitCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.grey[600]),
+          Icon(icon, size: 20, color: Colors.white70),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -211,7 +204,7 @@ class ExitCard extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Colors.white70,
                     fontSize: 12,
                   ),
                 ),
@@ -219,6 +212,7 @@ class ExitCard extends StatelessWidget {
                   value,
                   style: const TextStyle(
                     fontSize: 14,
+                    color: Colors.white70,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -308,7 +302,7 @@ class ExitCard extends StatelessWidget {
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation1, animation2) {
         return Dialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xff8ecae6),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: BlocConsumer<GuardExitBloc, GuardExitState>(
             listener: (context, state) {
@@ -350,14 +344,14 @@ class ExitCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     const Text(
                       'Checkout',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black54),
                     ),
                     const SizedBox(height: 10),
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16.0),
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.grey.shade300),
                       ),
@@ -374,7 +368,7 @@ class ExitCard extends StatelessWidget {
                               children: [
                                 Text(
                                   data.name!,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
                                 ),
                                 const SizedBox(height: 4.0),
                                 _buildTag(data.entryType ?? data.profileType!),
@@ -409,7 +403,7 @@ class ExitCard extends StatelessWidget {
                               ? const CircularProgressIndicator()
                               : const Text(
                             'Confirm Exit',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
                           ),
                         ),
                       ),
@@ -436,9 +430,9 @@ class ExitCard extends StatelessWidget {
   Widget _buildInfoRow(IconData icon, String info) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey.shade600), // Softer grey for icons
+        Icon(icon, size: 16, color: Colors.black54), // Softer grey for icons
         const SizedBox(width: 4.0),
-        Text(info.isEmpty ? "NA" : info, style: const TextStyle(color: Colors.grey)),
+        Text(info.isEmpty ? "NA" : info, style: const TextStyle(color: Colors.black54)),
       ],
     );
   }
@@ -452,7 +446,7 @@ class ExitCard extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: const TextStyle(color: Colors.black54, fontSize: 14,),
       ),
     );
   }

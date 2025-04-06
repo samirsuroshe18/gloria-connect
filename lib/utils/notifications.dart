@@ -1,21 +1,26 @@
 part of 'notification_service.dart';
 
-Future<void> showNotificationWithActions(payload) async {
+Future<void> showNotificationWithActions(payloadString) async {
+  final payload = jsonDecode(payloadString);
+
+  int notificationId = payload['notificationId'] ?? 'NA';
+  String profileImg = payload['profileImg'] ?? 'NA';
+  String name = payload['name'] ?? 'NA';
 
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
-      id: int.parse(payload['notificationId']),
+      id: notificationId,
       channelKey: 'app_notifications',
       title: 'Verify delivery',
-      body: 'You have got a Delivery at the main gate.\n${payload['name']}',
+      body: 'You have got a Delivery at the main gate.\n$name',
       notificationLayout: NotificationLayout.BigPicture,
-      bigPicture: payload['profileImg'],
+      bigPicture: profileImg,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': payloadString},
     ),
     actionButtons: [
       NotificationActionButton(
@@ -36,153 +41,202 @@ Future<void> showNotificationWithActions(payload) async {
   );
 }
 
-Future<void> residentVerifyNotification(payload) async {
+Future<void> residentVerifyNotification(payloadString) async {
+  final payload = jsonDecode(payloadString);
+
+  String societyBlock = payload['societyBlock'] ?? 'NA';
+  String societyName = payload['societyName'] ?? 'NA';
+  String apartment = payload['societyName'] ?? 'NA';
+  String ownership = payload['societyName'] ?? 'NA';
+  String userName = payload['userName'] ?? 'Anonymous';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Verify resident profile',
-      body: 'New resident profile submitted for verification. \n\nName: ${payload['userName']} \nSociety: ${payload['societyName'] ?? 'Society name'} \nBlock: ${payload['societyBlock'] ?? 'Society block'} \nApartment: ${payload['apartment'] ?? 'Society apartment'} \nOwnership: ${payload['ownership'] ?? 'Ownership'} \n\n Please review and approve or reject the profile.',
+      body: 'New resident profile submitted for verification. \n\nName: $userName \nSociety: $societyName \nBlock: $societyBlock \nApartment: $apartment \nOwnership: $ownership \n\n Please review and approve or reject the profile.',
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': payloadString},
     ),
   );
 }
 
-Future<void> guardVerifyNotification(payload) async {
+Future<void> guardVerifyNotification(payloadString) async {
+  final payload = jsonDecode(payloadString);
+
+  String userName = payload['userName'] ?? 'NA';
+  String societyName = payload['societyName'] ?? 'NA';
+  String gateAssign = payload['gateAssign'] ?? 'NA';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Verify security guard profile',
-      body: 'New security guard profile submitted for verification. \n\nName: ${payload['userName']} \nSociety: ${payload['societyName']} \nGate assigned: ${payload['gateAssign']} \n\n Please review and approve or reject the profile.',
+      body: 'New security guard profile submitted for verification. \n\nName: $userName \nSociety: $societyName \nGate assigned: $gateAssign \n\n Please review and approve or reject the profile.',
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': payloadString},
     ),
   );
 }
 
-Future<void> deliveryEntryApprovedNotification(payload) async {
+Future<void> deliveryEntryApprovedNotification(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
+  String companyName = payload['companyName'] ?? 'NA';
+  String deliveryName = payload['deliveryName'] ?? 'NA';
+  String userName = payload['userName'] ?? 'NA';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Entry Approved',
-      body: 'The delivery entry for ${payload['companyName']} (${payload['deliveryName']}) has been approved by ${payload['userName']}.',
+      body: 'The delivery entry for $companyName ($deliveryName) has been approved by $userName.',
       notificationLayout: NotificationLayout.Default,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': stringPayload},
     ),
   );
 }
 
-Future<void> deliveryEntryRejectedNotification(payload) async {
+Future<void> deliveryEntryRejectedNotification(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
+  String companyName = payload['companyName'] ?? 'NA';
+  String deliveryName = payload['deliveryName'] ?? 'NA';
+  String userName = payload['userName'] ?? 'NA';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Entry Rejected',
-      body: 'The delivery entry for ${payload['companyName']} (${payload['deliveryName']}) has been rejected by ${payload['userName']}.',
+      body: 'The delivery entry for $companyName ($deliveryName) has been rejected by $userName.',
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': stringPayload},
     ),
   );
 }
 
-Future<void> notifyGuardApprove(payload) async {
+Future<void> notifyGuardApprove(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
+  String deliveryName = payload['deliveryName'] ?? 'NA';
+  String userName = payload['userName'] ?? 'NA';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Entry Confirmed',
-      body: '${payload['userName']} (Resident) has approved ${payload['deliveryName']}. Please proceed.',
+      body: '$userName (Resident) has approved $deliveryName. Please proceed.',
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': stringPayload},
     ),
   );
 }
 
-Future<void> notifyGuardReject(payload) async {
+Future<void> notifyGuardReject(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
+  String deliveryName = payload['deliveryName'] ?? 'NA';
+  String userName = payload['userName'] ?? 'NA';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Entry Confirmed',
-      body: '${payload['userName']} (Resident) has rejected ${payload['deliveryName']}. Please proceed.',
+      body: '$userName (Resident) has rejected $deliveryName. Please proceed.',
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': stringPayload},
     ),
   );
 }
 
-Future<void> notifyResident(payload) async {
+Future<void> notifyResident(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
+  String deliveryName = payload['deliveryName'] ?? 'NA';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Entry Exited',
-      body: '${payload['deliveryName']} has been checked out.',
+      body: '$deliveryName has been checked out.',
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': stringPayload},
     ),
   );
 }
 
-Future<void> notifyCheckedInEntry(payload) async {
+Future<void> notifyCheckedInEntry(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
+  String entryType = payload['entryType'] ?? 'NA';
+  String deliveryName = payload['deliveryName'] ?? 'NA';
+  String guardName = payload['guardName'] ?? 'NA';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
-      title: 'Entry Confirmed: ${payload['entryType']}',
-      body: 'The ${payload['entryType']} (${payload['deliveryName']}) you pre-approved has been securely checked in by the guard (${payload['guardName']}).',
+      title: 'Entry Confirmed: $entryType',
+      body: 'The $entryType ($deliveryName) you pre-approved has been securely checked in by the guard ($guardName).',
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': stringPayload},
     ),
   );
 }
 
-Future<void> notifyRoleVerification(payload) async {
+Future<void> notifyRoleVerification(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
   String message = _getBody(payload["action"]);
   String title = _getTitle(payload["action"]);
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
@@ -195,7 +249,7 @@ Future<void> notifyRoleVerification(payload) async {
       displayOnForeground: true,
       displayOnBackground: true,
       actionType: ActionType.Default,
-      payload: payload,
+      payload: {'data': stringPayload},
     ),
   );
 }
@@ -317,7 +371,6 @@ Future<void> notifyComplaintResolved(String payloadString) async {
   final payload = jsonDecode(payloadString);
 
   String complaintType = payload['category'] ?? 'Unknown';
-  String societyName = payload['societyName'] ?? 'Unknown';
   String resolvedBy = payload['resolvedBy'] ?? 'Unknown';
   bool isResolvedByResident = payload['isResolvedByResident'];
 
@@ -384,11 +437,11 @@ Future<void> notifyComplaintReopened(String payloadString) async {
 
 // Helper method to generate a message based on action
 String _getBody(String action) {
-  if (action == "RESIDENT_APPROVE") {
+  if (action == 'RESIDENT_APPROVE') {
     return "Congratulations! Your resident profile has been successfully approved.";
-  } else if(action == "RESIDENT_REJECT"){
+  } else if(action == 'RESIDENT_REJECT'){
     return "Unfortunately, your resident profile was not approved. For more information, please reach out to us.";
-  } else if(action == "GUARD_APPROVE"){
+  } else if(action == 'GUARD_APPROVE'){
     return "Congratulations! Your guard profile has been successfully approved.";
   } else{
     return "Unfortunately, your guard profile was not approved. For more information, please reach out to us.";
@@ -397,11 +450,11 @@ String _getBody(String action) {
 
 // Helper method to generate a message based on action
 String _getTitle(String action) {
-  if (action == "RESIDENT_APPROVE") {
+  if (action == 'RESIDENT_APPROVE') {
     return "Resident Profile Approved";
-  } else if(action == "RESIDENT_REJECT"){
+  } else if(action == 'RESIDENT_REJECT'){
     return "Resident Profile Rejected";
-  } else if(action == "GUARD_APPROVE"){
+  } else if(action == 'GUARD_APPROVE'){
     return "Security Guard Profile Approved";
   } else{
     return "Security Guard Profile Rejected";

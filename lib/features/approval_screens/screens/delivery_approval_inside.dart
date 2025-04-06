@@ -33,7 +33,6 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.blue.shade400,
         body: BlocConsumer<GuardEntryBloc, GuardEntryState>(
           listener: (context, state) {
             if (state is ApproveDeliveryEntryLoading) {
@@ -99,7 +98,7 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                           style: const TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.white70,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -114,7 +113,7 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                             height: 320.0, // Increased height
                             padding: const EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12.0),
                               boxShadow: const [
                                 BoxShadow(
@@ -157,6 +156,7 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                                               : "The service provider is at the ${widget.payload?.societyDetails?.societyGates!}",
                                   style: const TextStyle(
                                     fontSize: 24.0,
+                                    color: Colors.white70
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -189,6 +189,7 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                                           style: const TextStyle(
                                             fontSize: 20.0,
                                             fontWeight: FontWeight.bold,
+                                            color: Colors.white70
                                           ),
                                         ),
                                         const SizedBox(height: 4.0),
@@ -227,7 +228,7 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                                                         'NA',
                                                 style: const TextStyle(
                                                   fontSize: 16.0,
-                                                  color: Colors.grey,
+                                                  color: Colors.white60,
                                                 ),
                                               ),
                                             ],
@@ -238,7 +239,7 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                                     IconButton(
                                         icon: const Icon(
                                           Icons.phone,
-                                          color: Colors.green,
+                                          color: Colors.white70,
                                           size: 30,
                                         ),
                                         onPressed: _makePhoneCall),
@@ -256,97 +257,108 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                               children: [
                                 Column(
                                   children: [
-                                    // Deny Entry Button with red background and white border
-                                    InkWell(
-                                      onTap: () {
-                                        // Deny Entry Action
-                                        context.read<GuardEntryBloc>().add(
-                                            RejectDeliveryEntry(
-                                                id: widget.payload!.id!));
-                                      },
-                                      child: Container(
-                                        width:
-                                            70, // Adjust the size to fit the design
-                                        height: 70,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: Colors.white,
-                                              width: 4), // White border
-                                        ),
-                                        child: _isLoadingDeny
-                                            ? const CircularProgressIndicator()
-                                            : const CircleAvatar(
-                                                radius: 35,
-                                                backgroundColor: Colors
-                                                    .red, // Set background color to red
-                                                child: Center(
-                                                  child: IconButton(
-                                                    icon: Icon(Icons.cancel,
-                                                        color: Colors
-                                                            .white), // Set icon color to white
-                                                    onPressed: null,
-                                                  ),
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                        height:
-                                            8.0), // Space between button and text
-                                    const Text(
-                                      "Deny Entry",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                    width: 120), // Adjust spacing as needed
-                                Column(
-                                  children: [
-                                    // Allow Entry Button with green background and white border
                                     InkWell(
                                       onTap: () {
                                         context.read<GuardEntryBloc>().add(
-                                            ApproveDeliveryEntry(
-                                                id: widget.payload!.id!));
+                                          RejectDeliveryEntry(id: widget.payload!.id!),
+                                        );
                                       },
+                                      borderRadius: BorderRadius.circular(40),
                                       child: Container(
                                         width: 70,
                                         height: 70,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: Colors.white,
-                                              width: 4), // White border
+                                          gradient: const LinearGradient(
+                                            colors: [Colors.redAccent, Colors.red],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.red.withOpacity(0.5),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 4),
+                                            )
+                                          ],
+                                          border: Border.all(color: Colors.white, width: 3),
                                         ),
-                                        child: _isLoadingAllow
-                                            ? const CircularProgressIndicator()
-                                            : const CircleAvatar(
-                                                radius: 35,
-                                                backgroundColor: Colors
-                                                    .green, // Set background color to green
-                                                child: IconButton(
-                                                  icon: Icon(Icons.check,
-                                                      color: Colors
-                                                          .white), // Set icon color to white
-                                                  onPressed: null,
-                                                ),
-                                              ),
+                                        child: _isLoadingDeny
+                                            ? const Padding(
+                                          padding: EdgeInsets.all(16.0),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 3,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
+                                        )
+                                            : const Center(
+                                          child: Icon(Icons.cancel, color: Colors.white, size: 32),
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(
-                                        height:
-                                            8.0), // Space between button and text
+                                    const SizedBox(height: 10),
+                                    const Text(
+                                      "Deny Entry",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 120), // Adjust spacing as needed
+                                Column(
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        context.read<GuardEntryBloc>().add(
+                                            ApproveDeliveryEntry(id: widget.payload!.id!)
+                                        );
+                                      },
+                                      borderRadius: BorderRadius.circular(40),
+                                      child: Container(
+                                        width: 70,
+                                        height: 70,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: const LinearGradient(
+                                            colors: [Colors.greenAccent, Colors.green],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.red.withOpacity(0.5),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 4),
+                                            )
+                                          ],
+                                          border: Border.all(color: Colors.white, width: 3),
+                                        ),
+                                        child: _isLoadingAllow
+                                            ? const Padding(
+                                          padding: EdgeInsets.all(16.0),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 3,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
+                                        )
+                                            : const Center(
+                                          child: Icon(Icons.check, color: Colors.white, size: 32),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
                                     const Text(
                                       "Allow Entry",
                                       style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold),
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.5,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -378,7 +390,7 @@ class _DeliveryApprovalInsideState extends State<DeliveryApprovalInside> {
                   right: 16.0,
                   child: IconButton(
                     icon: const Icon(Icons.cancel,
-                        color: Colors.white, size: 32.0),
+                        color: Colors.white70, size: 32.0),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },

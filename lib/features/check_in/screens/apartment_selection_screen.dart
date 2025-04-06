@@ -60,12 +60,12 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue, // Change AppBar color here
+        backgroundColor: Colors.black.withOpacity(0.2), // Change AppBar color here
         title: const Text(
           'Select apartment',
           style: TextStyle(
               fontSize: 20,
-              color: Colors.white,
+              color: Colors.white70,
               fontWeight: FontWeight
                   .bold), // Text color adjusted to white for visibility
         ),
@@ -97,17 +97,17 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
               children: [
                 // Search Bar and Block Info
                 Container(
-                  color: Colors
-                      .blue, // Background color for the search field's container
+                  color: Colors.black.withOpacity(0.2),
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     controller: searchController,
                     decoration: InputDecoration(
                       filled: true, // Enables the fill color
-                      fillColor: Colors.white,
+                      fillColor: Colors.white.withOpacity(0.2),
                       contentPadding: const EdgeInsets.symmetric(vertical: 5),
                       hintText: 'Search apartment',
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      hintStyle: const TextStyle(color: Colors.white60),
+                      prefixIcon: const Icon(Icons.search, color: Colors.white70),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -123,14 +123,14 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                       Text(
                         'Block : $blockName',
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white60),
                       ),
                       TextButton(
                         onPressed: () {
                           // Navigate to previous page (block selection)
                           Navigator.of(context).pop();
                         },
-                        child: const Text("Select Another Block"),
+                        child: const Text("Select Another Block", style: TextStyle(color: Colors.white60),),
                       )
                     ],
                   ),
@@ -146,7 +146,8 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Chip(
-                            label: Text(selectedFlats[index]),
+                            backgroundColor: Colors.black.withOpacity(0.2),
+                            label: Text(selectedFlats[index], style: TextStyle(color: Colors.white70),),
                             onDeleted: () {
                               // context.read().add(RemoveFlat(blockName: blockName!, flatName: selectedFlats[index]));
                               toggleFlatSelection(selectedFlats[index]);
@@ -176,10 +177,10 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                           final selected = '$blockName ${filteredFlats[index]}';
                           final isSelected = selectedFlats.contains(selected);
                           return Card(
+                            color: Colors.black.withOpacity(0.2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15.0),
                             ),
-                            elevation: 4,
                             child: InkWell(
                               onTap: () {
                                 toggleFlatSelection(selected);
@@ -190,13 +191,13 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                                 child: Row(
                                   children: [
                                     const Icon(Icons.home,
-                                        color: Colors.blueAccent),
+                                        color: Colors.white70),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Text(
                                         flat,
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                            fontWeight: FontWeight.w500, color: Colors.white70),
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),

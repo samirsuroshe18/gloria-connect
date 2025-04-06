@@ -23,7 +23,11 @@ class VisitorPastCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
+      color: Colors.black.withOpacity(0.1),
+      // Semi-transparent white background
       elevation: 2,
+      // Keep some shadow effect
+      // elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
@@ -206,7 +210,10 @@ class VisitorPastCard extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.grey.shade600),
+          Icon(
+            icon,
+            size: 16,
+          ),
           const SizedBox(width: 4),
           Expanded(
             child: Column(
@@ -214,15 +221,15 @@ class VisitorPastCard extends StatelessWidget {
               children: [
                 Text(
                   time,
-                  style: TextStyle(
-                    color: Colors.grey.shade800,
+                  style: const TextStyle(
+                    // color: Colors.grey.shade800,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
                   label,
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
+                  style: const TextStyle(
+                    // color: Colors.grey.shade600,
                     fontSize: 12,
                   ),
                 ),
@@ -236,12 +243,14 @@ class VisitorPastCard extends StatelessWidget {
 
   Widget _buildApprovalInfo() {
     final approvedBy = data.approvedBy?.user?.userName ??
-        (data.societyDetails?.societyApartments?.isEmpty ?? true ?
-        'No one' :
-        data.societyDetails?.societyApartments?[0].entryStatus?.approvedBy?.userName);
+        (data.societyDetails?.societyApartments?.isEmpty ?? true
+            ? 'No one'
+            : data.societyDetails?.societyApartments?[0].entryStatus?.approvedBy
+                ?.userName);
 
     final allowedBy = data.allowedBy?.user?.userName ??
-        data.guardStatus?.guard?.userName ?? 'Unknown Guard';
+        data.guardStatus?.guard?.userName ??
+        'Unknown Guard';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,8 +278,8 @@ class VisitorPastCard extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: TextStyle(
-              color: Colors.grey.shade700,
+            style: const TextStyle(
+              // color: Colors.grey.shade700,
               fontSize: 13,
             ),
             maxLines: 1,
@@ -317,41 +326,44 @@ class VisitorPastCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.topRight,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Hero(
-                tag: 'profile-${data.id}',
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  errorBuilder: (_, __, ___) => const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                  ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(width: 2, color: Colors.blueGrey),
+          ),
+          width: MediaQuery.of(context).size.width * 0.85,
+          // 70% of screen width
+          height: MediaQuery.of(context).size.width * 0.9,
+          // 40% of screen height
+          child: Stack(
+            children: [
+              Image.network(
+                imageUrl,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Colors.black,
                 ),
               ),
-            ),
-            Positioned(
-              top: -16,
-              right: -16,
-              child: Material(
-                color: Colors.transparent,
-                child: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Icon(Icons.close, color: Colors.black),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: double.infinity,
+                  height: 45,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  color: Colors.black.withOpacity(0.7),
+                  alignment: Alignment.centerLeft,
+                  child: const Text(
+                    "Samir SurosheSamir SurosheSamir SurosheSamir SurosheSamir Suroshe",
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-            ),
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -376,11 +388,18 @@ class _DetailSheet extends StatelessWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 16),
-          _buildDetailRow('Date', DateFormat('dd MMM, yyyy').format(data.entryTime ?? DateTime.now())),
-          _buildDetailRow('Entry Time', DateFormat('hh:mm a').format(data.entryTime ?? DateTime.now())),
-          _buildDetailRow('Exit Time', DateFormat('hh:mm a').format(data.exitTime ?? DateTime.now())),
-          _buildDetailRow('Type', data.entryType ?? data.profileType ?? 'Visitor'),
-          if (data.mobNumber != null) _buildDetailRow('Contact', data.mobNumber!),
+          _buildDetailRow(
+              'Date',
+              DateFormat('dd MMM, yyyy')
+                  .format(data.entryTime ?? DateTime.now())),
+          _buildDetailRow('Entry Time',
+              DateFormat('hh:mm a').format(data.entryTime ?? DateTime.now())),
+          _buildDetailRow('Exit Time',
+              DateFormat('hh:mm a').format(data.exitTime ?? DateTime.now())),
+          _buildDetailRow(
+              'Type', data.entryType ?? data.profileType ?? 'Visitor'),
+          if (data.mobNumber != null)
+            _buildDetailRow('Contact', data.mobNumber!),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
@@ -406,7 +425,7 @@ class _DetailSheet extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.grey,
+              // color: Colors.grey,
               fontWeight: FontWeight.w500,
             ),
           ),

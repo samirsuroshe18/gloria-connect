@@ -32,7 +32,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Change Password', style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: BlocConsumer<SettingBloc, SettingState>(
         listener: (context, state){
@@ -93,7 +93,25 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     obscureText: true,
                   ),
                   const SizedBox(height: 20),
-                  SettingBtn(onPressed: _onChanged, isLoading: _isLoading, text: 'Change Password',),
+                  ElevatedButton(
+                    onPressed: _onChanged,
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0), // Border radius
+                      ), // Border color and width
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Colors.deepPurple,
+                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator()
+                        : Text(
+                      "Change Password",
+                      style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.white70),
+                    ),
+                  )
+                  // SettingBtn(onPressed: _onChanged, isLoading: _isLoading, text: 'Change Password',),
                 ],
               ),
             ),

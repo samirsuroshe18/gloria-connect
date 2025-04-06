@@ -19,15 +19,14 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.data?.societyDetails!.societyApartments?[0].members);
     return Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text(
             'View Residents Approval',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white70),
           ),
-          backgroundColor: Colors.blue,
-          elevation: 5,
+          backgroundColor: Colors.black.withOpacity(0.2),
         ),
         body: BlocConsumer<GuardWaitingBloc, GuardWaitingState>(
           listener: (context, state) {
@@ -175,8 +174,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
 
   Widget _buildDeliveryCard() {
     return Card(
-      elevation: 10.0,
-      shadowColor: Colors.black.withOpacity(0.4),
+      color: Colors.black.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -199,7 +197,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: Colors.blue, // Border color
+          color: Colors.white70, // Border color
           width: 2, // Border width
         ),
       ),
@@ -245,7 +243,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
             style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Color(0xB3000000)),
+                color: Colors.white70),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
@@ -254,7 +252,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
           icon: const Icon(
             Icons.cancel,
             size: 20,
-            color: Colors.redAccent,
+            color: Colors.white70,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -268,19 +266,11 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
       decoration: BoxDecoration(
         gradient:
             const LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.4),
-            spreadRadius: 2,
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         widget.data!.entryType.toString().toUpperCase(),
-        style: const TextStyle(color: Colors.white, fontSize: 16),
+        style: const TextStyle(color: Colors.white70, fontSize: 16),
       ),
     );
   }
@@ -298,7 +288,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
             widget.data!.entryType == 'other'
                 ? widget.data?.serviceName ?? "NA"
                 : widget.data!.companyName!,
-            style: const TextStyle(fontSize: 16, color: Colors.black54)),
+            style: const TextStyle(fontSize: 16, color: Colors.white70)),
       ],
     );
   }
@@ -309,7 +299,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
       children: [
         const Padding(
             padding: EdgeInsets.all(5.0),
-            child: Icon(Icons.home, size: 20, color: Colors.black54)),
+            child: Icon(Icons.home, size: 20, color: Colors.white70)),
         const SizedBox(width: 5),
         Expanded(
           child: Column(
@@ -319,7 +309,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(e.apartment!,
                         style: const TextStyle(
-                            fontSize: 14, color: Colors.black54))))
+                            fontSize: 14, color: Colors.white70))))
                 .toList(),
           ),
         ),

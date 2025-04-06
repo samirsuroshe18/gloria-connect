@@ -69,20 +69,14 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: const Text(
           'Submit Complaint',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: BlocConsumer<SettingBloc, SettingState>(
@@ -154,7 +148,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF2C3E50),
+          color: Colors.white70,
         ),
       ),
     );
@@ -163,16 +157,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   Widget _buildAreaSelector() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: DropdownButtonFormField<String>(
         value: selectedArea,
@@ -184,10 +170,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Colors.white.withOpacity(0.2),
           hintText: 'Select Area',
+          hintStyle: const TextStyle(color: Colors.white70),
           prefixIcon:
-              const Icon(Icons.location_on_outlined, color: Color(0xFF3498DB)),
+              const Icon(Icons.location_on_outlined, color: Colors.white70),
         ),
         items: areas.map((String area) {
           return DropdownMenuItem<String>(
@@ -206,31 +193,20 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   Widget _buildCategorySelector() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: DropdownButtonFormField<String>(
         value: selectedCategory,
         decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          filled: true,
-          fillColor: Colors.white,
           hintText: 'Select Category',
-          prefixIcon:
-              const Icon(Icons.category_outlined, color: Color(0xFF3498DB)),
+          hintStyle: const TextStyle(color: Colors.white70),
+          prefixIcon: const Icon(Icons.category_outlined, color: Colors.white70),
         ),
         items: categories.keys.map((String category) {
           return DropdownMenuItem<String>(
@@ -298,16 +274,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   Widget _buildDescriptionField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: TextFormField(
         controller: _descriptionController,
@@ -318,12 +286,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          filled: true,
-          fillColor: Colors.white,
           hintText: 'Describe your complaint in detail...',
+          hintStyle: const TextStyle(color: Colors.white70),
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 15, right: 15, bottom: 80),
-            child: Icon(Icons.description_outlined, color: Color(0xFF3498DB)),
+            child: Icon(Icons.description_outlined, color: Colors.white70),
           ),
         ),
         validator: (value) =>
@@ -335,16 +302,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   Widget _buildImageUploader() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -386,6 +345,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                 onTap: _showImagePickerOptions,
                 child: Container(
                   height: 200,
+                  padding: EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     border:
                         Border.all(color: const Color(0xFF3498DB), width: 1),
@@ -400,7 +360,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       Text(
                         'Upload Supporting Image',
                         style: TextStyle(
-                          color: Color(0xFF3498DB),
+                          color: Colors.white70,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -408,7 +368,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                       Text(
                         '(Optional)',
                         style: TextStyle(
-                          color: Colors.grey,
+                          color: Colors.white60,
                           fontSize: 12,
                         ),
                       ),
@@ -429,11 +389,10 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       child: ElevatedButton(
         onPressed: isLoading ? null : _submitForm,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF3498DB),
+          backgroundColor: Colors.deepPurple.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 2,
         ),
         child: isLoading
             ? const SizedBox(
@@ -449,7 +408,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: Colors.white70,
                 ),
               ),
       ),

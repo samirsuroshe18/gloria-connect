@@ -38,7 +38,6 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Screenshot(
         controller: screenshotController,
         child: Container(

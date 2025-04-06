@@ -43,7 +43,7 @@ class _ContactsScreenState extends State<ContactsScreen> with SingleTickerProvid
     return Scaffold(
       appBar: AppBar(
         title: const Text('Select Contact', style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: DefaultTabController(
         length: 2,
@@ -52,7 +52,7 @@ class _ContactsScreenState extends State<ContactsScreen> with SingleTickerProvid
             children: [
               TabBar(
                 controller: _tabController,
-                labelColor: Colors.blue,
+                labelColor: Colors.white70,
                 tabs: const [
                   Tab(text: 'Contacts'),
                   Tab(text: 'Add Manually'),

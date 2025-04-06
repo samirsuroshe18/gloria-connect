@@ -48,11 +48,10 @@ class _MobileNoScreenState extends State<MobileNoScreen> {
       appBar: AppBar(
         title: const Text(
           'Mobile Number',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white70),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
-      backgroundColor: Colors.white, // Set screen background color to white
       body: Form(
         key: _formKey,
         child: Column(
@@ -64,7 +63,7 @@ class _MobileNoScreenState extends State<MobileNoScreen> {
                 'Enter Delivery Mobile Number',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: Colors.white70,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -73,6 +72,8 @@ class _MobileNoScreenState extends State<MobileNoScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: AuthTextField(
                 icon: const Icon(Icons.phone),
+                iconColor: Colors.white70,
+                fillColor: Colors.white.withOpacity(0.2),
                 hintText: 'Phone number',
                 controller: _phoneController,
                 errorMsg: 'Please enter phone number',

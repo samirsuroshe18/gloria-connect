@@ -50,15 +50,8 @@ class VisitorExpectedCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -71,7 +64,7 @@ class VisitorExpectedCard extends StatelessWidget {
               children: [
                 // Header section with status banner
                 Container(
-                  color: tagColor.withOpacity(0.1),
+                  color: Colors.white.withOpacity(0.2),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     children: [
@@ -92,7 +85,7 @@ class VisitorExpectedCard extends StatelessWidget {
                       Text(
                         DateFormat('MMM d, y').format(DateTime.parse(date)),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                          color: Colors.white70,
                         ),
                       ),
                     ],
@@ -136,8 +129,9 @@ class VisitorExpectedCard extends StatelessWidget {
                           children: [
                             Text(
                               userName,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                color: Colors.white70
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -162,7 +156,7 @@ class VisitorExpectedCard extends StatelessWidget {
                                     child: Text(
                                       serviceName ?? companyName!,
                                       style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: Colors.grey[600],
+                                        color: Colors.white70,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -175,13 +169,13 @@ class VisitorExpectedCard extends StatelessWidget {
                                 Icon(
                                   Icons.access_time,
                                   size: 16,
-                                  color: Colors.grey[600],
+                                  color: Colors.white70,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   DateFormat('hh:mm a').format(DateTime.parse(date)),
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: Colors.grey[600],
+                                    color: Colors.white70,
                                   ),
                                 ),
                               ],

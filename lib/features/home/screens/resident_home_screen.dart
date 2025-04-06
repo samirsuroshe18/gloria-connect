@@ -1,102 +1,3 @@
-// import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
-// import 'package:gloria_connect/features/resident_profile/screens/resident_profile_screen.dart';
-//
-// import '../../../utils/notification_service.dart';
-// import '../../invite_visitors/screens/invite_visitors_screen.dart';
-// import '../../my_visitors/screens/my_visitors_screen.dart';
-//
-// class ResidentHomeScreen extends StatefulWidget {
-//   const ResidentHomeScreen({super.key});
-//
-//   @override
-//   State<ResidentHomeScreen> createState() => _ResidentHomeScreenState();
-// }
-//
-// class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
-//   int _selectedIndex = 0;
-//   NotificationController notificationServices = NotificationController();
-//
-//   final List<Widget> _residentPages = [
-//     const MyVisitorsScreen(),
-//     const InviteVisitorsScreen(),
-//     const ResidentProfileScreen(),
-//   ];
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     notificationServices.requestNotificationPermission();
-//     // notificationServices.updateDeviceToken(context);
-//     // Schedule the listener setup in the microtask queue to ensure context is ready.
-//     Future.microtask(() {
-//       FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-//         if (mounted) {
-//           context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: newToken));
-//         }
-//       });
-//     });
-//   }
-//
-//   void _onItemTapped(int index) {
-//     setState(() {
-//       _selectedIndex = index;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text(
-//           'Gloria Connect',
-//           style: TextStyle(color: Colors.white),
-//         ),
-//         backgroundColor: Colors.blue,
-//       ),
-//       body: IndexedStack(
-//         index: _selectedIndex,
-//         children: _residentPages,
-//       ),
-//       bottomNavigationBar: SizedBox(
-//         height: 70,
-//         child: ClipRRect(
-//           borderRadius: const BorderRadius.only(
-//               topLeft: Radius.circular(40), topRight: Radius.circular(40)),
-//           child: BottomNavigationBar(
-//               type: BottomNavigationBarType.fixed,
-//               backgroundColor: const Color.fromARGB(255, 193, 209, 240),
-//               iconSize: 20.0,
-//               selectedIconTheme: const IconThemeData(size: 28.0),
-//               selectedItemColor: const Color.fromARGB(255, 46, 90, 172),
-//               unselectedItemColor: Colors.black,
-//               selectedFontSize: 16.0,
-//               unselectedFontSize: 12,
-//               currentIndex: _selectedIndex,
-//               // selectedItemColor: Colors.blue,
-//               onTap: _onItemTapped,
-//               items: const <BottomNavigationBarItem>[
-//                 BottomNavigationBarItem(
-//                   icon: Icon(Icons.people),
-//                   label: 'My Visitors',
-//                 ),
-//                 BottomNavigationBarItem(
-//                   icon: Icon(Icons.person_add),
-//                   label: 'Invite Visitors',
-//                 ),
-//                 BottomNavigationBarItem(
-//                   icon: Icon(Icons.person),
-//                   label: 'Profile',
-//                 ),
-//               ]),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -132,22 +33,14 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
   Future<void> _initializeNotifications() async {
     final notificationServices = NotificationController();
     await notificationServices.requestNotificationPermission();
-
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      if (mounted) {
-        context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: newToken));
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: Row(
           children: [
             Image.asset('assets/app_logo/app_logo.png', height: 40),
@@ -155,7 +48,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
             const Text(
               'Gloria Connect',
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.white70,
                 fontSize: 24,
               ),
             ),
@@ -163,7 +56,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+            icon: const Icon(Icons.notifications_outlined, color: Colors.white70),
             onPressed: () {
               // Handle notifications
               Navigator.pushNamed(context, '/general-notice-board-screen');
@@ -178,15 +71,11 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(30),
+            topLeft: Radius.circular(30),
+          ),
+          color: Colors.black.withOpacity(0.2),
         ),
         child: SafeArea(
           child: Padding(
@@ -198,24 +87,24 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
                   _selectedIndex = index;
                 });
               },
-              backgroundColor: Colors.white,
-              elevation: 0,
+              backgroundColor: Colors.transparent,
               labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+              indicatorColor: Colors.amberAccent.shade200.withOpacity(0.4),
               animationDuration: const Duration(milliseconds: 500),
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.people_outline),
-                  selectedIcon: Icon(Icons.people, color: Color(0xFF1A237E)),
+                  icon: Icon(Icons.people_outline, color: Colors.white70),
+                  selectedIcon: Icon(Icons.people, color: Colors.amberAccent),
                   label: 'Visitors',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.person_add_outlined),
-                  selectedIcon: Icon(Icons.person_add, color: Color(0xFF1A237E)),
+                  icon: Icon(Icons.person_add_outlined, color: Colors.white70),
+                  selectedIcon: Icon(Icons.person_add, color: Colors.amberAccent),
                   label: 'Invite',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.person_outline),
-                  selectedIcon: Icon(Icons.person, color: Color(0xFF1A237E)),
+                  icon: Icon(Icons.person_outline, color: Colors.white70),
+                  selectedIcon: Icon(Icons.person, color: Colors.amberAccent),
                   label: 'Profile',
                 ),
               ],

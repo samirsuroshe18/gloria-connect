@@ -94,7 +94,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
 
   Widget _buildComplaintCard(ComplaintModel complaint) {
     return Card(
-      elevation: 2, // Changed from a2 to direct value
+      color: Colors.black.withOpacity(0.2),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
         onTap: () => _cardOnTap(complaint),
@@ -111,7 +111,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
                     child: Text(
                       '#${complaint.complaintId}',
                       style: const TextStyle(
-                        color: Colors.grey,
+                        color: Colors.white70,
                         fontSize: 14,
                       ),
                     ),
@@ -125,6 +125,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white70
                 ),
               ),
               const SizedBox(height: 8),
@@ -134,7 +135,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 14,
-                  color: Colors.black87,
+                  color: Colors.white60,
                 ),
               ),
               const SizedBox(height: 12),
@@ -143,12 +144,12 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                      const Icon(Icons.calendar_today, size: 16, color: Colors.white60),
                       const SizedBox(width: 4),
                       Text(
                         DateFormat('MMM dd, yyyy').format(complaint.date!),
                         style: const TextStyle(
-                          color: Colors.grey,
+                          color: Colors.white60,
                           fontSize: 14,
                         ),
                       ),
@@ -156,12 +157,12 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.comment_outlined, size: 16, color: Colors.grey),
+                      const Icon(Icons.comment_outlined, size: 16, color: Colors.white60),
                       const SizedBox(width: 4),
                       Text(
                         '${complaint.responses?.length ?? 0}',
                         style: const TextStyle(
-                          color: Colors.grey,
+                          color: Colors.white60,
                           fontSize: 14,
                         ),
                       ),
@@ -235,9 +236,9 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: const Text(
           "Complaints",
           style: TextStyle(
@@ -255,9 +256,9 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
                   onChanged: _filterComplaints,
                   decoration: InputDecoration(
                     hintText: 'Search complaints...',
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.search, color: Colors.white70),
                     filled: true,
-                    fillColor: Colors.grey[100],
+                    fillColor: Colors.white.withOpacity(0.2),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -267,8 +268,8 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
               ),
               TabBar(
                 controller: _tabController,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.black54,
+                labelColor: Colors.white60,
+                unselectedLabelColor: Colors.white70,
                 indicatorColor: Colors.blue,
                 tabs: const [
                   Tab(text: 'Pending'),
@@ -357,10 +358,10 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _raiseComplaint(context),
         backgroundColor: Colors.blue,
-        icon: const Icon(Icons.add, color: Colors.white),
+        icon: const Icon(Icons.add, color: Colors.white70),
         label: const Text(
           'New Complaint',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white70),
         ),
       ),
     );

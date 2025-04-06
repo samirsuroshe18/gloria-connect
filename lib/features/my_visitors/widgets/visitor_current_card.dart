@@ -90,7 +90,7 @@ class VisitorCurrentCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -206,7 +206,7 @@ class VisitorCurrentCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
+              color: Colors.white70,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -251,19 +251,19 @@ class VisitorCurrentCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.grey[700]),
+          Icon(icon, size: 16, color: Colors.white60),
           const SizedBox(width: 4),
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
-              color: Colors.grey[700],
+              color: Colors.white60,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -298,15 +298,15 @@ class VisitorCurrentCard extends StatelessWidget {
         Icon(
           icon,
           size: 16,
-          color: Colors.grey[600],
+          color: Colors.white60,
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
-              color: Colors.grey[600],
+              color: Colors.white60,
               fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
@@ -323,7 +323,7 @@ class VisitorCurrentCard extends StatelessWidget {
         onPressed: () => _makePhoneCall(data.mobNumber),
         style: ElevatedButton.styleFrom(
           backgroundColor: _getStatusColor(),
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.white70,
           padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

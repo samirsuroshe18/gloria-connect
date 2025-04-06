@@ -49,7 +49,6 @@ class _OtpBannerState extends State<OtpBanner> {
     final double buttonWidth = screenSize.width * (isSmallScreen ? 0.6 : 0.8);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Screenshot(
         controller: screenshotController,
         child: Container(

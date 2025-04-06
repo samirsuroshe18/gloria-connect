@@ -11,7 +11,7 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -24,7 +24,6 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF2D3748),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -34,7 +33,6 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
                   crossAxisCount: 2,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: 0.85,
                   children: [
                     _buildVisitorCard(
                       icon: Icons.person,
@@ -101,18 +99,11 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.black.withOpacity(0.2),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -130,16 +121,14 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3748),
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
                 ),
               ),
             ],
