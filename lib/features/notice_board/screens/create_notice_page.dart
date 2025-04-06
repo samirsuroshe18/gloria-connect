@@ -4,6 +4,7 @@ import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class CreateNoticePage extends StatefulWidget {
@@ -27,11 +28,6 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
     "important": Icons.priority_high,
     "event": Icons.event,
     "maintenance": Icons.build,
-  };
-  final Map<String, Color> _categoryColors = {
-    "important": Colors.red.shade100,
-    "event": Colors.blue.shade100,
-    "maintenance": Colors.amber.shade100,
   };
 
   Future<void> _pickImage(ImageSource source) async {
@@ -130,7 +126,6 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -198,22 +193,6 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
     );
   }
 
-  Widget _buildHeaderDecoration() {
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        height: 120,
-        decoration: BoxDecoration(
-          color: Colors.deepPurple.withOpacity(0.5),
-          borderRadius: const BorderRadius.vertical(
-            bottom: Radius.circular(30),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildInfoCard() {
     return Card(
@@ -296,7 +275,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
+        SizedBox(
           height: 60,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,

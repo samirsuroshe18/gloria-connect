@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -188,7 +189,7 @@ class CheckoutHistoryCard extends StatelessWidget {
       ),
       child: Text(
         status,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white70,
           fontWeight: FontWeight.w600,
           fontSize: 12,
@@ -249,7 +250,7 @@ class CheckoutHistoryCard extends StatelessWidget {
               children: [
                 TextSpan(
                   text: '$label: ',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white70,
                   ),
                 ),

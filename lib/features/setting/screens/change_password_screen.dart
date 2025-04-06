@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gloria_connect/features/setting/widgets/setting_btn.dart';
 import 'package:gloria_connect/features/setting/widgets/setting_text_field.dart';
 
 import '../bloc/setting_bloc.dart';
@@ -104,9 +103,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator()
-                        : Text(
+                        : const Text(
                       "Change Password",
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 20,
                           color: Colors.white70),
                     ),

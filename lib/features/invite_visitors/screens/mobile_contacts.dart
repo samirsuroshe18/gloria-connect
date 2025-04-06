@@ -48,7 +48,7 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
           _isLoading = false;
         });
       } catch (e) {
-        print('Error fetching contacts: $e');
+        debugPrint('Error fetching contacts: $e');
         setState(() {
           _isLoading = false;
           _permissionDenied = true;
@@ -159,7 +159,7 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
                       ? formatPhoneNumber(contact.phones.first.number)
                       : 'No phone number';
                   return Container(
-                    margin: EdgeInsets.symmetric(vertical: 5),
+                    margin: const EdgeInsets.symmetric(vertical: 5),
                     decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(15)
@@ -200,7 +200,7 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
                       ),
                       subtitle: Text(
                         phoneNumber,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white60,
                         ),
                       ),

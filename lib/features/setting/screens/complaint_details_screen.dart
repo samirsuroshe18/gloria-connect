@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 import '../../auth/bloc/auth_bloc.dart';

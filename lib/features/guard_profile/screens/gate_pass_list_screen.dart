@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gloria_connect/features/guard_profile/models/GatePassBanner.dart';
+import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/gate_pass_card.dart';
 import 'package:lottie/lottie.dart';
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/guard_exit/bloc/guard_exit_bloc.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import '../../guard_waiting/models/entry.dart';
 
@@ -173,13 +174,13 @@ class ExitCard extends StatelessWidget {
       children: [
         Text(
           DateFormat('hh:mm a').format(data.entryTime ?? DateTime.now()),
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white70,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
         ),
-        Text(
+        const Text(
           'Checked In',
           style: TextStyle(
             color: Colors.white70,
@@ -203,7 +204,7 @@ class ExitCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
                   ),
@@ -302,7 +303,7 @@ class ExitCard extends StatelessWidget {
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation1, animation2) {
         return Dialog(
-          backgroundColor: Color(0xff8ecae6),
+          backgroundColor: const Color(0xff8ecae6),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: BlocConsumer<GuardExitBloc, GuardExitState>(
             listener: (context, state) {

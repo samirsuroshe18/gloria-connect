@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../utils/notification_service.dart';
-import '../../auth/bloc/auth_bloc.dart';
 import '../../guard_entry/screens/guard_entry_screen.dart';
 import '../../guard_exit/screens/guard_exit_screen.dart';
 import '../../guard_profile/screens/guard_profile_screen.dart';

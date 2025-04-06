@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../invite_visitors/models/pre_approved_banner.dart';
@@ -129,7 +129,7 @@ class VisitorExpectedCard extends StatelessWidget {
                           children: [
                             Text(
                               userName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 color: Colors.white70
                               ),
@@ -166,7 +166,7 @@ class VisitorExpectedCard extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.access_time,
                                   size: 16,
                                   color: Colors.white70,

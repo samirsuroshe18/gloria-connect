@@ -137,7 +137,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   data?.email ?? "NA",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                   ),
                                 ),

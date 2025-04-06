@@ -24,7 +24,6 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
   @override
   void initState() {
     super.initState();
-    print('Payload : ${widget.payload}');
 
     societyName = widget.payload?['societyDetails']['societyName'];
     societyBlock = widget.payload?['societyDetails']['societyApartments'][0]['societyBlock'];

@@ -345,7 +345,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                 onTap: _showImagePickerOptions,
                 child: Container(
                   height: 200,
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     border:
                         Border.all(color: const Color(0xFF3498DB), width: 1),
@@ -481,7 +481,8 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error picking image: $e'),
           backgroundColor: Colors.red,
@@ -491,6 +492,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
           ),
         ),
       );
+      }
     }
   }
 

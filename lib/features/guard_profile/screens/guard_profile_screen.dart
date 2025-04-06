@@ -266,7 +266,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListView.separated(
-        padding: EdgeInsets.only(top: 0),
+        padding: const EdgeInsets.only(top: 0),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: actions.length,

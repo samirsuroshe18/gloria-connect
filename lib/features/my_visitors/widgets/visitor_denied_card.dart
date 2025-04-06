@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/guard_waiting/models/entry.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -9,31 +10,41 @@ class VisitorDeniedCard extends StatelessWidget {
   const VisitorDeniedCard({super.key, required this.data});
 
   Future<void> _makePhoneCall(BuildContext context) async {
-    // Clean the phone number by removing any non-digit characters
-    final cleanNumber = data.mobNumber?.replaceAll(RegExp(r'[^\d+]'), '') ?? '';
+  // Clean the phone number by removing any non-digit characters
+  final cleanNumber = data.mobNumber?.replaceAll(RegExp(r'[^\d+]'), '') ?? '';
 
-    if (cleanNumber.isEmpty) {
-      // Show error if no phone number available
+  if (cleanNumber.isEmpty) {
+    // Show error if no phone number available
+    if (context.mounted) {
       _showErrorDialog('No phone number available', context);
-      return;
     }
+    return;
+  }
 
-    // Create the phone URI
-    final Uri phoneUri = Uri(
-      scheme: 'tel',
-      path: cleanNumber,
-    );
+  // Create the phone URI
+  final Uri phoneUri = Uri(
+    scheme: 'tel',
+    path: cleanNumber,
+  );
 
-    try {
-      if (await canLaunchUrl(phoneUri)) {
-        await launchUrl(phoneUri);
-      } else {
-        _showErrorDialog('Could not make phone call', context);
-      }
-    } catch (e) {
+  try {
+    final canLaunch = await canLaunchUrl(phoneUri);
+    
+    // Check if the widget is still in the tree after the async operation
+    if (!context.mounted) return;
+    
+    if (canLaunch) {
+      await launchUrl(phoneUri);
+    } else {
+      _showErrorDialog('Could not make phone call', context);
+    }
+  } catch (e) {
+    // Check if the widget is still in the tree
+    if (context.mounted) {
       _showErrorDialog('Error launching phone call', context);
     }
   }
+}
 
   void _showErrorDialog(String message, BuildContext context) {
     showDialog(

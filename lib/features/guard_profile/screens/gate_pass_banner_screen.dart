@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gloria_connect/features/guard_profile/models/GatePassBanner.dart';
+import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:screenshot/screenshot.dart';

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:share_plus/share_plus.dart';
@@ -20,22 +21,6 @@ class NoticeDetailPage extends StatelessWidget {
     // Get screen size for responsive layout
     final Size screenSize = MediaQuery.of(context).size;
     final bool isTablet = screenSize.width > 600;
-
-    // Function to get category color
-    Color getCategoryColor(String? category) {
-      if (category == null) return const Color(0xFF3498DB);
-
-      switch (category.toLowerCase()) {
-        case 'important':
-          return const Color(0xFFE74C3C);
-        case 'event':
-          return const Color(0xFF9B59B6);
-        case 'maintenance':
-          return const Color(0xFFE67E22);
-        default:
-          return const Color(0xFF3498DB);
-      }
-    }
 
     // Format date
     String formattedDate = data.createdAt != null
@@ -218,7 +203,7 @@ class NoticeDetailPage extends StatelessWidget {
                               (data.publishedBy?.userName?.isNotEmpty ?? false)
                                   ? data.publishedBy!.userName![0].toUpperCase()
                                   : 'A',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white60,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
@@ -251,7 +236,6 @@ class NoticeDetailPage extends StatelessWidget {
                       height: 1.6,
                     ),
                   ),
-
                   if (data.image != null && data.image!.isNotEmpty)
                     _buildAttachments(data.image!, context),
 
@@ -370,49 +354,68 @@ class NoticeDetailPage extends StatelessWidget {
   }
 
   Future<void> _downloadFile(String url, BuildContext context) async {
-    try {
-      // Show downloading message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Downloading file...")),
+  // Get the ScaffoldMessengerState before any async operations
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  
+  try {
+    // Show downloading message
+    scaffoldMessenger.showSnackBar(
+      const SnackBar(content: Text("Downloading file...")),
+    );
+
+    // Send GET request to download file
+    var response = await http.get(Uri.parse(url));
+
+    // Check if widget is still in the tree after async operation
+    if (!context.mounted) return;
+
+    if (response.statusCode == 200) {
+      // Get app's external storage directory
+      Directory? directory = await getExternalStorageDirectory();
+      
+      // Check if widget is still in the tree after another async operation
+      if (!context.mounted) return;
+      
+      if (directory == null) {
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(content: Text("Unable to find directory.")),
+        );
+        return;
+      }
+
+      // Create file path
+      String fileName = url.split('/').last;
+      String filePath = "${directory.path}/$fileName";
+
+      // Save file
+      File file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+
+      // Check if widget is still in the tree after another async operation
+      if (!context.mounted) return;
+
+      // Show success message
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text("Downloaded to $filePath")),
       );
 
-      // Send GET request to download file
-      var response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        // Get app's external storage directory
-        Directory? directory = await getExternalStorageDirectory();
-        if (directory == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Unable to find directory.")),
-          );
-          return;
-        }
-
-        // Create file path
-        String fileName = url.split('/').last;
-        String filePath = "${directory.path}/$fileName";
-
-        // Save file
-        File file = File(filePath);
-        await file.writeAsBytes(response.bodyBytes);
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Downloaded to $filePath")),
-        );
-
-        // Open file after download
-        OpenFile.open(filePath);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Download failed: Server error.")),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Download failed: $e")),
+      // Open file after download
+      OpenFile.open(filePath);
+    } else {
+      // Check if widget is still in the tree
+      if (!context.mounted) return;
+      
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text("Download failed: Server error.")),
       );
     }
+  } catch (e) {
+    // Check if widget is still in the tree
+    if (!context.mounted) return;
+    
+    scaffoldMessenger.showSnackBar(
+      SnackBar(content: Text("Download failed: $e")),
+    );
+  }
   }
 }
