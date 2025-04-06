@@ -39,43 +39,50 @@ class FlatRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.home, color: Colors.grey, size: 28), // Home icon
-              const SizedBox(width: 12),
-              // Reduced font size for flat number
-              Text(data!.apartment ?? 'NA',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-            ],
-          ),
-          Row(
-            children: [
-              Icon(
-                data?.entryStatus?.status == 'pending'
-                    ? Icons.hourglass_empty
-                    : data?.entryStatus?.status == 'approve'
-                        ? Icons.check_circle
-                        : Icons.cancel, // Conditionally show icons
-                color: data?.entryStatus?.status == 'pending'
-                    ? Colors.yellow
-                    : data?.entryStatus?.status == 'approve'
-                        ? Colors.green
-                        : Colors.red, // Green for approved, red for declined
-                size: 28,
-              ),
-              const SizedBox(width: 12),
-              // Reduced font size for flat number
-              IconButton(
-                icon: const Icon(Icons.call, color: Colors.grey),
-                onPressed: () => _showContactDialog(context),
-              )
-            ],
-          ),
-        ],
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.all(Radius.circular(13))
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.home, color: Colors.grey, size: 28), // Home icon
+                const SizedBox(width: 12),
+                // Reduced font size for flat number
+                Text(data!.apartment ?? 'NA',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(
+                  data?.entryStatus?.status == 'pending'
+                      ? Icons.hourglass_empty
+                      : data?.entryStatus?.status == 'approve'
+                          ? Icons.check_circle
+                          : Icons.cancel, // Conditionally show icons
+                  color: data?.entryStatus?.status == 'pending'
+                      ? Colors.yellow
+                      : data?.entryStatus?.status == 'approve'
+                          ? Colors.green
+                          : Colors.red, // Green for approved, red for declined
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                // Reduced font size for flat number
+                IconButton(
+                  icon: const Icon(Icons.call, color: Colors.grey),
+                  onPressed: () => _showContactDialog(context),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

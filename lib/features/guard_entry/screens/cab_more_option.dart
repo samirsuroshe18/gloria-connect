@@ -51,9 +51,8 @@ class _CabMoreOptionState extends State<CabMoreOption> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Company', style: TextStyle(color: Colors.white, fontSize: 20)),
-        elevation: 0,
-        backgroundColor: Colors.blueAccent,
+        title: const Text('Select Company', style: TextStyle(color: Colors.white70, fontSize: 20)),
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,22 +61,17 @@ class _CabMoreOptionState extends State<CabMoreOption> {
             // Search bar with more padding and enhanced UI
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(15),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                  ),
-                ],
               ),
               child: TextField(
                 controller: cabMoreSearchController,
                 style: const TextStyle(fontSize: 16),
                 decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: Colors.blueAccent),
+                  prefixIcon: Icon(Icons.search, color: Colors.white70),
                   hintText: 'Search Companies...',
+                  hintStyle: TextStyle(color: Colors.white60),
+                  fillColor: Colors.transparent,
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(15),
                 ),
@@ -93,11 +87,11 @@ class _CabMoreOptionState extends State<CabMoreOption> {
                   final image = company['image'];
                   final name = company['name'] ?? '';
                   return Card(
-                    elevation: 3,
+                    color: Colors.black.withOpacity(0.2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    margin: const EdgeInsets.symmetric(vertical: 4),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: ListTile(
@@ -112,7 +106,7 @@ class _CabMoreOptionState extends State<CabMoreOption> {
                             fontSize: 16,
                           ),
                         ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.blueAccent),
+                        trailing: const Icon(Icons.chevron_right, color: Colors.white70),
                         onTap: () {
                           if (company['name'] == 'Other') {
                             _showOtherCompanyDialog(context, image);

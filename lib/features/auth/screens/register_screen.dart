@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/utils/gradient_color.dart';
 
 import '../bloc/auth_bloc.dart';
 import '../models/user_model.dart';
@@ -95,22 +96,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         },
         builder: (context, state) {
-          return CustomScrollView(
-            slivers: <Widget>[
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate(
-                    [
-                      ..._header(),
-                      ..._form(),
-                      ..._footer(),
-                      _privacyPolicy(),
-                    ],
+          return GradientColor(
+            child: SafeArea(
+              child: CustomScrollView(
+                slivers: <Widget>[
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.05, // Adjust if needed
+                          ),
+                          ..._header(),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                          ..._form(),
+                          ..._footer(),
+                          _privacyPolicy(),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           );
         },
       )
@@ -140,20 +151,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   List<Widget> _header() {
     return [
-      const SizedBox(height: 80.0),
       const Text(
         textAlign: TextAlign.center,
         "Sign up",
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 40,
           fontWeight: FontWeight.bold,
         ),
       ),
-      const SizedBox(height: 20),
-      Text(
+      const Text(
         textAlign: TextAlign.center,
         "Create your account",
-        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
       ),
     ];
   }

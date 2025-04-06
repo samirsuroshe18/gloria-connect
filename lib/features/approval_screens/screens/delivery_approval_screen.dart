@@ -24,15 +24,12 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
   @override
   void initState() {
     super.initState();
-    String input = widget.payload?['societyDetails'];
-    RegExp societyNameRegex = RegExp(r'societyName:\s*([^,]+)');
-    RegExp societyApartmentsRegex = RegExp(r'societyApartments:\s*\[\{societyBlock:\s*([^,]+),\s*apartment:\s*([^\}]+)\}\]');
-    RegExp societyGatesRegex = RegExp(r'societyGates:\s*([^\}]+)');
+    print('Payload : ${widget.payload}');
 
-    societyName = societyNameRegex.firstMatch(input)?.group(1);
-    societyBlock = societyApartmentsRegex.firstMatch(input)?.group(1);
-    apartment = societyApartmentsRegex.firstMatch(input)?.group(2);
-    societyGate = societyGatesRegex.firstMatch(input)?.group(1);
+    societyName = widget.payload?['societyDetails']['societyName'];
+    societyBlock = widget.payload?['societyDetails']['societyApartments'][0]['societyBlock'];
+    apartment = widget.payload?['societyDetails']['societyApartments'][0]['apartment'];
+    societyGate = widget.payload?['societyDetails']['societyGates'];
   }
 
   void _makePhoneCall() async {
@@ -49,9 +46,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: Colors.blue.shade400,
       body: BlocConsumer<GuardEntryBloc, GuardEntryState>(
         listener: (context, state){
           if(state is ApproveDeliveryEntryLoading){
@@ -113,7 +108,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                         style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.white70,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -128,7 +123,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                           height: 320.0, // Increased height
                           padding: const EdgeInsets.all(16.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12.0),
                             boxShadow: const [
                               BoxShadow(
@@ -164,6 +159,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                                     : "The service provider is at the $societyGate",
                                 style: const TextStyle(
                                   fontSize: 24.0,
+                                  color: Colors.white70,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -188,6 +184,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                                         style: const TextStyle(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold,
+                                          color: Colors.white70
                                         ),
                                       ),
                                       const SizedBox(height: 4.0),
@@ -218,7 +215,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                                   ),
                                   const Spacer(),
                                   IconButton(
-                                    icon: const Icon(Icons.phone, color: Colors.green),
+                                    icon: const Icon(Icons.phone, color: Colors.white70 , size: 30,),
                                     onPressed: _makePhoneCall,
                                   ),
                                 ],
@@ -234,38 +231,53 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                             children: [
                               Column(
                                 children: [
-                                  // Deny Entry Button with red background and white border
                                   InkWell(
-                                    onTap : () {
-                                      // Deny Entry Action
-                                      context.read<GuardEntryBloc>().add(RejectDeliveryEntry(id: widget.payload?['id']));
+                                    onTap: () {
+                                      context.read<GuardEntryBloc>().add(
+                                        RejectDeliveryEntry(id: widget.payload?['id']),
+                                      );
                                     },
+                                    borderRadius: BorderRadius.circular(40),
                                     child: Container(
-                                      width: 70, // Adjust the size to fit the design
+                                      width: 70,
                                       height: 70,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 4), // White border
+                                        gradient: const LinearGradient(
+                                          colors: [Colors.redAccent, Colors.red],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.red.withOpacity(0.5),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          )
+                                        ],
+                                        border: Border.all(color: Colors.white, width: 3),
                                       ),
                                       child: _isLoadingDeny
-                                          ? const CircularProgressIndicator()
-                                          :  const CircleAvatar(
-                                              radius: 35,
-                                              backgroundColor: Colors.red, // Set background color to red
-                                              child: IconButton(
-                                                icon: Icon(Icons.cancel, color: Colors.white), // Set icon color to white
-                                                onPressed: null,
-                                              ),
-                                            ),
+                                          ? const Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                          : const Center(
+                                        child: Icon(Icons.cancel, color: Colors.white, size: 32),
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 8.0), // Space between button and text
+                                  const SizedBox(height: 10),
                                   const Text(
                                     "Deny Entry",
                                     style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
                                 ],
@@ -273,37 +285,51 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                               const SizedBox(width: 120), // Adjust spacing as needed
                               Column(
                                 children: [
-                                  // Allow Entry Button with green background and white border
                                   InkWell(
                                     onTap: () {
                                       context.read<GuardEntryBloc>().add(ApproveDeliveryEntry(id: widget.payload?['id']));
                                     },
+                                    borderRadius: BorderRadius.circular(40),
                                     child: Container(
                                       width: 70,
                                       height: 70,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 4), // White border
+                                        gradient: const LinearGradient(
+                                          colors: [Colors.greenAccent, Colors.green],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.red.withOpacity(0.5),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          )
+                                        ],
+                                        border: Border.all(color: Colors.white, width: 3),
                                       ),
                                       child: _isLoadingAllow
-                                         ? const CircularProgressIndicator()
-                                         :  const CircleAvatar(
-                                            radius: 35,
-                                            backgroundColor: Colors.green, // Set background color to green
-                                            child: IconButton(
-                                              icon: Icon(Icons.check, color: Colors.white), // Set icon color to white
-                                              onPressed: null,
-                                            ),
-                                          ),
+                                          ? const Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                          : const Center(
+                                        child: Icon(Icons.check, color: Colors.white, size: 32),
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 8.0), // Space between button and text
+                                  const SizedBox(height: 10),
                                   const Text(
                                     "Allow Entry",
                                     style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
                                 ],
@@ -334,7 +360,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                 top: 40.0,
                 right: 16.0,
                 child: IconButton(
-                  icon: const Icon(Icons.cancel, color: Colors.white, size: 32.0),
+                  icon: const Icon(Icons.cancel, color: Colors.white70, size: 32.0),
                   onPressed: () {
                     // SystemNavigator.pop();
                     Navigator.of(context).pop();

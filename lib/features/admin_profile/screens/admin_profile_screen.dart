@@ -32,7 +32,8 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthGetUserLoading) {
@@ -62,19 +63,8 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                           Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
+                              color: Colors.black.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
                             ),
                             child: Column(
                               children: [
@@ -90,7 +80,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: Colors.white,
+                                              color: Colors.white.withOpacity(0.5),
                                               width: 3,
                                             ),
                                             image: DecorationImage(
@@ -142,7 +132,6 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                   style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -150,7 +139,6 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                   data?.email ?? "NA",
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.white.withOpacity(0.9),
                                   ),
                                 ),
                               ],
@@ -162,15 +150,8 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.black.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +161,6 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2D3142),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -204,15 +184,8 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.black.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,7 +195,6 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2D3142),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -236,7 +208,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                 _buildActionButton(
                                   'Settings',
                                   Icons.settings_outlined,
-                                  const Color(0xFF6B7280),
+                                  Colors.white60,
                                       () => Navigator.pushNamed(context, '/setting-screen', arguments: data),
                                 ),
                                 const SizedBox(height: 12),
@@ -295,9 +267,9 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: Colors.white70,
                 ),
               ),
               const SizedBox(height: 4),
@@ -306,7 +278,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF2D3142),
+                  color: Colors.white70
                 ),
               ),
             ],

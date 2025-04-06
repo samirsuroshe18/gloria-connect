@@ -15,7 +15,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
       icon: Icons.person_add_rounded,
       route: '/resident-approval',
       badgeCount: 0,
-      color: Colors.blue,
+      color: Colors.yellow,
       description: 'Review and approve new resident applications',
     ),
     AdminMenuItem(
@@ -37,7 +37,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
       title: 'Manage Guards',
       icon: Icons.security_rounded,
       route: '/all-guard-screen',
-      color: Colors.purple,
+      color: Colors.deepOrange,
       description: 'Oversee security staff details',
     ),
   ];
@@ -78,7 +78,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
 
   Widget _buildMenuItem(AdminMenuItem item) {
     return Material(
-      color: item.color.withOpacity(0.1),
+      color: Colors.blue.shade50.withOpacity(0.2),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -113,7 +113,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
                 item.description,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Colors.grey[400],
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -127,6 +127,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
 
   Widget _buildQuickActions() {
     return Card(
+      color: Colors.blue.shade50.withOpacity(0.2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

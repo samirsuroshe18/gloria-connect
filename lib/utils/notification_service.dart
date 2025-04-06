@@ -92,35 +92,32 @@ class NotificationController {
   }
 
   Future<void> handleNotification(RemoteMessage message, String from) async {
-
-    Map<String, String?> stringPayload = Map<String, String?>.from(jsonDecode(message.data['payload'])?.map((key, value) => MapEntry(key.toString(), jsonEncode(value))));
-
     if (message.data['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
-      residentVerifyNotification(stringPayload);
+      residentVerifyNotification(message.data['payload']);
     } else if (message.data['action'] == 'VERIFY_GUARD_PROFILE_TYPE') {
-      guardVerifyNotification(stringPayload);
+      guardVerifyNotification(message.data['payload']);
     } else if (message.data['action'] == 'VERIFY_DELIVERY_ENTRY') {
-      showNotificationWithActions(stringPayload);
+      showNotificationWithActions(message.data['payload']);
     } else if (message.data['action'] == 'DELIVERY_ENTRY_APPROVE') {
-      deliveryEntryApprovedNotification(stringPayload);
+      deliveryEntryApprovedNotification(message.data['payload']);
     } else if (message.data['action'] == 'DELIVERY_ENTRY_REJECTED') {
-      deliveryEntryRejectedNotification(stringPayload);
+      deliveryEntryRejectedNotification(message.data['payload']);
     } else if (message.data['action'] == 'NOTIFY_GUARD_APPROVE') {
-      notifyGuardApprove(stringPayload);
+      notifyGuardApprove(message.data['payload']);
     } else if (message.data['action'] == 'NOTIFY_GUARD_REJECTED') {
-      notifyGuardReject(stringPayload);
+      notifyGuardReject(message.data['payload']);
     } else if (message.data['action'] == 'NOTIFY_EXIT_ENTRY') {
-      notifyResident(stringPayload);
+      notifyResident(message.data['payload']);
     } else if (message.data['action'] == 'NOTIFY_CHECKED_IN_ENTRY') {
-      notifyCheckedInEntry(stringPayload);
+      notifyCheckedInEntry(message.data['payload']);
     } else if (message.data['action'] == 'RESIDENT_APPROVE') {
-      notifyRoleVerification(stringPayload);
+      notifyRoleVerification(message.data['payload']);
     } else if (message.data['action'] == 'RESIDENT_REJECT') {
-      notifyRoleVerification(stringPayload);
+      notifyRoleVerification(message.data['payload']);
     } else if (message.data['action'] == 'GUARD_APPROVE') {
-      notifyRoleVerification(stringPayload);
+      notifyRoleVerification(message.data['payload']);
     } else if (message.data['action'] == 'GUARD_REJECT') {
-      notifyRoleVerification(stringPayload);
+      notifyRoleVerification(message.data['payload']);
     }else if (message.data['action'] == 'NOTIFY_NOTICE_CREATED') {
       notifyNoticeCreated(message.data['payload']);
     }else if (message.data['action'] == 'NOTIFY_COMPLAINT_CREATED') {
@@ -134,7 +131,7 @@ class NotificationController {
     }else if (message.data['action'] == 'NOTIFY_COMPLAINT_RESOLVED') {
       notifyComplaintResolved(message.data['payload']);
     }else if (message.data['action'] == 'CANCEL') {
-      await AwesomeNotifications().cancel(int.parse(stringPayload['notificationId']!));
+      await AwesomeNotifications().cancel(jsonDecode(message.data['payload'])['notificationId']);
     }
   }
 
@@ -143,22 +140,17 @@ class NotificationController {
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     NavigatorState? currentState = MyApp.navigatorKey.currentState;
 
-    if (receivedAction.payload?['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE' && isInForeground == true) {
-
-      currentState?.pushNamedAndRemoveUntil('/resident-approval', (route) => route.isFirst,);
-
-    } else if (receivedAction.payload?['action'] == 'VERIFY_GUARD_PROFILE_TYPE' && isInForeground == true) {
-
-      currentState?.pushNamedAndRemoveUntil('/guard-approval', (route) => route.isFirst,);
-
-    } else if (receivedAction.payload?['action'] == 'VERIFY_DELIVERY_ENTRY') {
-
+    if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE' && isInForeground == true) {
+      currentState?.pushNamed('/resident-approval');
+    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'VERIFY_GUARD_PROFILE_TYPE' && isInForeground == true) {
+      currentState?.pushNamed('/guard-approval');
+    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'VERIFY_DELIVERY_ENTRY') {
       if (receivedAction.buttonKeyPressed == 'APPROVE') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? accessToken = prefs.getString('accessToken');
         const apiKey = 'https://invite.iotsense.in/api/v1/delivery-entry/approve-delivery';
         final Map<String, dynamic> data = {
-          'id': receivedAction.payload?['id'],
+          'id': jsonDecode(receivedAction.payload!['data']!)['id'],
         };
 
         final response = await http.post(
@@ -175,14 +167,12 @@ class NotificationController {
         } else {
           debugPrint('error : statusCode: ${response.statusCode}, message: ${jsonDecode(response.body)['message']}');
         }
-
       } else if (receivedAction.buttonKeyPressed == 'REJECT') {
-
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? accessToken = prefs.getString('accessToken');
         const apiKey = 'https://invite.iotsense.in/api/v1/delivery-entry/reject-delivery';
         final Map<String, dynamic> data = {
-          'id': receivedAction.payload?['id'],
+          'id': jsonDecode(receivedAction.payload!['data']!)['id'],
         };
 
         final response = await http.post(
@@ -199,11 +189,8 @@ class NotificationController {
         } else {
           debugPrint('error : statusCode: ${response.statusCode}, message: ${jsonDecode(response.body)['message']}');
         }
-
       } else if (isInForeground == true) {
-
-        currentState?.pushNamedAndRemoveUntil('/delivery-approval-screen', (route) => route.isFirst, arguments: receivedAction.payload);
-
+        currentState?.pushNamedAndRemoveUntil('/delivery-approval-screen', (route) => route.isFirst, arguments: jsonDecode(receivedAction.payload!['data']!));
       }
     } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED' && isInForeground == true) {
       currentState?.pushNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));

@@ -34,9 +34,9 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
       appBar: AppBar(
         title: const Text(
           'Gate Entry',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: BlocListener<GuardEntryBloc, GuardEntryState>(
         listener: (context, state) {
@@ -95,8 +95,7 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
 
   Widget _buildDeliveryCard() {
     return Card(
-      elevation: 10.0,
-      shadowColor: Colors.black.withOpacity(0.4),
+      color: Colors.black.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -154,13 +153,13 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
         Expanded(
           child: Text(
             widget.deliveryData?['name'] ?? 'NA',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xB3000000)),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white70),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.edit, size: 20),
+          icon: const Icon(Icons.edit, size: 20, color: Colors.white70,),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ],
@@ -172,19 +171,11 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.4),
-            spreadRadius: 2,
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         widget.deliveryData!['entryType'].toString().toUpperCase(),
-        style: const TextStyle(color: Colors.white, fontSize: 16),
+        style: const TextStyle(color: Colors.white70, fontSize: 16),
       ),
     );
   }
@@ -194,7 +185,7 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
       children: [
         CircleAvatar(radius: 13, backgroundImage: AssetImage(widget.deliveryData?['companyLogo'] ?? 'assets/images/amazon_log.png')),
         const SizedBox(width: 5),
-        Text(widget.deliveryData?['companyName'] ?? 'Company', style: const TextStyle(fontSize: 16, color: Colors.black54)),
+        Text(widget.deliveryData?['companyName'] ?? 'Company', style: const TextStyle(fontSize: 16, color: Colors.white70)),
       ],
     );
   }
@@ -203,12 +194,12 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(padding: EdgeInsets.all(5.0), child: Icon(Icons.home, size: 20, color: Colors.black54)),
+        const Padding(padding: EdgeInsets.all(5.0), child: Icon(Icons.home, size: 20, color: Colors.white70)),
         const SizedBox(width: 5),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: societyApartments.map((e) => Padding(padding: const EdgeInsets.only(top: 4.0), child: Text(e['apartment']!, style: const TextStyle(fontSize: 14, color: Colors.black54)))).toList(),
+            children: societyApartments.map((e) => Padding(padding: const EdgeInsets.only(top: 4.0), child: Text(e['apartment']!, style: const TextStyle(fontSize: 14, color: Colors.white70)))).toList(),
           ),
         ),
       ],
@@ -222,7 +213,7 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
         const SizedBox(height: 20),
         const Text(
           'Vehicle Details',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
         ),
         const SizedBox(height: 10),
         GridView.count(
@@ -252,7 +243,7 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
         const SizedBox(height: 20),
         const Text(
           'Vehicle Number',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
         ),
         const SizedBox(height: 10),
         PinCodeTextField(
@@ -288,7 +279,7 @@ class _AskingCabApprovalScreenState extends State<AskingCabApprovalScreen> {
           textStyle: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Colors.black, // Black text for visibility
+            color: Colors.white70, // Black text for visibility
           ),
         )
       ],

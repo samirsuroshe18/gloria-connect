@@ -13,7 +13,7 @@ class EntryCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Card(
-          elevation: 4,
+          color: Colors.black.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
@@ -47,6 +47,7 @@ class EntryCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 20, // Larger font size for name
                               fontWeight: FontWeight.bold,
+                              color: Colors.white70
                             ),
                             overflow: TextOverflow.ellipsis, // Handle overflow
                           ),
@@ -55,13 +56,13 @@ class EntryCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: Colors.deepPurple,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               data.entryType!,
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.white70,
                                 fontSize: 16,
                               ),
                             ),
@@ -71,7 +72,7 @@ class EntryCard extends StatelessWidget {
                             children: [
                               const Icon(
                                 Icons.apartment,
-                                color: Colors.grey,
+                                color: Colors.white70,
                                 size: 18,
                               ),
                               const SizedBox(width: 5),
@@ -84,7 +85,7 @@ class EntryCard extends StatelessWidget {
                                       .join(', '),
                                   style: const TextStyle(
                                       fontSize: 16,
-                                      color: Colors.grey,
+                                      color: Colors.white70,
                                       overflow: TextOverflow
                                           .ellipsis // Handle overflow
                                       ),
@@ -103,7 +104,7 @@ class EntryCard extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: Colors.white.withOpacity(0.2),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -116,7 +117,7 @@ class EntryCard extends StatelessWidget {
                     child: const Text(
                       'VIEW APPROVALS',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.white70,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),

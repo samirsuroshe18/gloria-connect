@@ -67,7 +67,7 @@ class VerificationRequestCard extends StatelessWidget {
       "startDate": startDate,
       "title": isTenantAgreement ? 'Tenant Agreement' : 'Ownership Document'
     };
-    Navigator.pushNamed(context, '/document-view-screen', arguments: data);
+    Navigator.pushNamed(context, '/', arguments: data);
     // showDialog(
     //   context: context,
     //   builder: (context) => Dialog(
@@ -194,17 +194,13 @@ class VerificationRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.blue.shade50.withOpacity(0.2),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.white, Colors.blue.shade50],
-          ),
         ),
         child: Column(
           children: [
@@ -291,13 +287,13 @@ class VerificationRequestCard extends StatelessWidget {
                                 _buildInfoChip(
                                   Icons.calendar_today,
                                   date,
-                                  Colors.blue.shade700,
+                                  Colors.white70,
                                 ),
                                 const SizedBox(width: 8),
                                 _buildInfoChip(
                                   Icons.access_time,
                                   time,
-                                  Colors.blue.shade700,
+                                  Colors.white70,
                                 ),
                               ],
                             ),
@@ -352,9 +348,9 @@ class VerificationRequestCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.3),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade100),
+        border: Border.all(color: Colors.blue.shade100.withOpacity(0.2)),
       ),
       child: Column(
         children: [
@@ -373,13 +369,13 @@ class VerificationRequestCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.blue.shade700),
+          Icon(icon, size: 16, color: Colors.white70),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                color: Colors.grey.shade700,
+              style: const TextStyle(
+                color: Colors.white70,
                 fontSize: 14,
               ),
             ),
@@ -406,14 +402,15 @@ class VerificationRequestCard extends StatelessWidget {
           isTenantAgreement: isTenant,
         );
       },
-      icon: const Icon(Icons.description),
+      icon: const Icon(Icons.description, color: Colors.white70,),
       label: Text(
         isTenant ? 'View Tenant Agreement' : 'View Ownership Document',
+        style: const TextStyle(
+          color: Colors.white70
+        ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue.shade50,
-        foregroundColor: Colors.blue.shade700,
-        elevation: 0,
+        backgroundColor: Colors.blue.shade50.withOpacity(0.5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(color: Colors.blue.shade200),
@@ -425,9 +422,9 @@ class VerificationRequestCard extends StatelessWidget {
   Widget _buildActionButtons() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: const BorderRadius.vertical(
           bottom: Radius.circular(16),
         ),
       ),
@@ -504,6 +501,7 @@ class VerificationRequestCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
+              color: Colors.white70
             ),
           ),
         ],

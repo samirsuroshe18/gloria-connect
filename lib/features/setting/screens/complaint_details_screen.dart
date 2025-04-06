@@ -73,17 +73,16 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Complaint #${complaintModel.complaintId}',
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.white70,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -91,15 +90,15 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
             Text(
               DateFormat('MMMM d, yyyy')
                   .format(complaintModel.date ?? DateTime.now()),
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+              style: const TextStyle(
+                color: Colors.white60,
                 fontSize: 12,
               ),
             ),
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white70),
           onPressed: () => Navigator.pop(context, complaintModel),
         ),
         actions: [
@@ -159,13 +158,13 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
           Icon(
             isResolved ? Icons.check_circle : Icons.pending,
             size: 14,
-            color: Colors.white,
+            color: Colors.white70,
           ),
           const SizedBox(width: 4),
           Text(
             isResolved ? 'Resolved' : 'Pending',
             style: const TextStyle(
-              color: Colors.white,
+              color: Colors.white70,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
@@ -179,15 +178,8 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,15 +229,16 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
                 complaintModel.category ?? 'NA',
                 style: const TextStyle(
                   fontSize: 18,
+                  color: Colors.white70,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 complaintModel.subCategory ?? 'NA',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: Colors.white60,
                 ),
               ),
             ],
@@ -318,7 +311,7 @@ void _showImageDialog(String imageUrl) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
+        Icon(icon, size: 20, color: Colors.white70),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -326,9 +319,9 @@ void _showImageDialog(String imageUrl) {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Colors.white70,
                 ),
               ),
               const SizedBox(height: 4),
@@ -336,6 +329,7 @@ void _showImageDialog(String imageUrl) {
                 content,
                 style: const TextStyle(
                   fontSize: 14,
+                  color: Colors.white70
                 ),
               ),
             ],
@@ -360,6 +354,7 @@ void _showImageDialog(String imageUrl) {
           const SizedBox(width: 8),
           Flexible(
             child: Container(
+              
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isMe ? Theme.of(context).primaryColor : Colors.white,
@@ -474,7 +469,7 @@ void _showImageDialog(String imageUrl) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withOpacity(0.2),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -483,17 +478,15 @@ void _showImageDialog(String imageUrl) {
             ),
           ],
         ),
-        child: SafeArea(
-          child: OutlinedButton.icon(
-            onPressed: _onReopen,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Reopen Complaint'),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              minimumSize: const Size(double.infinity, 0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+        child: OutlinedButton.icon(
+          onPressed: _onReopen,
+          icon: const Icon(Icons.refresh, color: Colors.white70,),
+          label: const Text('Reopen Complaint', style: TextStyle(color: Colors.white70),),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            minimumSize: const Size(double.infinity, 0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
@@ -503,7 +496,7 @@ void _showImageDialog(String imageUrl) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -512,49 +505,48 @@ void _showImageDialog(String imageUrl) {
           ),
         ],
       ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _messageController,
-              decoration: InputDecoration(
-                hintText: 'Type your message...',
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _messageController,
+            decoration: InputDecoration(
+              hintText: 'Type your message...',
+              hintStyle: const TextStyle(color: Colors.white60),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
+              fillColor: Colors.black.withOpacity(0.2),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              suffixIcon: IconButton(
+                icon: const Icon(
+                  Icons.send_rounded,
+                  color: Colors.white70,
                 ),
-                filled: true,
-                fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.send_rounded,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  onPressed: _sendMessage,
-                ),
+                onPressed: _sendMessage,
               ),
             ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: _onIsResolved,
-              icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Mark as Resolved'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                minimumSize: const Size(double.infinity, 0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: _onIsResolved,
+            icon: const Icon(Icons.check_circle_outline, color: Colors.white70,),
+            label: const Text('Mark as Resolved',style: TextStyle(color: Colors.white70),),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              minimumSize: const Size(double.infinity, 0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
+              backgroundColor: Colors.deepPurple.withOpacity(0.5)
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

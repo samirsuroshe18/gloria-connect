@@ -1,4 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -98,12 +99,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
     NotificationController.isInForeground = true;
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationController.onActionReceivedMethod,
     );
-    super.initState();
+    // FCM token refresh listener
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: newToken));
+      }
+    });
   }
 
   @override

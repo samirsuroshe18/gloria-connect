@@ -134,15 +134,10 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.primaryColor,
-        elevation: 0,
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: const Text('Create Notice',
-            style: TextStyle(fontWeight: FontWeight.w600)),
+            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: BlocConsumer<NoticeBoardBloc, NoticeBoardState>(
         listener: (context, state) {
@@ -173,35 +168,30 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
           }
         },
         builder: (context, state) {
-          return Stack(
-            children: [
-              _buildHeaderDecoration(),
-              SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInfoCard(),
-                        const SizedBox(height: 20),
-                        _buildTitleField(),
-                        const SizedBox(height: 16),
-                        _buildCategorySelector(),
-                        const SizedBox(height: 16),
-                        _buildDescriptionField(),
-                        const SizedBox(height: 20),
-                        _buildImageSection(),
-                        const SizedBox(height: 30),
-                        _buildSubmitButton(),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInfoCard(),
+                    const SizedBox(height: 20),
+                    _buildTitleField(),
+                    const SizedBox(height: 16),
+                    _buildCategorySelector(),
+                    const SizedBox(height: 16),
+                    _buildDescriptionField(),
+                    const SizedBox(height: 20),
+                    _buildImageSection(),
+                    const SizedBox(height: 30),
+                    _buildSubmitButton(),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
-            ],
+            ),
           );
         },
       ),
@@ -216,7 +206,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
       child: Container(
         height: 120,
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
+          color: Colors.deepPurple.withOpacity(0.5),
           borderRadius: const BorderRadius.vertical(
             bottom: Radius.circular(30),
           ),
@@ -227,6 +217,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
 
   Widget _buildInfoCard() {
     return Card(
+      color: Colors.white.withOpacity(0.3),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
@@ -234,15 +225,16 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
-                Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
-                const Text(
+                Icon(Icons.info_outline, color: Colors.white70,),
+                SizedBox(width: 8),
+                Text(
                   'Create a New Notice',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white70
                   ),
                 ),
               ],
@@ -250,17 +242,17 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
             const SizedBox(height: 8),
             const Text(
               'Share important announcements, updates, or events with your community.',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14, color: Colors.white60),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.calendar_today,
-                    size: 14, color: Colors.grey.shade600),
+                const Icon(Icons.calendar_today,
+                    size: 14, color: Colors.white60),
                 const SizedBox(width: 5),
                 Text(
                   'Today, ${DateFormat.yMMMd().format(DateTime.now())}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: const TextStyle(fontSize: 12, color: Colors.white70),
                 ),
               ],
             ),
@@ -300,7 +292,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 8),
@@ -326,8 +318,8 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? _categoryColors[category]
-                          : Colors.grey.shade200,
+                          ? Colors.deepPurple
+                          : const Color(0xff41436a),
                       borderRadius: BorderRadius.circular(20),
                       border: isSelected
                           ? Border.all(
@@ -340,9 +332,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                       children: [
                         Icon(
                           _categoryIcons[category],
-                          color: isSelected
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey.shade700,
+                          color: Colors.white70,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
@@ -351,8 +341,8 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                               category.substring(1),
                           style: TextStyle(
                             color: isSelected
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey.shade700,
+                                ? Colors.white70
+                                : Colors.white60,
                             fontWeight: isSelected
                                 ? FontWeight.bold
                                 : FontWeight.normal,
@@ -410,7 +400,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 10),
@@ -421,7 +411,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
               height: 150,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: Colors.grey.shade100.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.shade300),
               ),
@@ -436,7 +426,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                   const SizedBox(height: 8),
                   Text(
                     'Add an image',
-                    style: TextStyle(color: Colors.grey.shade600),
+                    style: TextStyle(color: Colors.grey.shade400),
                   ),
                 ],
               ),
@@ -507,9 +497,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                 }
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).primaryColor,
-          foregroundColor: Colors.white,
-          elevation: 2,
+          backgroundColor: Colors.deepPurple.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -528,6 +516,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white70
                 ),
               ),
       ),

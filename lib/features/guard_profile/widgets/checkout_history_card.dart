@@ -23,10 +23,9 @@ class CheckoutHistoryCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
-      elevation: 2,
+      color: Colors.black.withOpacity(0.2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -69,8 +68,9 @@ class CheckoutHistoryCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               data.name ?? 'Visitor',
-                              style: theme.textTheme.titleLarge?.copyWith(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white70
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -153,7 +153,7 @@ class CheckoutHistoryCard extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: _makePhoneCall,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primaryColor,
+                  backgroundColor: Colors.blueAccent,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
@@ -183,14 +183,13 @@ class CheckoutHistoryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blue.shade100),
       ),
       child: Text(
         status,
         style: TextStyle(
-          color: Colors.blue.shade700,
+          color: Colors.white70,
           fontWeight: FontWeight.w600,
           fontSize: 12,
         ),
@@ -201,12 +200,12 @@ class CheckoutHistoryCard extends StatelessWidget {
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey.shade600),
+        Icon(icon, size: 16, color: Colors.white70),
         const SizedBox(width: 6),
         Text(
           text,
-          style: TextStyle(
-            color: Colors.grey.shade700,
+          style: const TextStyle(
+            color: Colors.white70,
             fontSize: 14,
           ),
         ),
@@ -217,13 +216,13 @@ class CheckoutHistoryCard extends StatelessWidget {
   Widget _buildTimeInfo(String label, String time, IconData icon) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: Colors.grey.shade600),
+        Icon(icon, size: 20, color: Colors.white70),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
-            color: Colors.grey.shade600,
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 2),
@@ -241,7 +240,7 @@ class CheckoutHistoryCard extends StatelessWidget {
   Widget _buildApprovalInfo(String label, String name, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: Colors.grey.shade600),
+        Icon(icon, size: 18, color: Colors.white70),
         const SizedBox(width: 8),
         Expanded(
           child: RichText(
@@ -251,13 +250,13 @@ class CheckoutHistoryCard extends StatelessWidget {
                 TextSpan(
                   text: '$label: ',
                   style: TextStyle(
-                    color: Colors.grey.shade600,
+                    color: Colors.white70,
                   ),
                 ),
                 TextSpan(
                   text: name,
                   style: const TextStyle(
-                    color: Colors.black87,
+                    color: Colors.white70,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -305,7 +304,7 @@ class CheckoutHistoryCard extends StatelessWidget {
                     );
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.error, size: 100);
+                    return const Icon(Icons.error, size: 100, color: Colors.white70,);
                   },
                 ),
               ),
@@ -326,7 +325,7 @@ class CheckoutHistoryCard extends StatelessWidget {
                     ),
                     child: const Icon(
                       Icons.close,
-                      color: Colors.white,
+                      color: Colors.white70,
                       size: 20,
                     ),
                   ),

@@ -55,7 +55,7 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
             'Society Admin',
             style: TextStyle(color: Colors.white,),
           ),
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Colors.black.withOpacity(0.2),
         ),
         body: BlocConsumer<AdministrationBloc, AdministrationState>(
           listener: (context, state){
@@ -98,18 +98,21 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
                 onRefresh: _refreshUserData,  // Method to refresh user data
                 child: Column(
                   children: [
-                    TextField(
-                      onChanged: (query) => filterResidents(query),
-                      style: const TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                        hintText: 'Search by name or mobile number',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide.none,
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: TextField(
+                        onChanged: (query) => filterResidents(query),
+                        style: const TextStyle(color: Colors.white70),
+                        decoration: InputDecoration(
+                          hintText: 'Search by name or mobile number',
+                          hintStyle: const TextStyle(color: Colors.white60),
+                          prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.2),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                     ),
@@ -120,6 +123,7 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
                         itemBuilder: (context, index) {
                           final member = filteredAdmin[index];
                           return Card(
+                            color: Colors.black.withOpacity(0.2),
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)

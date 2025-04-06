@@ -35,22 +35,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Future<void> _initializeNotifications() async {
     final notificationServices = NotificationController();
     await notificationServices.requestNotificationPermission();
-
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      if (mounted) {
-        context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: newToken));
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2),
         elevation: 0,
-        backgroundColor: Colors.blue,
         title: Row(
           children: [
             Image.asset('assets/app_logo/app_logo.png', height: 40),
@@ -81,15 +75,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(30),
+            topLeft: Radius.circular(30),
+          ),
+          color: Colors.black.withOpacity(0.2),
         ),
         child: SafeArea(
           child: Padding(
@@ -101,29 +91,30 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   _selectedIndex = index;
                 });
               },
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.transparent, // Keeps the gradient visible
               elevation: 0,
               labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+              indicatorColor: Colors.amberAccent.shade200.withOpacity(0.4), // Elegant gold accent
               animationDuration: const Duration(milliseconds: 500),
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.people_outline),
-                  selectedIcon: Icon(Icons.people, color: Color(0xFF1A237E)),
+                  icon: Icon(Icons.people_outline, color: Colors.white70),
+                  selectedIcon: Icon(Icons.people, color: Colors.amberAccent),
                   label: 'Visitors',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.person_add_outlined),
-                  selectedIcon: Icon(Icons.person_add, color: Color(0xFF1A237E)),
+                  icon: Icon(Icons.person_add_outlined, color: Colors.white70),
+                  selectedIcon: Icon(Icons.person_add, color: Colors.amberAccent),
                   label: 'Invite',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.admin_panel_settings_outlined),
-                  selectedIcon: Icon(Icons.admin_panel_settings, color: Color(0xFF1A237E)),
+                  icon: Icon(Icons.admin_panel_settings_outlined, color: Colors.white70),
+                  selectedIcon: Icon(Icons.admin_panel_settings, color: Colors.amberAccent),
                   label: 'Admin',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.person_outline),
-                  selectedIcon: Icon(Icons.person, color: Color(0xFF1A237E)),
+                  icon: Icon(Icons.person_outline, color: Colors.white70),
+                  selectedIcon: Icon(Icons.person, color: Colors.amberAccent),
                   label: 'Profile',
                 ),
               ],

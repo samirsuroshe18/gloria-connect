@@ -6,10 +6,12 @@ class AuthTextField extends StatelessWidget {
   final TextEditingController controller;
   final String errorMsg;
   final Icon? icon;
+  final Color? iconColor;
+  final Color? fillColor;
   final bool obscureText;
   final int inputLength;
   final TextInputType inputType;
-  const AuthTextField({super.key, required this.hintText, required this.controller, required this.errorMsg, this.icon, required this.obscureText, this.inputLength = 100, this.inputType = TextInputType.text});
+  const AuthTextField({super.key, required this.hintText, required this.controller, required this.errorMsg, this.icon, required this.obscureText, this.inputLength = 100, this.inputType = TextInputType.text, this.iconColor, this.fillColor});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +23,13 @@ class AuthTextField extends StatelessWidget {
       ],
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: TextStyle(
+          color: iconColor
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
-        fillColor: Colors.blue.withOpacity(0.1),
+        fillColor: fillColor ?? Colors.blue.withOpacity(0.1),
         filled: true,
         prefixIcon: icon,
       ),

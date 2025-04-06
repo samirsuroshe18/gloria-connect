@@ -58,30 +58,29 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
     }
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black.withOpacity(0.2),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back,
-              color: Color(0xFF2C3E50)), // Darker color
+              color: Colors.white70), // Darker color
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Notice Board',
           style: TextStyle(
-            color: Color(0xFF2C3E50),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFF3498DB)),
+            icon: const Icon(Icons.refresh, color: Colors.white70),
             onPressed: _onRefresh,
             tooltip: 'Refresh Notices',
           ),
           IconButton(
-            icon: const Icon(Icons.filter_list, color: Color(0xFF3498DB)),
+            icon: const Icon(Icons.filter_list, color: Colors.white70),
             onPressed: () {
               _showFilterBottomSheet(context);
             },
@@ -97,9 +96,12 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
               onChanged: (_) => _filterNotices(),
               decoration: InputDecoration(
                 hintText: 'Search notices...',
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF95A5A6)),
+                hintStyle: const TextStyle(
+                  color: Colors.white60
+                ),
+                prefixIcon: const Icon(Icons.search, color: Colors.white70),
                 filled: true,
-                fillColor: const Color(0xFFECF0F1),
+                fillColor: Colors.white.withOpacity(0.2),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -200,8 +202,8 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
             });
           }
         },
-        backgroundColor: const Color(0xFF3498DB),
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add, color: Colors.white70),
       ),
     );
   }
@@ -236,8 +238,8 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
     }
 
     return Card(
+      color: Colors.black.withOpacity(0.2),
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -256,7 +258,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
             // Category label
             Container(
               decoration: BoxDecoration(
-                color: getCategoryColor(notice.category ?? 'event'),
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
@@ -267,14 +269,14 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                 children: [
                   Icon(
                     getCategoryIcon(notice.category ?? 'event'),
-                    color: Colors.white,
+                    color: Colors.white70,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     notice.category ?? 'Not available',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.white70,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -282,7 +284,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                   Text(
                     DateFormat('MMM dd, yyyy').format(notice.createdAt ?? DateTime.now()),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.white70,
                       fontSize: 12,
                     ),
                   ),
@@ -301,7 +303,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
+                      color: Colors.white70,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -311,7 +313,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     notice.description ?? 'No description',
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF7F8C8D),
+                      color: Colors.white60,
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
@@ -328,10 +330,10 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                 children: [
                   Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 16,
-                        backgroundColor: Color(0xFFECF0F1),
-                        child: Icon(
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        child: const Icon(
                           Icons.person,
                           size: 18,
                           color: Color(0xFF7F8C8D),
@@ -342,16 +344,16 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                         notice.publishedBy?.userName ?? "Unknown",
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF7F8C8D),
+                          color: Colors.white60,
                         ),
                       ),
                     ],
                   ),
-                  Text(
+                  const Text(
                     'Read more',
                     style: TextStyle(
                       fontSize: 12,
-                      color: getCategoryColor(notice.category ?? 'event'),
+                      color: Colors.white60,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -479,6 +481,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
 
   void _showFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
+      backgroundColor: Colors.deepPurple,
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -502,7 +505,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C3E50),
+                          color: Colors.white70,
                         ),
                       ),
                       IconButton(
@@ -517,7 +520,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
+                      color: Colors.white70,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -526,6 +529,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     runSpacing: 8,
                     children: _categories.map((category) {
                       return ChoiceChip(
+                        backgroundColor: Colors.purple.withOpacity(0.5),
                         label: Text(category),
                         selected: _filterCategory == category,
                         onSelected: (selected) {
@@ -534,7 +538,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                           });
                           _filterNotices();
                         },
-                        selectedColor: const Color(0xFF3498DB),
+                        selectedColor: Colors.purple.withOpacity(0.5),
                         labelStyle: TextStyle(
                           color: _filterCategory == category
                               ? Colors.white
@@ -559,7 +563,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                           _filterNotices();
                           Navigator.pop(context);
                         },
-                        child: const Text('Reset Filters'),
+                        child: const Text('Reset Filters', style: TextStyle(color: Colors.white70),),
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton(
@@ -568,7 +572,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3498DB),
+                          backgroundColor: Colors.purple.withOpacity(0.5),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),

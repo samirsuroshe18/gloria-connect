@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/utils/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../auth/bloc/auth_bloc.dart';
@@ -33,14 +34,16 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     if (!mounted) return;
     context.read<AuthBloc>().add(AuthGetUser());
     context.read<AuthBloc>().add(AuthGetContactEmail());
+    final notificationServices = NotificationController();
+    await notificationServices.requestNotificationPermission();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blue.withOpacity(0.2),
         title: const Text(
           'Verification Status',
           style: TextStyle(
@@ -93,7 +96,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     // Profile Section
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.blue.shade50.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -140,7 +143,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                                 .textTheme
                                 .titleLarge
                                 ?.copyWith(
-                              color: const Color(0xFF1E3A8A),
+                              color: Colors.white70,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -163,7 +166,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     // Information Card
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
+                        color: Colors.blue.shade50.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       padding: const EdgeInsets.all(16),
@@ -171,7 +174,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                         children: [
                           Icon(
                             Icons.info_outline,
-                            color: Color(0xFF1E3A8A),
+                            color: Colors.white70,
                             size: 28,
                           ),
                           SizedBox(height: 12),
@@ -179,7 +182,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                             'Our team is reviewing your information. This process typically takes 24-48 hours. You will be notified once the verification is complete.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Color(0xFF1E3A8A),
+                              color: Colors.white70,
                               height: 1.5,
                             ),
                           ),
@@ -191,10 +194,10 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     OutlinedButton(
                       onPressed: _contactSupport,
                       style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.black.withOpacity(0.2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        side: const BorderSide(color: Color(0xFF1E3A8A)),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
@@ -202,7 +205,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                       ),
                       child: const Text(
                         'Contact Support',
-                        style: TextStyle(color: Color(0xFF1E3A8A)),
+                        style: TextStyle(color: Colors.white70),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -220,9 +223,9 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     switch (status.toLowerCase()) {
       case 'pending':
         return Colors.orange;
-      case 'approve':
+      case 'approved':
         return Colors.green;
-      case 'reject':
+      case 'rejected':
         return Colors.red;
       default:
         return Colors.grey;
@@ -233,16 +236,12 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16),
+        const Padding(
+          padding: EdgeInsets.only(left: 16),
           child: Text(
             'Verification Process',
-            style: Theme
-                .of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(
-              color: const Color(0xFF1E3A8A),
+            style: TextStyle(
+              color: Colors.white70,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -285,7 +284,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                   height: 40,
                   decoration: BoxDecoration(
                     color: isCompleted
-                        ? const Color(0xFF1E3A8A)
+                        ? Colors.orange
                         : Colors.grey.shade200,
                     shape: BoxShape.circle,
                   ),
@@ -300,7 +299,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     child: Container(
                       width: 2,
                       color: isCompleted
-                          ? const Color(0xFF1E3A8A)
+                          ? Colors.orange
                           : Colors.grey.shade200,
                     ),
                   ),
@@ -319,16 +318,16 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: isCompleted
-                          ? const Color(0xFF1E3A8A)
-                          : Colors.grey.shade600,
+                          ? Colors.orange
+                          : Colors.white70,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: Colors.white60,
                     ),
                   ),
                 ],

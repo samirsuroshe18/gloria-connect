@@ -37,11 +37,11 @@ class _GuardApprovalScreenState extends State<GuardApprovalScreen> {
           'Guard Approval',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: BlocConsumer<AdministrationBloc, AdministrationState>(
         listener: (context, state) {
-          if (state is AdminGetPendingResidentReqLoading) {
+          if (state is AdminGetPendingGuardReqLoading) {
             setState(() {
               _isLoading = true;
               _isError = false;

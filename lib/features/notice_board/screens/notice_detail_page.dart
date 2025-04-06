@@ -12,6 +12,7 @@ import 'package:open_file/open_file.dart';
 
 class NoticeDetailPage extends StatelessWidget {
   final NoticeBoardModel data;
+
   const NoticeDetailPage({super.key, required this.data});
 
   @override
@@ -42,7 +43,6 @@ class NoticeDetailPage extends StatelessWidget {
         : 'Date not available';
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           // Custom app bar with image if available
@@ -53,23 +53,15 @@ class NoticeDetailPage extends StatelessWidget {
                 ? 240.0
                 : 0.0,
             pinned: true,
-            elevation: 0,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.black.withOpacity(0.2),
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
-                child: const Icon(Icons.arrow_back, color: Color(0xFF2C3E50)),
+                child: const Icon(Icons.arrow_back, color: Colors.white70),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -78,7 +70,7 @@ class NoticeDetailPage extends StatelessWidget {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
@@ -88,7 +80,7 @@ class NoticeDetailPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.share, color: Color(0xFF2C3E50)),
+                  child: const Icon(Icons.share, color: Colors.white70),
                 ),
                 onPressed: () {
                   Share.share(
@@ -162,18 +154,20 @@ class NoticeDetailPage extends StatelessWidget {
                   if (data.category != null && data.category!.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(bottom: 16),
-                      child: Chip(
-                        label: Text(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2), // background of chip container
+                        borderRadius: BorderRadius.circular(20), // match Chip’s roundness
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        child: Text(
                           data.category!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+                            style: const TextStyle(
+                              color: Colors.white70, // your preferred text color
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            )
                         ),
-                        backgroundColor: getCategoryColor(data.category),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 0),
                       ),
                     ),
 
@@ -183,7 +177,7 @@ class NoticeDetailPage extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
+                      color: Colors.white70,
                       height: 1.3,
                     ),
                   ),
@@ -196,14 +190,14 @@ class NoticeDetailPage extends StatelessWidget {
                       const Icon(
                         Icons.calendar_today,
                         size: 14,
-                        color: Color(0xFF95A5A6),
+                        color: Colors.white60,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           formattedDate,
                           style: const TextStyle(
-                            color: Color(0xFF95A5A6),
+                            color: Colors.white60,
                             fontSize: 14,
                           ),
                         ),
@@ -219,14 +213,13 @@ class NoticeDetailPage extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 14,
-                            backgroundColor: getCategoryColor(data.category)
-                                .withOpacity(0.2),
+                            backgroundColor: Colors.white.withOpacity(0.2),
                             child: Text(
                               (data.publishedBy?.userName?.isNotEmpty ?? false)
                                   ? data.publishedBy!.userName![0].toUpperCase()
                                   : 'A',
                               style: TextStyle(
-                                color: getCategoryColor(data.category),
+                                color: Colors.white60,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
@@ -236,7 +229,7 @@ class NoticeDetailPage extends StatelessWidget {
                           Text(
                             'Posted by ${data.publishedBy?.userName ?? "Unknown"}',
                             style: const TextStyle(
-                              color: Color(0xFF7F8C8D),
+                              color: Colors.white60,
                               fontSize: 14,
                             ),
                           ),
@@ -244,14 +237,17 @@ class NoticeDetailPage extends StatelessWidget {
                       ),
                     ),
 
-                  const Divider(height: 32),
+                  const Divider(
+                    height: 32,
+                    color: Colors.white30,
+                  ),
 
                   // Description
                   Text(
                     data.description ?? 'No Description',
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF34495E),
+                      color: Colors.white60,
                       height: 1.6,
                     ),
                   ),
@@ -272,10 +268,17 @@ class NoticeDetailPage extends StatelessWidget {
                             subject: data.title,
                           );
                         },
-                        icon: const Icon(Icons.share, size: 18),
-                        label: const Text('Share'),
+                        icon: const Icon(
+                          Icons.share,
+                          size: 18,
+                          color: Colors.white60,
+                        ),
+                        label: const Text(
+                          'Share',
+                          style: TextStyle(color: Colors.white60),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3498DB),
+                          backgroundColor: Colors.deepPurple,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
@@ -289,10 +292,17 @@ class NoticeDetailPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        icon: const Icon(Icons.arrow_back, size: 18),
-                        label: const Text('Back to Notices'),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          size: 18,
+                          color: Colors.white60,
+                        ),
+                        label: const Text(
+                          'Back to Notices',
+                          style: TextStyle(color: Colors.white60),
+                        ),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF3498DB),
+                          backgroundColor: Colors.deepPurple.withOpacity(0.2),
                           side: const BorderSide(color: Color(0xFF3498DB)),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
@@ -313,95 +323,96 @@ class NoticeDetailPage extends StatelessWidget {
   }
 
   Widget _buildAttachments(String imageUrl, BuildContext context) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const SizedBox(height: 24),
-      const Text(
-        'Attachment',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF2C3E50),
-        ),
-      ),
-      const SizedBox(height: 12),
-      Card(
-        margin: const EdgeInsets.only(bottom: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: Colors.grey.shade200),
-        ),
-        child: ListTile(
-          leading: const Icon(
-            Icons.image,
-            color: Color(0xFF3498DB),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        const Text(
+          'Attachment',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2C3E50),
           ),
-          title: const Text(
-            'Image Attachment',
-            style: TextStyle(fontSize: 14),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(color: Colors.grey.shade200),
           ),
-          trailing: IconButton(
-            icon: const Icon(
-              Icons.download,
+          child: ListTile(
+            leading: const Icon(
+              Icons.image,
               color: Color(0xFF3498DB),
             ),
-            onPressed: () async {
-              await _downloadFile(imageUrl, context);
+            title: const Text(
+              'Image Attachment',
+              style: TextStyle(fontSize: 14),
+            ),
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.download,
+                color: Color(0xFF3498DB),
+              ),
+              onPressed: () async {
+                await _downloadFile(imageUrl, context);
+              },
+            ),
+            onTap: () {
+              // Handle open image
             },
           ),
-          onTap: () {
-            // Handle open image
-          },
         ),
-      ),
-    ],
-  );
-}
-
-Future<void> _downloadFile(String url, BuildContext context) async {
-  try {
-    // Show downloading message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Downloading file...")),
-    );
-
-    // Send GET request to download file
-    var response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      // Get app's external storage directory
-      Directory? directory = await getExternalStorageDirectory();
-      if (directory == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Unable to find directory.")),
-        );
-        return;
-      }
-
-      // Create file path
-      String fileName = url.split('/').last;
-      String filePath = "${directory.path}/$fileName";
-
-      // Save file
-      File file = File(filePath);
-      await file.writeAsBytes(response.bodyBytes);
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Downloaded to $filePath")),
-      );
-
-      // Open file after download
-      OpenFile.open(filePath);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Download failed: Server error.")),
-      );
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Download failed: $e")),
+      ],
     );
   }
-}}
+
+  Future<void> _downloadFile(String url, BuildContext context) async {
+    try {
+      // Show downloading message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Downloading file...")),
+      );
+
+      // Send GET request to download file
+      var response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        // Get app's external storage directory
+        Directory? directory = await getExternalStorageDirectory();
+        if (directory == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Unable to find directory.")),
+          );
+          return;
+        }
+
+        // Create file path
+        String fileName = url.split('/').last;
+        String filePath = "${directory.path}/$fileName";
+
+        // Save file
+        File file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Downloaded to $filePath")),
+        );
+
+        // Open file after download
+        OpenFile.open(filePath);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Download failed: Server error.")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Download failed: $e")),
+      );
+    }
+  }
+}

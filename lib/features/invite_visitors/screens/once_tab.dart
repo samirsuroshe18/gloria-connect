@@ -70,238 +70,218 @@ class _OnceTabState extends State<OnceTab> {
           }
         },
         builder: (context, state) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.blue.shade50,
-                  Colors.white,
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Invite Visitor',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Invite Visitor',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Schedule a visit by selecting date, time and duration',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
-                        ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Schedule a visit by selecting date, time and duration',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white60,
                       ),
-                      const SizedBox(height: 32),
+                    ),
+                    const SizedBox(height: 32),
 
-                      // Date Selection Card
-                      _buildSelectionCard(
-                        title: 'Visit Date',
-                        icon: Icons.calendar_month_rounded,
-                        value: selectedDate != null
-                            ? DateFormat('EEEE, MMMM d, y').format(selectedDate!)
-                            : 'Select Date',
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate ?? DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(const Duration(days: 90)),
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  colorScheme: ColorScheme.light(
-                                    primary: Colors.blue.shade700,
-                                  ),
-                                ),
-                                child: child!,
-                              );
-                            },
-                          );
-                          if (date != null) {
-                            setState(() => selectedDate = date);
-                          }
-                        },
-                      ),
-
-                      // Time Selection Card
-                      _buildSelectionCard(
-                        title: 'Visit Time',
-                        icon: Icons.access_time_rounded,
-                        value: selectedTime != null
-                            ? selectedTime!.format(context)
-                            : 'Select Time',
-                        onTap: () async {
-                          final time = await showTimePicker(
-                            context: context,
-                            initialTime: selectedTime ?? TimeOfDay.now(),
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  colorScheme: ColorScheme.light(
-                                    primary: Colors.blue.shade700,
-                                  ),
-                                ),
-                                child: child!,
-                              );
-                            },
-                          );
-                          if (time != null) {
-                            setState(() => selectedTime = time);
-                          }
-                        },
-                      ),
-
-                      const SizedBox(height: 24),
-                      Text(
-                        'Pass Duration',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Duration Selection Grid
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 2.5,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                        itemCount: durations.length,
-                        itemBuilder: (context, index) {
-                          final duration = durations[index];
-                          final isSelected = selectedDuration == duration;
-
-                          return InkWell(
-                            onTap: () => selectDuration(duration),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Colors.blue.shade700
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? Colors.transparent
-                                      : Colors.grey.shade300,
-                                ),
-                                boxShadow: isSelected
-                                    ? [
-                                  BoxShadow(
-                                    color: Colors.blue.shade200,
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  )
-                                ]
-                                    : null,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  duration,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.grey.shade700,
-                                  ),
+                    // Date Selection Card
+                    _buildSelectionCard(
+                      title: 'Visit Date',
+                      icon: Icons.calendar_month_rounded,
+                      value: selectedDate != null
+                          ? DateFormat('EEEE, MMMM d, y').format(selectedDate!)
+                          : 'Select Date',
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate ?? DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 90)),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Colors.blue.shade700,
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // Pre-approve Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : () {
-                            if (selectedDate != null &&
-                                selectedTime != null &&
-                                selectedDuration != null) {
-                              context
-                                  .read<InviteVisitorsBloc>()
-                                  .add(AddPreApproveEntry(
-                                name: widget.data?['name'],
-                                mobNumber: widget.data?['number'],
-                                profileImg: widget.data?['profileImg'],
-                                companyName: widget.data?['companyName'],
-                                companyLogo: widget.data?['companyLogo'],
-                                serviceName: widget.data?['serviceName'],
-                                serviceLogo: widget.data?['serviceLogo'],
-                                vehicleNumber: widget.data?['vehicleNo'],
-                                entryType: widget.data?['profileType'],
-                                checkInCodeStartDate:
-                                startDate!.toIso8601String(),
-                                checkInCodeExpiryDate:
-                                endDate!.toIso8601String(),
-                                checkInCodeStart:
-                                startTime!.toIso8601String(),
-                                checkInCodeExpiry:
-                                endTime!.toIso8601String(),
-                              ));
-                            } else {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: const Text(
-                                  'Please select date, time and pass duration',
-                                ),
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: Colors.red.shade700,
-                                margin: const EdgeInsets.all(16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ));
-                            }
+                              child: child!,
+                            );
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade700,
-                            shape: RoundedRectangleBorder(
+                        );
+                        if (date != null) {
+                          setState(() => selectedDate = date);
+                        }
+                      },
+                    ),
+
+                    // Time Selection Card
+                    _buildSelectionCard(
+                      title: 'Visit Time',
+                      icon: Icons.access_time_rounded,
+                      value: selectedTime != null
+                          ? selectedTime!.format(context)
+                          : 'Select Time',
+                      onTap: () async {
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: selectedTime ?? TimeOfDay.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Colors.blue.shade700,
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (time != null) {
+                          setState(() => selectedTime = time);
+                        }
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Pass Duration',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Duration Selection Grid
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 2.5,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: durations.length,
+                      itemBuilder: (context, index) {
+                        final duration = durations[index];
+                        final isSelected = selectedDuration == duration;
+
+                        return InkWell(
+                          onTap: () => selectDuration(duration),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Colors.blue.shade700.withOpacity(0.2)
+                                  : Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.grey.shade300
+                                    : Colors.transparent,
+                              ),
                             ),
-                            elevation: 2,
+                            child: Center(
+                              child: Text(
+                                duration,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.white60,
+                                ),
+                              ),
+                            ),
                           ),
-                          child: _isLoading
-                              ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                              : const Text(
-                            'Pre-approve Visit',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                                color: Colors.white
-                            ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Pre-approve Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                          if (selectedDate != null &&
+                              selectedTime != null &&
+                              selectedDuration != null) {
+                            context
+                                .read<InviteVisitorsBloc>()
+                                .add(AddPreApproveEntry(
+                              name: widget.data?['name'],
+                              mobNumber: widget.data?['number'],
+                              profileImg: widget.data?['profileImg'],
+                              companyName: widget.data?['companyName'],
+                              companyLogo: widget.data?['companyLogo'],
+                              serviceName: widget.data?['serviceName'],
+                              serviceLogo: widget.data?['serviceLogo'],
+                              vehicleNumber: widget.data?['vehicleNo'],
+                              entryType: widget.data?['profileType'],
+                              checkInCodeStartDate:
+                              startDate!.toIso8601String(),
+                              checkInCodeExpiryDate:
+                              endDate!.toIso8601String(),
+                              checkInCodeStart:
+                              startTime!.toIso8601String(),
+                              checkInCodeExpiry:
+                              endTime!.toIso8601String(),
+                            ));
+                          } else {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(SnackBar(
+                              content: const Text(
+                                'Please select date, time and pass duration',
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.red.shade700,
+                              margin: const EdgeInsets.all(16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ));
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                            : const Text(
+                          'Pre-approve Visit',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                              color: Colors.white70
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -322,15 +302,15 @@ class _OnceTabState extends State<OnceTab> {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade800,
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 8),
         Card(
-          elevation: 0,
+          color: Colors.white.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(color: Colors.grey.shade300),
@@ -344,22 +324,22 @@ class _OnceTabState extends State<OnceTab> {
                 children: [
                   Icon(
                     icon,
-                    color: Colors.blue.shade700,
+                    color: Colors.white70,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       value,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
-                        color: Colors.grey.shade700,
+                        color: Colors.white70,
                       ),
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.arrow_forward_ios_rounded,
-                    color: Colors.grey.shade400,
+                    color: Colors.white70,
                     size: 16,
                   ),
                 ],

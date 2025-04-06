@@ -27,9 +27,9 @@ class _GuardExitScreenState extends State<GuardExitScreen> {
         appBar: AppBar(
           title: const Text(
             'Main-Gates-Exit',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white70),
           ),
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.black.withOpacity(0.2),
         ),
         body: const Column(
           children: [

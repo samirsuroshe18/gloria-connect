@@ -28,11 +28,11 @@ class _CheckoutHistoryScreenState extends State<CheckoutHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Colors.black.withOpacity(0.2),
           title: const Text(
             "Checkout History",
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.white70,
             ),
           ),
         ),

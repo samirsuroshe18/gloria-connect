@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
 import 'package:gloria_connect/features/guard_profile/bloc/guard_profile_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 
 import '../../auth/bloc/auth_bloc.dart';
 
@@ -100,7 +99,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: const Text(
           "Edit Profile",
           style: TextStyle(
@@ -188,12 +187,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 30),
                 // Name Field Label
-                Align(
+                const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Full Name",
                     style: TextStyle(
-                      color: Colors.grey[800],
+                      color: Colors.white70,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
@@ -205,8 +204,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   controller: _nameController,
                   decoration: InputDecoration(
                     hintText: "Enter your name",
+                    hintStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.white.withOpacity(0.2),
                     contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -228,11 +228,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ElevatedButton(
                   onPressed: _isLoading ? null : _saveChanges,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff448EE4),
+                    backgroundColor: Colors.deepPurple,
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    elevation: 10,
-                    shadowColor: Colors.blueGrey.shade200,
                   ),
                   child: Center(
                     child: _isLoading
@@ -240,7 +238,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       valueColor: const AlwaysStoppedAnimation<Color>(Colors.blueAccent),
                       backgroundColor: Colors.grey[200],
                       strokeWidth: 5.0,)
-                        : const Text('Save Changes', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                        : const Text('Save Changes', style: TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.bold)),
                   ),
                 )
               ],

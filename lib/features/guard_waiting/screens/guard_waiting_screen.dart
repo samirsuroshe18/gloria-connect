@@ -31,10 +31,9 @@ class _GuardWaitingScreenState extends State<GuardWaitingScreen> {
         appBar: AppBar(
           title: const Text(
             'Waiting for Approval',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white70),
           ),
-          backgroundColor: Colors.blue,
-          elevation: 5,
+          backgroundColor: Colors.black.withOpacity(0.2),
         ),
         body: BlocConsumer<GuardWaitingBloc, GuardWaitingState>(
           listener: (context, state) {

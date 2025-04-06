@@ -35,9 +35,8 @@ class _ApartmentMembersScreenState extends State<ApartmentMembersScreen> {
         appBar: AppBar(
           title: const Text(
             'Apartment Members',
-            style: TextStyle(color: Colors.white,),
           ),
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Colors.black.withOpacity(0.2),
         ),
       body: BlocConsumer<ResidentProfileBloc, ResidentProfileState>(
         listener: (context, state){
@@ -66,6 +65,7 @@ class _ApartmentMembersScreenState extends State<ApartmentMembersScreen> {
                 itemBuilder: (context, index) {
                   final member = data[index];
                   return Card(
+                    color: Colors.black.withOpacity(0.2),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(member.user?.profile ?? ""),

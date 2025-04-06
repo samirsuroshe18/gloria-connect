@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gloria_connect/features/administration/screens/all_admin_screen.dart';
 import 'package:gloria_connect/features/administration/screens/all_guard_screen.dart';
 import 'package:gloria_connect/features/administration/screens/all_resident_screen.dart';
@@ -10,6 +13,7 @@ import 'package:gloria_connect/features/approval_screens/screens/verification_pe
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
 import 'package:gloria_connect/features/auth/screens/forgot_password_screen.dart';
 import 'package:gloria_connect/features/auth/screens/login_screen.dart';
+import 'package:gloria_connect/features/auth/screens/pdf_preview_screen.dart';
 import 'package:gloria_connect/features/auth/screens/register_screen.dart';
 import 'package:gloria_connect/features/auth/screens/splash_screen.dart';
 import 'package:gloria_connect/features/check_in/screens/apartment_selection_screen.dart';
@@ -54,18 +58,18 @@ import 'package:gloria_connect/features/notice_board/screens/genral_notice_board
 import 'package:gloria_connect/features/notice_board/screens/notice_board_page.dart';
 import 'package:gloria_connect/features/notice_board/screens/notice_detail_page.dart';
 import 'package:gloria_connect/features/resident_profile/screens/apartment_members_screen.dart';
-import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:gloria_connect/features/setting/screens/change_password_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_details_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_form_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_screen.dart';
 import 'package:gloria_connect/features/setting/screens/setting_screen.dart';
+import 'package:gloria_connect/utils/check_internet_connection.dart';
+import 'package:gloria_connect/utils/gradient_color.dart';
 
 class AppRoutes {
 
   static Route onGenerateRoutes(RouteSettings settings){
     final args = settings.arguments;
-    print('Navigating to: ${settings.name}');
 
     switch(settings.name){
       case '/':
@@ -284,6 +288,10 @@ class AppRoutes {
         return _materialRoute(const CreateNoticePage(), name: '/create-notice-board-screen');
       case '/general-notice-board-screen':
         return _materialRoute(const GeneralNoticeBoardPage(), name: '/general-notice-board-screen');
+      case '/pdf-preview-screen':
+        return _materialRoute(PdfPreviewScreen(file: args as File), name: '/pdf-preview-screen');
+      case '/check-internet':
+        return _materialRoute(const CheckInternetConnection(), name: '/check-internet');
       default:
         return _materialRoute(const SplashScreen(), name: '/');
     }
@@ -291,8 +299,16 @@ class AppRoutes {
 
   static Route<dynamic> _materialRoute(Widget view, {String? name}) {
     return MaterialPageRoute(
-      builder: (_) => view,
-      settings: RouteSettings(name: name), // Assign the route name here
+      builder: (_) => GradientColor(child: Builder(
+        builder: (context) {
+          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+            statusBarColor: Colors.black.withOpacity(0.2), // Apply opacity to the color
+            statusBarIconBrightness: Brightness.light, // Adjust for visibility
+          ));
+          return view;
+        }
+      )),
+      settings: RouteSettings(name: name),
     );
   }
 
