@@ -103,11 +103,23 @@ final class AuthGetUserSuccess extends AuthState{
   AuthGetUserSuccess({required this.response});
 }
 
-final class AuthGetUserFailure extends AuthState{
+enum AuthErrorType {
+  unauthorized,     // 401 errors
+  noInternet,       // Connection errors
+  serverError,      // 500 errors
+  unexpectedError   // Other errors
+}
+
+final class AuthGetUserFailure extends AuthState {
   final String message;
   final int? status;
+  final AuthErrorType errorType;
 
-  AuthGetUserFailure( {required this.message, this.status});
+  AuthGetUserFailure({
+    required this.message,
+    this.status,
+    this.errorType = AuthErrorType.unexpectedError
+  });
 }
 
 /// Get Extra info
