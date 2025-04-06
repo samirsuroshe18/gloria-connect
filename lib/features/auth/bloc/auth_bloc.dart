@@ -118,14 +118,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthGetUser>((event, emit) async {
       emit(AuthGetUserLoading());
       try {
+        // Check for internet first
+        bool hasInternet = await _checkInternetConnection();
+        if (!hasInternet) {
+          emit(AuthGetUserFailure(
+              message: "No internet connection",
+              errorType: AuthErrorType.noInternet
+          ));
+          return;
+        }
+
         final GetUserModel response = await _authRepository.getUser();
         emit(AuthGetUserSuccess(response: response));
       } catch (e) {
         if (e is ApiError) {
+          if (e.statusCode == 401) {
+            emit(AuthGetUserFailure(
+                message: e.message.toString(),
+                status: e.statusCode,
+                errorType: AuthErrorType.unauthorized
+            ));
+          } else if (e.statusCode != null && e.statusCode! >= 500) {
+            emit(AuthGetUserFailure(
+                message: e.message.toString(),
+                status: e.statusCode,
+                errorType: AuthErrorType.serverError
+            ));
+          } else {
+            emit(AuthGetUserFailure(
+                message: e.message.toString(),
+                status: e.statusCode,
+                errorType: AuthErrorType.unexpectedError
+            ));
+          }
+        } else if (e is SocketException || e.toString().contains('SocketException')) {
           emit(AuthGetUserFailure(
-              message: e.message.toString(), status: e.statusCode));
+              message: "No internet connection",
+              errorType: AuthErrorType.noInternet
+          ));
         } else {
-          emit(AuthGetUserFailure(message: e.toString()));
+          emit(AuthGetUserFailure(
+              message: e.toString(),
+              errorType: AuthErrorType.unexpectedError
+          ));
         }
       }
     });
@@ -244,5 +279,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthState getLatestState() {
     return state;
+  }
+}
+
+Future<bool> _checkInternetConnection() async {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+  } on SocketException catch (_) {
+    return false;
   }
 }

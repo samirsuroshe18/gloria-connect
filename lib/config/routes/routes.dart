@@ -64,6 +64,7 @@ import 'package:gloria_connect/features/setting/screens/complaint_form_screen.da
 import 'package:gloria_connect/features/setting/screens/complaint_screen.dart';
 import 'package:gloria_connect/features/setting/screens/setting_screen.dart';
 import 'package:gloria_connect/utils/check_internet_connection.dart';
+import 'package:gloria_connect/utils/error_screen.dart';
 import 'package:gloria_connect/utils/gradient_color.dart';
 
 class AppRoutes {
@@ -292,6 +293,30 @@ class AppRoutes {
         return _materialRoute(PdfPreviewScreen(file: args as File), name: '/pdf-preview-screen');
       case '/check-internet':
         return _materialRoute(const CheckInternetConnection(), name: '/check-internet');
+      case '/error':
+        if (args != null && args is Map<String, dynamic>) {
+          return _materialRoute(
+              ErrorScreen(
+                errorType: args['errorType'] ?? 'unknown',
+                message: args['message'] ?? 'An error occurred',
+                showLoginOption: args['showLoginOption'] ?? false,
+                showRetryOption: args['showRetryOption'] ?? false,
+                onRetry: args['onRetry'],
+              ),
+              name: '/error'
+          );
+        } else {
+          // Default error screen if no arguments provided
+          return _materialRoute(
+              const ErrorScreen(
+                errorType: 'unknown',
+                message: 'An unexpected error occurred',
+                showLoginOption: true,
+                showRetryOption: false,
+              ),
+              name: '/error'
+          );
+        }
       default:
         return _materialRoute(const SplashScreen(), name: '/');
     }

@@ -263,7 +263,7 @@ class AuthRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiKey = 'http://192.168.190.221:8000/api/v1/users/extra-info';
+      const apiKey = 'https://invite.iotsense.in/api/v1/users/extra-info';
       var request = http.MultipartRequest('POST', Uri.parse(apiKey));
       request.headers['Authorization'] = 'Bearer $accessToken';
 
