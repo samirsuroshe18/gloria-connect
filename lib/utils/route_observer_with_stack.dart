@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 class RouteObserverWithStack extends NavigatorObserver {
   final List<Route<dynamic>> routeStack = [];
 
@@ -16,4 +18,10 @@ class RouteObserverWithStack extends NavigatorObserver {
     debugPrint('Stack after pop: ${routeStack.map((r) => r.settings.name).toList()}');
     super.didPop(route, previousRoute);
   }
+}
+
+String? getCurrentRouteName() {
+  return routeObserver.routeStack.isNotEmpty
+      ? routeObserver.routeStack.last.settings.name
+      : null;
 }

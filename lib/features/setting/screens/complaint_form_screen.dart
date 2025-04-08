@@ -230,7 +230,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
       padding: const EdgeInsets.only(top: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -251,10 +251,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
               borderSide: BorderSide.none,
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: Colors.transparent,
             hintText: 'Select Sub-Category',
+            hintStyle: const TextStyle(color: Colors.white70),
             prefixIcon: const Icon(Icons.subdirectory_arrow_right,
-                color: Color(0xFF3498DB)),
+                color: Colors.white70),
           ),
           items: categories[selectedCategory]!.map((String subCategory) {
             return DropdownMenuItem(

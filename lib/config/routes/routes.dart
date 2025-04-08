@@ -272,11 +272,7 @@ class AppRoutes {
       case '/complaint-form-screen':
         return _materialRoute(const ComplaintFormScreen(), name: '/complaint-form-screen');
       case '/complaint-details-screen':
-        if (args != null && args is Map<String, dynamic>) {
-          return _materialRoute(ComplaintDetailsScreen(data: args), name: '/complaint-details-screen');
-        }else{
-          return _materialRoute(const ComplaintDetailsScreen(), name: '/complaint-details-screen');
-        }
+        return _materialRoute(ComplaintDetailsScreen(data: args as Map<String, dynamic>), name: '/complaint-details-screen');
       case '/notice-board-screen':
         return _materialRoute(const NoticeBoardPage(), name: '/notice-board-screen');
       case '/notice-board-details-screen':

@@ -23,6 +23,12 @@ final class SettingSubmitComplaint extends SettingEvent{
 
 final class SettingGetComplaint extends SettingEvent{}
 
+final class SettingGetComplaintDetails extends SettingEvent{
+  final String id;
+
+  SettingGetComplaintDetails({required this.id});
+}
+
 final class SettingAddResponse extends SettingEvent{
   final String id;
   final String message;

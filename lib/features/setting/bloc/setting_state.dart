@@ -51,6 +51,21 @@ final class SettingGetComplaintFailure extends SettingState{
 }
 
 /// To add response
+final class SettingGetComplaintDetailsLoading extends SettingState{}
+
+final class SettingGetComplaintDetailsSuccess extends SettingState{
+  final ComplaintModel response;
+  SettingGetComplaintDetailsSuccess({required this.response});
+}
+
+final class SettingGetComplaintDetailsFailure extends SettingState{
+  final String message;
+  final int? status;
+
+  SettingGetComplaintDetailsFailure( {required this.message, this.status});
+}
+
+/// To add response
 final class SettingAddResponseLoading extends SettingState{}
 
 final class SettingAddResponseSuccess extends SettingState{

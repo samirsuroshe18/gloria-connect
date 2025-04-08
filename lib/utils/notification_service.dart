@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/firebase_options.dart';
+import 'package:gloria_connect/utils/route_observer_with_stack.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -195,11 +196,35 @@ class NotificationController {
     } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED' && isInForeground == true) {
       currentState?.pushNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));
     } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED' && isInForeground == true) {
-      currentState?.pushNamed('/complaint-details-screen', arguments: jsonDecode(receivedAction.payload!['data']!));
+      if(getCurrentRouteName() == '/complaint-details-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+        });
+      }
     } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED' && isInForeground == true) {
-      currentState?.pushNamed('/complaint-details-screen', arguments: jsonDecode(receivedAction.payload!['data']!));
+      if(getCurrentRouteName() == '/complaint-details-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+        });
+      }
     } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED' && isInForeground == true) {
-      currentState?.pushNamed('/complaint-details-screen', arguments: jsonDecode(receivedAction.payload!['data']!));
+      if(getCurrentRouteName() == '/complaint-details-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+        });
+      }
     }
   }
 
