@@ -67,11 +67,44 @@ class NoticeDetailPage extends StatelessWidget {
                   ),
                   child: const Icon(Icons.share, color: Colors.white70),
                 ),
-                onPressed: () {
-                  Share.share(
-                    'Check out this important notice: ${data.title}\n\n${data.description}',
-                    subject: data.title,
-                  );
+                onPressed: () async {
+                  String shareText =
+                      'Check out this important notice: ${data.title}\n\n${data.description}';
+
+                  if (data.image != null && data.image!.isNotEmpty) {
+                    try {
+                      // Download the image
+                      final response = await http.get(Uri.parse(data.image!));
+                      final bytes = response.bodyBytes;
+
+                      // Get temporary directory
+                      final tempDir = await getTemporaryDirectory();
+                      final file = File('${tempDir.path}/notice_image.jpg');
+
+                      // Save the image
+                      await file.writeAsBytes(bytes);
+
+                      // Share image + text
+                      await Share.shareXFiles(
+                        [XFile(file.path)],
+                        text: shareText,
+                        subject: data.title,
+                      );
+                    } catch (e) {
+                      debugPrint('Error sharing image: $e');
+                      // Fallback to text only
+                      await Share.share(
+                        shareText,
+                        subject: data.title,
+                      );
+                    }
+                  } else {
+                    // Share text only
+                    await Share.share(
+                      shareText,
+                      subject: data.title,
+                    );
+                  }
                 },
               ),
               const SizedBox(width: 8),
@@ -242,11 +275,43 @@ class NoticeDetailPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: () {
-                          Share.share(
-                            'Check out this important notice: ${data.title}\n\n${data.description}',
-                            subject: data.title,
-                          );
+                        onPressed: () async {
+                          String shareText =
+                              'Check out this important notice: ${data.title}\n\n${data.description}';
+                          if (data.image != null && data.image!.isNotEmpty) {
+                            try {
+                              // Download the image
+                              final response = await http.get(Uri.parse(data.image!));
+                              final bytes = response.bodyBytes;
+
+                              // Get temporary directory
+                              final tempDir = await getTemporaryDirectory();
+                              final file = File('${tempDir.path}/notice_image.jpg');
+
+                              // Save the image
+                              await file.writeAsBytes(bytes);
+
+                              // Share image + text
+                              await Share.shareXFiles(
+                                [XFile(file.path)],
+                                text: shareText,
+                                subject: data.title,
+                              );
+                            } catch (e) {
+                              debugPrint('Error sharing image: $e');
+                              // Fallback to text only
+                              await Share.share(
+                                shareText,
+                                subject: data.title,
+                              );
+                            }
+                          } else {
+                            // Share text only
+                            await Share.share(
+                              shareText,
+                              subject: data.title,
+                            );
+                          }
                         },
                         icon: const Icon(
                           Icons.share,
@@ -312,11 +377,12 @@ class NoticeDetailPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF2C3E50),
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 12),
         Card(
+          color: Colors.black.withOpacity(0.2),
           margin: const EdgeInsets.only(bottom: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),

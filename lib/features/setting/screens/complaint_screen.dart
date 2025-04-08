@@ -402,7 +402,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black54,
+                  color: Colors.white70,
                 ),
               ),
             ],

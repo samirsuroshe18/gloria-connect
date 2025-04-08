@@ -194,7 +194,15 @@ class NotificationController {
         currentState?.pushNamedAndRemoveUntil('/delivery-approval-screen', (route) => route.isFirst, arguments: jsonDecode(receivedAction.payload!['data']!));
       }
     } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED' && isInForeground == true) {
-      currentState?.pushNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));
+      if(getCurrentRouteName() == '/create-notice-board-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));
+        });
+      }
     } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED' && isInForeground == true) {
       if(getCurrentRouteName() == '/complaint-details-screen'){
         WidgetsBinding.instance.addPostFrameCallback((_) {
