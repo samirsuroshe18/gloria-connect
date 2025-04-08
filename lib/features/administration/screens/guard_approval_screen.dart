@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/administration/models/guard_requests_model.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:gloria_connect/features/administration/widgets/verification_request_card.dart';
@@ -101,27 +103,30 @@ class _GuardApprovalScreenState extends State<GuardApprovalScreen> {
           if (data.isNotEmpty && _isLoading == false) {
             return RefreshIndicator(
               onRefresh: _refreshUserData,
-              child: ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return VerificationRequestCard(
-                    profileImageUrl: data[index].user?.profile ?? '',
-                    userName: data[index].user?.userName ?? 'NA',
-                    role: data[index].profileType ?? 'NA',
-                    societyName: data[index].societyName ?? 'NA',
-                    gateAssign: data[index].gateAssign ?? 'NA',
-                    isLoadingApprove: isLoadingList[index]['approve']!,
-                    isLoadingReject: isLoadingList[index]['reject']!,
-                    date: data[index].createdAt != null
-                        ? '${data[index].createdAt!.day}/${data[index].createdAt!.month}/${data[index].createdAt!.year}'
-                        : 'NA',
-                    tagColor: Colors.orange,
-                    time: timeago.format(data[index].createdAt ?? DateTime.now()),
-                    onApprove: () => onApprove(data[index], index),
-                    onReject: () => onReject(data[index], index),
-                    onCall: () => onCall(data[index]),
-                  );
-                },
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return StaggeredListAnimation(index: index, child: VerificationRequestCard(
+                      profileImageUrl: data[index].user?.profile ?? '',
+                      userName: data[index].user?.userName ?? 'NA',
+                      role: data[index].profileType ?? 'NA',
+                      societyName: data[index].societyName ?? 'NA',
+                      gateAssign: data[index].gateAssign ?? 'NA',
+                      isLoadingApprove: isLoadingList[index]['approve']!,
+                      isLoadingReject: isLoadingList[index]['reject']!,
+                      date: data[index].createdAt != null
+                          ? '${data[index].createdAt!.day}/${data[index].createdAt!.month}/${data[index].createdAt!.year}'
+                          : 'NA',
+                      tagColor: Colors.orange,
+                      time: timeago.format(data[index].createdAt ?? DateTime.now()),
+                      onApprove: () => onApprove(data[index], index),
+                      onReject: () => onReject(data[index], index),
+                      onCall: () => onCall(data[index]),
+                    ));
+                  },
+                ),
               ),
             );
           } else if (_isLoading) {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/resident_profile/bloc/resident_profile_bloc.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -59,31 +61,34 @@ class _ApartmentMembersScreenState extends State<ApartmentMembersScreen> {
           if(data.isNotEmpty && _isLoading == false) {
             return RefreshIndicator(
               onRefresh: _onRefresh,  // Method to refresh user data
-              child: ListView.builder(
-                itemCount: data.length,
-                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                itemBuilder: (context, index) {
-                  final member = data[index];
-                  return Card(
-                    color: Colors.black.withOpacity(0.2),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(member.user?.profile ?? ""),
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: data.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                  itemBuilder: (context, index) {
+                    final member = data[index];
+                    return StaggeredListAnimation(index: index, child: Card(
+                      color: Colors.black.withOpacity(0.2),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(member.user?.profile ?? ""),
+                        ),
+                        title: Text(
+                          member.user?.userName ?? "NA",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(member.user?.phoneNo ?? ""),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.call),
+                          onPressed: () {
+                            _makePhoneCall(member.user?.phoneNo ?? "");
+                          },
+                        ),
                       ),
-                      title: Text(
-                        member.user?.userName ?? "NA",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(member.user?.phoneNo ?? ""),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.call),
-                        onPressed: () {
-                          _makePhoneCall(member.user?.phoneNo ?? "");
-                        },
-                      ),
-                    ),
-                  );
-                },
+                    ));
+                  },
+                ),
               ),
             );
           } else if (_isLoading) {

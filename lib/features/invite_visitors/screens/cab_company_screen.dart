@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 
 class CabCompanyScreen extends StatefulWidget {
   const CabCompanyScreen({super.key});
@@ -79,46 +81,49 @@ class _CabCompanyScreenState extends State<CabCompanyScreen> {
             const SizedBox(height: 20),
             // Expanded list of companies
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredCab.length,
-                itemBuilder: (context, index) {
-                  final cab = filteredCab[index];
-                  final image = cab['image'];
-                  final name = cab['name'] ?? '';
-                  return Card(
-                    color: Colors.black.withOpacity(0.2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: AssetImage(image!),
-                          radius: 25,
-                        ),
-                        title: Text(
-                          name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.white70),
-                        onTap: () {
-                          if (cab['name'] == 'Other') {
-                            _showOtherCabDialog(context, image);  // Use modal bottom sheet approach
-                            // _navigateToOtherCompanyScreen(context);  // Use navigation approach
-                          } else {
-                            // Handle tap for predefined companies
-                            Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'cab', 'image': image, 'companyName': name});
-                          }
-                        },
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: filteredCab.length,
+                  itemBuilder: (context, index) {
+                    final cab = filteredCab[index];
+                    final image = cab['image'];
+                    final name = cab['name'] ?? '';
+                    return StaggeredListAnimation(index: index, child: Card(
+                      color: Colors.black.withOpacity(0.2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                    ),
-                  );
-                },
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: AssetImage(image!),
+                            radius: 25,
+                          ),
+                          title: Text(
+                            name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.white70),
+                          onTap: () {
+                            if (cab['name'] == 'Other') {
+                              _showOtherCabDialog(context, image);  // Use modal bottom sheet approach
+                              // _navigateToOtherCompanyScreen(context);  // Use navigation approach
+                            } else {
+                              // Handle tap for predefined companies
+                              Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'cab', 'image': image, 'companyName': name});
+                            }
+                          },
+                        ),
+                      ),
+                    ));
+                  },
+                ),
               ),
             ),
           ],

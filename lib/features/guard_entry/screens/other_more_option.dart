@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 
 class OtherMoreOption extends StatefulWidget {
   final bool? isAddService;
@@ -105,47 +107,50 @@ class _OtherMoreOptionState extends State<OtherMoreOption> {
             const SizedBox(height: 20),
             // Expanded list of companies
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredServices.length,
-                itemBuilder: (context, index) {
-                  final service = filteredServices[index];
-                  final image = service['image'];
-                  final name = service['name'] ?? '';
-                  return Card(
-                    color: Colors.black.withOpacity(0.2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: AssetImage(image!),
-                          radius: 25,
-                        ),
-                        title: Text(
-                          name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.white70),
-                        onTap: () {
-                          if (service['name'] == 'Other') {
-                            _showOtherCompanyDialog(context, image);
-                          } else if (widget.isAddService == true) {
-                            Navigator.pop(context, {'logo': image, 'name': name});
-                          } else {
-                            Navigator.pop(context, {'logo': image, 'name': name});
-                            // Navigator.pushReplacementNamed(context, '/delivery-approval-profile', arguments: {'logo': image, 'name': name});
-                          }
-                        },
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: filteredServices.length,
+                  itemBuilder: (context, index) {
+                    final service = filteredServices[index];
+                    final image = service['image'];
+                    final name = service['name'] ?? '';
+                    return StaggeredListAnimation(index: index, child: Card(
+                      color: Colors.black.withOpacity(0.2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                    ),
-                  );
-                },
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: AssetImage(image!),
+                            radius: 25,
+                          ),
+                          title: Text(
+                            name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.white70),
+                          onTap: () {
+                            if (service['name'] == 'Other') {
+                              _showOtherCompanyDialog(context, image);
+                            } else if (widget.isAddService == true) {
+                              Navigator.pop(context, {'logo': image, 'name': name});
+                            } else {
+                              Navigator.pop(context, {'logo': image, 'name': name});
+                              // Navigator.pushReplacementNamed(context, '/delivery-approval-profile', arguments: {'logo': image, 'name': name});
+                            }
+                          },
+                        ),
+                      ),
+                    ));
+                  },
+                ),
               ),
             ),
           ],

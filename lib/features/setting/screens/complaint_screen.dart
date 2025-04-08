@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -371,10 +373,13 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
         ? _buildEmptyState()
         : RefreshIndicator(
       onRefresh: _onRefresh,
-      child: ListView.builder(
-        itemCount: complaints.length,
-        padding: const EdgeInsets.only(bottom: 80),
-        itemBuilder: (context, index) => _buildComplaintCard(complaints[index]),
+      child: AnimationLimiter(
+        child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: complaints.length,
+          padding: const EdgeInsets.only(bottom: 80),
+          itemBuilder: (context, index) => StaggeredListAnimation(index: index, child: _buildComplaintCard(complaints[index])),
+        ),
       ),
     );
   }

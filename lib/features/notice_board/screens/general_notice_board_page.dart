@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -157,16 +158,7 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
                   itemCount: _filteredData.length,
                   padding: const EdgeInsets.all(16.0),
                   itemBuilder: (BuildContext context, int index) {
-                    return AnimationConfiguration.staggeredList(
-                      position: index,
-                      duration: const Duration(milliseconds: 375),
-                      child: SlideAnimation(
-                        verticalOffset: 50.0,
-                        child: FadeInAnimation(
-                          child: _buildNoticeCard(_filteredData[index]),
-                        ),
-                      ),
-                    );
+                    return StaggeredListAnimation(index: index, child: _buildNoticeCard(_filteredData[index]));
                   },
                 ),
               ),

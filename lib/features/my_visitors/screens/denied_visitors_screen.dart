@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../guard_waiting/models/entry.dart';
@@ -52,12 +54,15 @@ class _DeniedVisitorsScreenState extends State<DeniedVisitorsScreen>
         if (data.isNotEmpty && _isLoading == false) {
           return RefreshIndicator(
             onRefresh: _onRefresh,
-            child: ListView.builder(
-              itemCount: data.length,
-              padding: const EdgeInsets.all(8.0),
-              itemBuilder: (BuildContext context, int index) {
-                return VisitorDeniedCard(data: data[index]);
-              },
+            child: AnimationLimiter(
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: data.length,
+                padding: const EdgeInsets.all(8.0),
+                itemBuilder: (BuildContext context, int index) {
+                  return StaggeredListAnimation(index: index, child: VisitorDeniedCard(data: data[index]));
+                },
+              ),
             ),
           );
         } else if (_isLoading) {

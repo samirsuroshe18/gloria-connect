@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/guard_exit/bloc/guard_exit_bloc.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../guard_waiting/models/entry.dart';
@@ -53,12 +55,15 @@ class _AllTabState extends State<AllTab> with AutomaticKeepAliveClientMixin {
             return Scaffold(
               body: RefreshIndicator(
                 onRefresh: _refresh,
-                child: ListView.builder(
-                  itemCount: data.length,
-                  padding: const EdgeInsets.all(8.0),
-                  itemBuilder: (BuildContext context, int index) {
-                    return ExitCard(data: data[index], type: 'all');
-                  },
+                child: AnimationLimiter(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: data.length,
+                    padding: const EdgeInsets.all(8.0),
+                    itemBuilder: (BuildContext context, int index) {
+                      return StaggeredListAnimation(index: index, child: ExitCard(data: data[index], type: 'all'));
+                    },
+                  ),
                 ),
               ),
             );

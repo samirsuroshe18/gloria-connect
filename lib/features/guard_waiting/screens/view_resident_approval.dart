@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/guard_waiting/bloc/guard_waiting_bloc.dart';
 import 'package:gloria_connect/features/guard_waiting/widgets/flat_row.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 
 import '../models/entry.dart';
 
@@ -84,16 +86,19 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
 
                   // Flats list arranged vertically with dividers only
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: widget.data?.societyDetails?.societyApartments
-                              ?.length ??
-                          0,
-                      itemBuilder: (context, index) {
-                        return FlatRow(
-                          data: widget
-                              .data?.societyDetails!.societyApartments![index],
-                        );
-                      },
+                    child: AnimationLimiter(
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: widget.data?.societyDetails?.societyApartments
+                                ?.length ??
+                            0,
+                        itemBuilder: (context, index) {
+                          return StaggeredListAnimation(index: index, child: FlatRow(
+                            data: widget
+                                .data?.societyDetails!.societyApartments![index],
+                          ));
+                        },
+                      ),
                     ),
                   ),
 
