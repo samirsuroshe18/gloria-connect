@@ -107,6 +107,8 @@ class NotificationController {
       notifyGuardApprove(message.data['payload']);
     } else if (message.data['action'] == 'NOTIFY_GUARD_REJECTED') {
       notifyGuardReject(message.data['payload']);
+    } else if (message.data['action'] == 'NOTIFY_CHECKED_IN') {
+      notifyResidentCheckedIn(message.data['payload']);
     } else if (message.data['action'] == 'NOTIFY_EXIT_ENTRY') {
       notifyResident(message.data['payload']);
     } else if (message.data['action'] == 'NOTIFY_CHECKED_IN_ENTRY') {

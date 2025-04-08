@@ -207,6 +207,28 @@ Future<void> notifyResident(stringPayload) async {
   );
 }
 
+Future<void> notifyResidentCheckedIn(stringPayload) async {
+  final payload = jsonDecode(stringPayload);
+
+  String name = payload['name'] ?? 'NA';
+
+  await AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      channelKey: 'alert_notification',
+      title: 'New Visitor Checked In',
+      body: '$name has checked in',
+      notificationLayout: NotificationLayout.Inbox,
+      largeIcon: 'asset://assets/images/app_logo.png',
+      wakeUpScreen: true,
+      displayOnForeground: true,
+      displayOnBackground: true,
+      actionType: ActionType.Default,
+      payload: {'data': stringPayload},
+    ),
+  );
+}
+
 Future<void> notifyCheckedInEntry(stringPayload) async {
   final payload = jsonDecode(stringPayload);
 
