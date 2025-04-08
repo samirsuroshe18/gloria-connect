@@ -31,19 +31,17 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
     context.read<AdministrationBloc>().add(AdminGetSocietyAdmin());
   }
 
-  void filterResidents(String query) {
-    final filtered = data.where((data) {
-      final nameLower = data.user?.userName?.toLowerCase() ?? '';
-      final phoneLower = data.user?.phoneNo?.toLowerCase() ?? '';
-      final searchLower = query.toLowerCase();
-
-      return nameLower.contains(searchLower) ||
-          phoneLower.contains(searchLower);
-    }).toList();
-
+  void _filterAdmin(String query) {
     setState(() {
-      filteredAdmin = filtered;
-      searchQuery = query;
+      if (query.isEmpty) {
+        filteredAdmin = data;
+      } else {
+        filteredAdmin = data
+            .where((data) =>
+        data.user!.userName!.toLowerCase().contains(query.toLowerCase()) ||
+            data.user!.phoneNo!.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
     });
   }
 
@@ -56,6 +54,25 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
             style: TextStyle(color: Colors.white,),
           ),
           backgroundColor: Colors.black.withOpacity(0.2),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(64),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                onChanged: _filterAdmin,
+                decoration: InputDecoration(
+                  hintText: 'Search by name or mobile number',
+                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.2),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         body: BlocConsumer<AdministrationBloc, AdministrationState>(
           listener: (context, state){
@@ -96,83 +113,59 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
             if(filteredAdmin.isNotEmpty && _isLoading == false) {
               return RefreshIndicator(
                 onRefresh: _refreshUserData,  // Method to refresh user data
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: TextField(
-                        onChanged: (query) => filterResidents(query),
-                        style: const TextStyle(color: Colors.white70),
-                        decoration: InputDecoration(
-                          hintText: 'Search by name or mobile number',
-                          hintStyle: const TextStyle(color: Colors.white60),
-                          prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.2),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide.none,
-                          ),
+                child: ListView.builder(
+                  itemCount: filteredAdmin.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                  itemBuilder: (context, index) {
+                    final member = filteredAdmin[index];
+                    return Card(
+                      color: Colors.black.withOpacity(0.2),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
+                              ? NetworkImage(member.user!.profile!)
+                              : const AssetImage('assets/images/profile.png') as ImageProvider,
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: filteredAdmin.length,
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                        itemBuilder: (context, index) {
-                          final member = filteredAdmin[index];
-                          return Card(
-                            color: Colors.black.withOpacity(0.2),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
-                                    ? NetworkImage(member.user!.profile!)
-                                    : const AssetImage('assets/images/profile.png') as ImageProvider,
-                              ),
-                              title: Text(
-                                member.user?.userName ?? "NA",
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Text(member.user?.phoneNo ?? ""),
-                              trailing: PopupMenuButton<String>(
-                                onSelected: (value) {
-                                  if (value == 'remove') {
-                                    _removeAdmin(member.user?.email ?? "");
-                                  } else if(value == 'call'){
-                                    _makePhoneCall(member.user?.phoneNo ?? "");
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'remove',
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.person_remove, color: Colors.red),
-                                        SizedBox(width: 8),
-                                        Text('Remove Admin'),
-                                      ],
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'call',
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.call, color: Colors.blue),
-                                        SizedBox(width: 8),
-                                        Text('Call'),
-                                      ],
-                                    ),
-                                  ),
+                        title: Text(
+                          member.user?.userName ?? "NA",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(member.user?.phoneNo ?? ""),
+                        trailing: PopupMenuButton<String>(
+                          onSelected: (value) {
+                            if (value == 'remove') {
+                              _removeAdmin(member.user?.email ?? "");
+                            } else if(value == 'call'){
+                              _makePhoneCall(member.user?.phoneNo ?? "");
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'remove',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.person_remove, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text('Remove Admin'),
                                 ],
-                                icon: const Icon(Icons.more_vert), // Three-dot icon
                               ),
                             ),
-                          );
-                        },
+                            const PopupMenuItem(
+                              value: 'call',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.call, color: Colors.blue),
+                                  SizedBox(width: 8),
+                                  Text('Call'),
+                                ],
+                              ),
+                            ),
+                          ],
+                          icon: const Icon(Icons.more_vert), // Three-dot icon
+                        ),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               );
             } else if (_isLoading) {
@@ -190,7 +183,7 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
-                    height: MediaQuery.of(context).size.height - 200,
+                    height: MediaQuery.of(context).size.height - (kToolbarHeight*2),
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -218,7 +211,7 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
-                    height: MediaQuery.of(context).size.height - 200,
+                    height: MediaQuery.of(context).size.height - (kToolbarHeight*2),
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

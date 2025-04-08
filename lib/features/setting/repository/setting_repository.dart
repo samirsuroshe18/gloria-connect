@@ -118,6 +118,37 @@ class SettingRepository{
     }
   }
 
+  Future<ComplaintModel> getComplaintDetails({required String id}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final apiUrl =
+          'https://invite.iotsense.in/api/v1/complaint/get-details/$id';
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return ComplaintModel.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
   Future<ComplaintModel> addResponse({required String id, required String message}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

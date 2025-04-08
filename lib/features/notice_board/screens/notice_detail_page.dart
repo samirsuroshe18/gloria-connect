@@ -76,52 +76,49 @@ class NoticeDetailPage extends StatelessWidget {
               ),
               const SizedBox(width: 8),
             ],
-            flexibleSpace: data.image != null &&
-                    data.image is String &&
-                    data.image!.isNotEmpty
+            // ✅ FIXED HERE: only render if valid image
+            flexibleSpace: (data.image != null && data.image!.isNotEmpty)
                 ? FlexibleSpaceBar(
-                    background: Hero(
-                      tag: 'notice-image-${data.id}',
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          CachedNetworkImage(
-                            imageUrl: data.image!,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => BlurHash(
-                              hash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4",
-                              image: data.image,
-                              imageFit: BoxFit.cover,
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.grey[200],
-                              child: const Icon(
-                                Icons.image_not_supported,
-                                size: 50,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                          // Gradient overlay for better readability
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.7),
-                                  ],
-                                  stops: const [0.6, 1.0],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+              background: Hero(
+                tag: 'notice-image-${data.id}',
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: data.image!,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const BlurHash(
+                        hash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4",
+                        imageFit: BoxFit.cover,
+                      ), // ✅ FIXED HERE: removed image param
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
-                  )
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.7),
+                            ],
+                            stops: const [0.6, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
                 : null,
           ),
 
@@ -169,7 +166,6 @@ class NoticeDetailPage extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Date and author info
                   Row(
                     children: [
                       const Icon(
@@ -237,7 +233,7 @@ class NoticeDetailPage extends StatelessWidget {
                     ),
                   ),
                   if (data.image != null && data.image!.isNotEmpty)
-                    _buildAttachments(data.image!, context),
+                    _buildAttachments(data.image!, context), // ✅ Only called when image is valid
 
                   const SizedBox(height: 40),
 
@@ -356,66 +352,51 @@ class NoticeDetailPage extends StatelessWidget {
   Future<void> _downloadFile(String url, BuildContext context) async {
   // Get the ScaffoldMessengerState before any async operations
   final scaffoldMessenger = ScaffoldMessenger.of(context);
-  
+
   try {
     // Show downloading message
     scaffoldMessenger.showSnackBar(
       const SnackBar(content: Text("Downloading file...")),
     );
 
-    // Send GET request to download file
-    var response = await http.get(Uri.parse(url));
-
-    // Check if widget is still in the tree after async operation
-    if (!context.mounted) return;
-
-    if (response.statusCode == 200) {
-      // Get app's external storage directory
-      Directory? directory = await getExternalStorageDirectory();
-      
-      // Check if widget is still in the tree after another async operation
+      var response = await http.get(Uri.parse(url));
       if (!context.mounted) return;
-      
-      if (directory == null) {
+
+      if (response.statusCode == 200) {
+        Directory? directory = await getExternalStorageDirectory();
+        if (!context.mounted) return;
+
+        if (directory == null) {
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(content: Text("Unable to find directory.")),
+          );
+          return;
+        }
+
+        String fileName = url.split('/').last;
+        String filePath = "${directory.path}/$fileName";
+
+        File file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+
+        if (!context.mounted) return;
+
         scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text("Unable to find directory.")),
+          SnackBar(content: Text("Downloaded to $filePath")),
         );
-        return;
+
+        OpenFile.open(filePath);
+      } else {
+        if (!context.mounted) return;
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(content: Text("Download failed: Server error.")),
+        );
       }
-
-      // Create file path
-      String fileName = url.split('/').last;
-      String filePath = "${directory.path}/$fileName";
-
-      // Save file
-      File file = File(filePath);
-      await file.writeAsBytes(response.bodyBytes);
-
-      // Check if widget is still in the tree after another async operation
+    } catch (e) {
       if (!context.mounted) return;
-
-      // Show success message
       scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text("Downloaded to $filePath")),
-      );
-
-      // Open file after download
-      OpenFile.open(filePath);
-    } else {
-      // Check if widget is still in the tree
-      if (!context.mounted) return;
-      
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text("Download failed: Server error.")),
+        SnackBar(content: Text("Download failed: $e")),
       );
     }
-  } catch (e) {
-    // Check if widget is still in the tree
-    if (!context.mounted) return;
-    
-    scaffoldMessenger.showSnackBar(
-      SnackBar(content: Text("Download failed: $e")),
-    );
-  }
   }
 }

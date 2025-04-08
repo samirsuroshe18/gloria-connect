@@ -302,7 +302,7 @@ class VisitorPastCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            border: Border.all(width: 2, color: Colors.blueGrey),
+            border: Border.all(width: 2, color: Colors.white70),
           ),
           width: MediaQuery.of(context).size.width * 0.85,
           // 70% of screen width
@@ -321,20 +321,21 @@ class VisitorPastCard extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                  width: double.infinity,
-                  height: 45,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  color: Colors.black.withOpacity(0.7),
-                  alignment: Alignment.centerLeft,
-                  child: const Text(
-                    "Samir SurosheSamir SurosheSamir SurosheSamir SurosheSamir Suroshe",
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              )
+              /// If You want to add any text on image then uncomment this code
+              // Align(
+              //   alignment: Alignment.topCenter,
+              //   child: Container(
+              //     width: double.infinity,
+              //     height: 45,
+              //     padding: const EdgeInsets.symmetric(horizontal: 10),
+              //     color: Colors.black.withOpacity(0.7),
+              //     alignment: Alignment.centerLeft,
+              //     child: const Text(
+              //       "Samir SurosheSamir SurosheSamir SurosheSamir SurosheSamir Suroshe",
+              //       overflow: TextOverflow.ellipsis,
+              //     ),
+              //   ),
+              // )
             ],
           ),
         ),

@@ -44,7 +44,7 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
           (route) => route.isFirst,
         );
       } else if (initialAction != null &&
-          initialAction?.payload?['action'] == '"VERIFY_DELIVERY_ENTRY"') {
+          initialAction?.payload?['action'] == 'VERIFY_DELIVERY_ENTRY') {
         Navigator.pushNamedAndRemoveUntil(
             context, '/delivery-approval-screen', (route) => route.isFirst,
             arguments: initialAction?.payload);
@@ -57,17 +57,17 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
           jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED') {
         Navigator.pushNamedAndRemoveUntil(
             context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: jsonDecode(initialAction!.payload!['data']!));
+            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
       }else if (initialAction != null &&
           jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED') {
         Navigator.pushNamedAndRemoveUntil(
             context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: jsonDecode(initialAction!.payload!['data']!));
+            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
       }else if (initialAction != null &&
           jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED') {
         Navigator.pushNamedAndRemoveUntil(
             context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: jsonDecode(initialAction!.payload!['data']!));
+            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
       } else {
         context.read<MyVisitorsBloc>().add(GetServiceRequest());
       }

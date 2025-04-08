@@ -72,9 +72,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
   }
 
   Future<void> _cardOnTap(ComplaintModel complaint) async {
-    Map<String, dynamic> args = widget.isAdmin == true
-        ? {'data': complaint, 'user': user}
-        : {'data': complaint, 'user': widget.data};
+    Map<String, dynamic> args = {'id': complaint.id,};
 
     var result = await Navigator.pushNamed(
       context,

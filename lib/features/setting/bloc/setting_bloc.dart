@@ -56,6 +56,20 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>{
       }
     });
 
+    on<SettingGetComplaintDetails>((event, emit) async {
+      emit(SettingGetComplaintDetailsLoading());
+      try{
+        final ComplaintModel response = await _settingRepository.getComplaintDetails(id: event.id);
+        emit(SettingGetComplaintDetailsSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(SettingGetComplaintDetailsFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(SettingGetComplaintDetailsFailure(message: e.toString()));
+        }
+      }
+    });
+
     on<SettingAddResponse>((event, emit) async {
       emit(SettingAddResponseLoading());
       try{
