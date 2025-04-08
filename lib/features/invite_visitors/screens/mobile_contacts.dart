@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 
 class MobileContacts extends StatefulWidget {
   final Function(String, String) onContactSelected;
@@ -150,64 +152,67 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
                     style: const TextStyle(color: Colors.grey),
                   )
               )
-                  : ListView.builder(
-                shrinkWrap: true,
-                itemCount: filteredContacts.length,
-                itemBuilder: (context, index) {
-                  final contact = filteredContacts[index];
-                  final phoneNumber = contact.phones.isNotEmpty
-                      ? formatPhoneNumber(contact.phones.first.number)
-                      : 'No phone number';
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(15)
-                    ),
-                    child: ListTile(
-                      onTap: () {
-                        if (contact.phones.isNotEmpty) {
-                          widget.onContactSelected(
-                              contact.displayName,
-                              contact.phones.first.number
-                          );
-                        }
-                      },
-                      leading: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
-                        ),
-                        child: contact.photo != null
-                            ? ClipOval(
-                          child: Image.memory(
-                            contact.photo!,
-                            fit: BoxFit.cover,
-                            width: 40,
-                            height: 40,
+                  : AnimationLimiter(
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: filteredContacts.length,
+                                    itemBuilder: (context, index) {
+                    final contact = filteredContacts[index];
+                    final phoneNumber = contact.phones.isNotEmpty
+                        ? formatPhoneNumber(contact.phones.first.number)
+                        : 'No phone number';
+                    return StaggeredListAnimation(index: index, child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          if (contact.phones.isNotEmpty) {
+                            widget.onContactSelected(
+                                contact.displayName,
+                                contact.phones.first.number
+                            );
+                          }
+                        },
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.2),
                           ),
-                        )
-                            : const Icon(Icons.person, color: Colors.grey),
-                      ),
-                      title: Text(
-                        contact.displayName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white70
+                          child: contact.photo != null
+                              ? ClipOval(
+                            child: Image.memory(
+                              contact.photo!,
+                              fit: BoxFit.cover,
+                              width: 40,
+                              height: 40,
+                            ),
+                          )
+                              : const Icon(Icons.person, color: Colors.grey),
+                        ),
+                        title: Text(
+                          contact.displayName,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white70
+                          ),
+                        ),
+                        subtitle: Text(
+                          phoneNumber,
+                          style: const TextStyle(
+                            color: Colors.white60,
+                          ),
                         ),
                       ),
-                      subtitle: Text(
-                        phoneNumber,
-                        style: const TextStyle(
-                          color: Colors.white60,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                    ));
+                                    },
+                                  ),
+                  ),
             ),
           ],
         ),

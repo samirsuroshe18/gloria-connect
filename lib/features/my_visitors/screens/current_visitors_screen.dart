@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/visitor_current_card.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../guard_waiting/models/entry.dart';
@@ -113,12 +115,15 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
         if (data.isNotEmpty && _isLoading == false) {
           return RefreshIndicator(
             onRefresh: _onRefresh,
-            child: ListView.builder(
-              itemCount: data.length,
-              padding: const EdgeInsets.all(8.0),
-              itemBuilder: (BuildContext context, int index) {
-                return VisitorCurrentCard(data: data[index]);
-              },
+            child: AnimationLimiter(
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: data.length,
+                padding: const EdgeInsets.all(8.0),
+                itemBuilder: (BuildContext context, int index) {
+                  return StaggeredListAnimation(index: index, child: VisitorCurrentCard(data: data[index]));
+                },
+              ),
             ),
           );
         } else if (_isLoading) {

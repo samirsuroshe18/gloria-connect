@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/administration/models/society_guard.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -114,59 +116,62 @@ class _AllGuardScreenState extends State<AllGuardScreen> {
             if(data.isNotEmpty && _isLoading == false) {
               return RefreshIndicator(
                 onRefresh: _refreshUserData,  // Method to refresh user data
-                child: ListView.builder(
-                  itemCount: filteredGuards.length,
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                  itemBuilder: (context, index) {
-                    final member = filteredGuards[index];
-                    return Card(
-                      color: Colors.black.withOpacity(0.2),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
-                              ? NetworkImage(member.user!.profile!)
-                              : const AssetImage('assets/images/profile.png') as ImageProvider,
-                        ),
-                        title: Text(
-                          member.user?.userName ?? "NA",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(member.user?.phoneNo ?? ""),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (value) {
-                            if (value == 'delete') {
-                              _deleteGuard(member.user?.id ?? "");
-                            } else if(value == 'call'){
-                              _makePhoneCall(member.user?.phoneNo ?? "");
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete, color: Colors.red),
-                                  SizedBox(width: 8),
-                                  Text('Delete Guard'),
-                                ],
+                child: AnimationLimiter(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: filteredGuards.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                    itemBuilder: (context, index) {
+                      final member = filteredGuards[index];
+                      return StaggeredListAnimation(index: index, child: Card(
+                        color: Colors.black.withOpacity(0.2),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
+                                ? NetworkImage(member.user!.profile!)
+                                : const AssetImage('assets/images/profile.png') as ImageProvider,
+                          ),
+                          title: Text(
+                            member.user?.userName ?? "NA",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(member.user?.phoneNo ?? ""),
+                          trailing: PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'delete') {
+                                _deleteGuard(member.user?.id ?? "");
+                              } else if(value == 'call'){
+                                _makePhoneCall(member.user?.phoneNo ?? "");
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete, color: Colors.red),
+                                    SizedBox(width: 8),
+                                    Text('Delete Guard'),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'call',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.call, color: Colors.blue),
-                                  SizedBox(width: 8),
-                                  Text('Call'),
-                                ],
+                              const PopupMenuItem(
+                                value: 'call',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.call, color: Colors.blue),
+                                    SizedBox(width: 8),
+                                    Text('Call'),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                          icon: const Icon(Icons.more_vert), // Three-dot icon
+                            ],
+                            icon: const Icon(Icons.more_vert), // Three-dot icon
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      ));
+                    },
+                  ),
                 ),
               );
             } else if (_isLoading) {

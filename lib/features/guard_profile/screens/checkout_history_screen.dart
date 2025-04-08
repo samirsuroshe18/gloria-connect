@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/guard_profile/bloc/guard_profile_bloc.dart';
 import 'package:gloria_connect/features/guard_profile/models/checkout_history.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/checkout_history_card.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 
 class CheckoutHistoryScreen extends StatefulWidget {
@@ -58,12 +60,15 @@ class _CheckoutHistoryScreenState extends State<CheckoutHistoryScreen> {
             if (data.isNotEmpty && _isLoading == false) {
               return RefreshIndicator(
                 onRefresh: _onRefresh,
-                child: ListView.builder(
-                  itemCount: data.length,
-                  padding: const EdgeInsets.all(8.0),
-                  itemBuilder: (BuildContext context, int index) {
-                    return CheckoutHistoryCard(data: data[index]);
-                  },
+                child: AnimationLimiter(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: data.length,
+                    padding: const EdgeInsets.all(8.0),
+                    itemBuilder: (BuildContext context, int index) {
+                      return StaggeredListAnimation(index: index, child: CheckoutHistoryCard(data: data[index]));
+                    },
+                  ),
                 ),
               );
             } else if (_isLoading) {

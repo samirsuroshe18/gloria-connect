@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:gloria_connect/features/administration/widgets/verification_request_card.dart';
@@ -105,32 +107,35 @@ class _ResidentApprovalScreenState extends State<ResidentApprovalScreen> {
           if (data.isNotEmpty && _isLoading == false) {
             return RefreshIndicator(
               onRefresh: _refreshUserData,
-              child: ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return VerificationRequestCard(
-                    profileImageUrl: data[index].user?.profile ?? '', // Access with index
-                    userName: data[index].user!.userName!, // Access with index
-                    role: data[index].profileType!, // Access with index
-                    societyName: data[index].societyName!, // Access with index
-                    blockName: data[index].societyBlock!, // Access with index
-                    apartment: data[index].apartment!,
-                    isLoadingApprove: isLoadingList[index]['approve'] ?? false,
-                    isLoadingReject: isLoadingList[index]['reject'] ?? false,
-                    date: '${data[index].createdAt!.day}/${data[index].createdAt!.month}/${data[index].createdAt!.year}',
-                    tagColor: Colors.orange,
-                    time: timeago.format(data[index].createdAt!),
-                    onApprove: () => onApprove(data[index], index),
-                    onReject: () => onReject(data[index], index),
-                    onCall: () => onCall(data[index]),
-                    profileType: data[index].profileType,
-                    ownership: data[index].ownership,
-                    tenantAgreement: data[index].tenantAgreement,
-                    ownershipDocument: data[index].ownershipDocument,
-                    startDate: data[index].startDate,
-                    endDate: data[index].endDate,
-                  );
-                },
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return StaggeredListAnimation(index: index, child: VerificationRequestCard(
+                      profileImageUrl: data[index].user?.profile ?? '', // Access with index
+                      userName: data[index].user!.userName!, // Access with index
+                      role: data[index].profileType!, // Access with index
+                      societyName: data[index].societyName!, // Access with index
+                      blockName: data[index].societyBlock!, // Access with index
+                      apartment: data[index].apartment!,
+                      isLoadingApprove: isLoadingList[index]['approve'] ?? false,
+                      isLoadingReject: isLoadingList[index]['reject'] ?? false,
+                      date: '${data[index].createdAt!.day}/${data[index].createdAt!.month}/${data[index].createdAt!.year}',
+                      tagColor: Colors.orange,
+                      time: timeago.format(data[index].createdAt!),
+                      onApprove: () => onApprove(data[index], index),
+                      onReject: () => onReject(data[index], index),
+                      onCall: () => onCall(data[index]),
+                      profileType: data[index].profileType,
+                      ownership: data[index].ownership,
+                      tenantAgreement: data[index].tenantAgreement,
+                      ownershipDocument: data[index].ownershipDocument,
+                      startDate: data[index].startDate,
+                      endDate: data[index].endDate,
+                    ));
+                  },
+                ),
               ),
             );
           } else if (_isLoading) {

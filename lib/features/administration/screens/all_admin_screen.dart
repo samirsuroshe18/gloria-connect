@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/administration/models/society_member.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -113,59 +115,62 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
             if(filteredAdmin.isNotEmpty && _isLoading == false) {
               return RefreshIndicator(
                 onRefresh: _refreshUserData,  // Method to refresh user data
-                child: ListView.builder(
-                  itemCount: filteredAdmin.length,
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                  itemBuilder: (context, index) {
-                    final member = filteredAdmin[index];
-                    return Card(
-                      color: Colors.black.withOpacity(0.2),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
-                              ? NetworkImage(member.user!.profile!)
-                              : const AssetImage('assets/images/profile.png') as ImageProvider,
-                        ),
-                        title: Text(
-                          member.user?.userName ?? "NA",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(member.user?.phoneNo ?? ""),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (value) {
-                            if (value == 'remove') {
-                              _removeAdmin(member.user?.email ?? "");
-                            } else if(value == 'call'){
-                              _makePhoneCall(member.user?.phoneNo ?? "");
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'remove',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.person_remove, color: Colors.red),
-                                  SizedBox(width: 8),
-                                  Text('Remove Admin'),
-                                ],
+                child: AnimationLimiter(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: filteredAdmin.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                    itemBuilder: (context, index) {
+                      final member = filteredAdmin[index];
+                      return StaggeredListAnimation(index: index, child: Card(
+                        color: Colors.black.withOpacity(0.2),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
+                                ? NetworkImage(member.user!.profile!)
+                                : const AssetImage('assets/images/profile.png') as ImageProvider,
+                          ),
+                          title: Text(
+                            member.user?.userName ?? "NA",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(member.user?.phoneNo ?? ""),
+                          trailing: PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'remove') {
+                                _removeAdmin(member.user?.email ?? "");
+                              } else if(value == 'call'){
+                                _makePhoneCall(member.user?.phoneNo ?? "");
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'remove',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.person_remove, color: Colors.red),
+                                    SizedBox(width: 8),
+                                    Text('Remove Admin'),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'call',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.call, color: Colors.blue),
-                                  SizedBox(width: 8),
-                                  Text('Call'),
-                                ],
+                              const PopupMenuItem(
+                                value: 'call',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.call, color: Colors.blue),
+                                    SizedBox(width: 8),
+                                    Text('Call'),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                          icon: const Icon(Icons.more_vert), // Three-dot icon
+                            ],
+                            icon: const Icon(Icons.more_vert), // Three-dot icon
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      ));
+                    },
+                  ),
                 ),
               );
             } else if (_isLoading) {

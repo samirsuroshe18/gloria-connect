@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/visitor_expected_card.dart';
+import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 
 class ExpectedVisitorsScreen extends StatefulWidget {
@@ -51,26 +53,29 @@ class _ExpectedVisitorsScreenState extends State<ExpectedVisitorsScreen>
           if (data.isNotEmpty && _isLoading == false) {
             return RefreshIndicator(
               onRefresh: _onRefresh,
-              child: ListView.builder(
-                itemCount: data.length,
-                padding: const EdgeInsets.all(8.0),
-                itemBuilder: (BuildContext context, int index) {
-                  return VisitorExpectedCard(
-                    userName: data[index].name!,
-                    // date: DateFormat('dd MMM, yyyy')
-                    //     .format(data[index].checkInCodeStartDate!).toString(),
-                    date: data[index].checkInCodeStartDate!.toString(),
-                    tag: data[index].entryType!,
-                    companyLogo: data[index].companyLogo,
-                    companyName: data[index].companyName,
-                    serviceName: data[index].serviceName,
-                    serviceLogo: data[index].serviceLogo,
-                    tagColor: Colors.orange,
-                    profileImageUrl:
-                        data[index].profileImg ?? 'assets/images/profile.png',
-                    data: data[index],
-                  );
-                },
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: data.length,
+                  padding: const EdgeInsets.all(8.0),
+                  itemBuilder: (BuildContext context, int index) {
+                    return StaggeredListAnimation(index: index, child: VisitorExpectedCard(
+                      userName: data[index].name!,
+                      // date: DateFormat('dd MMM, yyyy')
+                      //     .format(data[index].checkInCodeStartDate!).toString(),
+                      date: data[index].checkInCodeStartDate!.toString(),
+                      tag: data[index].entryType!,
+                      companyLogo: data[index].companyLogo,
+                      companyName: data[index].companyName,
+                      serviceName: data[index].serviceName,
+                      serviceLogo: data[index].serviceLogo,
+                      tagColor: Colors.orange,
+                      profileImageUrl:
+                      data[index].profileImg ?? 'assets/images/profile.png',
+                      data: data[index],
+                    ));
+                  },
+                ),
               ),
             );
           } else if (_isLoading) {
