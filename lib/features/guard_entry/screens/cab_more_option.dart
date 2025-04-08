@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 
 class CabMoreOption extends StatefulWidget {
   const CabMoreOption({super.key});
@@ -132,6 +133,7 @@ class _CabMoreOptionState extends State<CabMoreOption> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.deepPurple,
           insetPadding: const EdgeInsets.all(10),
           child: SingleChildScrollView(
             child: Padding(
@@ -146,19 +148,28 @@ class _CabMoreOptionState extends State<CabMoreOption> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: cabOtherCompanyName,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Enter other cab service name',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      fillColor: Colors.white.withOpacity(0.2)
                     ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                    ),
                     onPressed: () {
+                      if(cabOtherCompanyName.text.isEmpty){
+                        CustomSnackbar.show(context: context, message: 'This field is required', type: SnackbarType.error);
+                        return;
+                      }
                       Navigator.pop(context); // Close the dialog
                       Navigator.pop(context, {'logo': image, 'name': cabOtherCompanyName.text});
                       // Navigator.pushReplacementNamed(context, '/delivery-approval-profile', arguments: {'logo': image, 'name': name.text});
                     },
-                    child: const Text('Submit'),
+                    child: const Text('Submit', style: TextStyle(color: Colors.white),),
                   ),
                 ],
               ),
