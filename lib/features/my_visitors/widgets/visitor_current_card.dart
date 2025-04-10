@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../guard_waiting/models/entry.dart';
 
 class VisitorCurrentCard extends StatelessWidget {
-  final Entry data;
+  final VisitorEntries data;
 
   const VisitorCurrentCard({super.key, required this.data});
 
@@ -443,7 +443,7 @@ class VisitorCurrentCard extends StatelessWidget {
   //   );
   // }
 
-  void _showImageDialog(BuildContext context, Entry data) {
+  void _showImageDialog(BuildContext context, VisitorEntries data) {
     if (data.profileImg == null) return;
 
     showDialog(

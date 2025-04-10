@@ -20,7 +20,7 @@ class _CabTabState extends State<CabTab> with AutomaticKeepAliveClientMixin {
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;
-  List<Entry> data = [];
+  List<VisitorEntries> data = [];
 
   @override
   void initState() {

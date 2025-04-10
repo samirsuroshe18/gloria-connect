@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class VisitorDeniedCard extends StatelessWidget {
-  final Entry data;
+  final VisitorEntries data;
 
   const VisitorDeniedCard({super.key, required this.data});
 

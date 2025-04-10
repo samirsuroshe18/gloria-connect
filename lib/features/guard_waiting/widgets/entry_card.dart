@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/entry.dart';
 
 class EntryCard extends StatelessWidget {
-  final Entry data;
+  final VisitorEntries data;
 
   const EntryCard({super.key, required this.data});
 

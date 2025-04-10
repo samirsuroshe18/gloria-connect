@@ -1,14 +1,15 @@
 import 'dart:convert';
 
+import 'package:gloria_connect/features/guard_waiting/models/entry.dart';
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
+import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/api_error.dart';
-import '../../guard_waiting/models/entry.dart';
 
 class MyVisitorsRepository {
-  Future<List<Entry>> getCurrentEntries() async {
+  Future<List<VisitorEntries>> getCurrentEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -26,7 +27,7 @@ class MyVisitorsRepository {
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(
@@ -41,15 +42,14 @@ class MyVisitorsRepository {
     }
   }
 
-  Future<List<Entry>> getPastEntries() async {
+  Future<PastDeliveryModel> getPastEntries({ required final Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-past';
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/delivery-entry/get-past', queryParams);
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -58,9 +58,7 @@ class MyVisitorsRepository {
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
-            .toList();
+        return PastDeliveryModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -74,7 +72,7 @@ class MyVisitorsRepository {
     }
   }
 
-  Future<List<Entry>> getDeniedEntries() async {
+  Future<List<VisitorEntries>> getDeniedEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -92,7 +90,7 @@ class MyVisitorsRepository {
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(
@@ -140,7 +138,7 @@ class MyVisitorsRepository {
     }
   }
 
-  Future<Entry> getServiceRequest() async {
+  Future<VisitorEntries> getServiceRequest() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -157,7 +155,7 @@ class MyVisitorsRepository {
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return Entry.fromJson(jsonBody['data']);
+        return VisitorEntries.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

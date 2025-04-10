@@ -7,7 +7,7 @@ import '../../../utils/api_error.dart';
 import '../../guard_waiting/models/entry.dart';
 
 class GuardExitRepository {
-  Future<List<Entry>> getAllowedEntries() async {
+  Future<List<VisitorEntries>> getAllowedEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -25,7 +25,7 @@ class GuardExitRepository {
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(
@@ -40,7 +40,7 @@ class GuardExitRepository {
     }
   }
 
-  Future<List<Entry>> getGuestEntries() async {
+  Future<List<VisitorEntries>> getGuestEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -58,7 +58,7 @@ class GuardExitRepository {
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(
@@ -73,7 +73,7 @@ class GuardExitRepository {
     }
   }
 
-  Future<List<Entry>> getCabEntries() async {
+  Future<List<VisitorEntries>> getCabEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -91,7 +91,7 @@ class GuardExitRepository {
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(
@@ -106,7 +106,7 @@ class GuardExitRepository {
     }
   }
 
-  Future<List<Entry>> getDeliveryEntries() async {
+  Future<List<VisitorEntries>> getDeliveryEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -124,7 +124,7 @@ class GuardExitRepository {
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(
@@ -139,7 +139,7 @@ class GuardExitRepository {
     }
   }
 
-  Future<List<Entry>> getServiceEntries() async {
+  Future<List<VisitorEntries>> getServiceEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -157,7 +157,7 @@ class GuardExitRepository {
 
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(

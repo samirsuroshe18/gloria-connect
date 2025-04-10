@@ -7,7 +7,7 @@ import '../../guard_waiting/models/entry.dart';
 import '../../my_visitors/bloc/my_visitors_bloc.dart';
 
 class DeliveryApprovalInside extends StatefulWidget {
-  final Entry? payload;
+  final VisitorEntries? payload;
   const DeliveryApprovalInside({super.key, this.payload});
 
   @override

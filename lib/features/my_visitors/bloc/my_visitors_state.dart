@@ -24,7 +24,7 @@ final class GetExpectedEntriesFailure extends MyVisitorsState{
 final class GetCurrentEntriesLoading extends MyVisitorsState{}
 
 final class GetCurrentEntriesSuccess extends MyVisitorsState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   GetCurrentEntriesSuccess({required this.response});
 }
 
@@ -39,7 +39,7 @@ final class GetCurrentEntriesFailure extends MyVisitorsState{
 final class GetDeniedEntriesLoading extends MyVisitorsState{}
 
 final class GetDeniedEntriesSuccess extends MyVisitorsState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   GetDeniedEntriesSuccess({required this.response});
 }
 
@@ -54,7 +54,7 @@ final class GetDeniedEntriesFailure extends MyVisitorsState{
 final class GetPastEntriesLoading extends MyVisitorsState{}
 
 final class GetPastEntriesSuccess extends MyVisitorsState{
-  final List<Entry> response;
+  final PastDeliveryModel response;
   GetPastEntriesSuccess({required this.response});
 }
 
@@ -69,7 +69,7 @@ final class GetPastEntriesFailure extends MyVisitorsState{
 final class GetServiceRequestLoading extends MyVisitorsState{}
 
 final class GetServiceRequestSuccess extends MyVisitorsState{
-  final Entry response;
+  final VisitorEntries response;
   GetServiceRequestSuccess({required this.response});
 }
 

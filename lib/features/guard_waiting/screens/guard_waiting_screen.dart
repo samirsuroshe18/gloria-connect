@@ -16,7 +16,7 @@ class GuardWaitingScreen extends StatefulWidget {
 }
 
 class _GuardWaitingScreenState extends State<GuardWaitingScreen> {
-  List<Entry> data = [];
+  List<VisitorEntries> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;

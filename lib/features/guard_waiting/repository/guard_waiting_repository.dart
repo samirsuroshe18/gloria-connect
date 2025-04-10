@@ -7,7 +7,7 @@ import '../../../utils/api_error.dart';
 import '../models/entry.dart';
 
 class GuardWaitingRepository {
-  Future<List<Entry>> getEntries() async {
+  Future<List<VisitorEntries>> getEntries() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -24,7 +24,7 @@ class GuardWaitingRepository {
       final jsonBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
-            .map((data) => Entry.fromJson(data))
+            .map((data) => VisitorEntries.fromJson(data))
             .toList();
       } else {
         throw ApiError(

@@ -9,7 +9,7 @@ final class GuardWaitingInitial extends GuardWaitingState{}
 final class WaitingGetEntriesLoading extends GuardWaitingState{}
 
 final class WaitingGetEntriesSuccess extends GuardWaitingState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   WaitingGetEntriesSuccess({required this.response});
 }
 
