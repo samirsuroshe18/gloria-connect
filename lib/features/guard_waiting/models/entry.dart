@@ -4,13 +4,13 @@
 
 import 'dart:convert';
 
-List<Entry> entryFromJson(String str) =>
-    List<Entry>.from(json.decode(str).map((x) => Entry.fromJson(x)));
+List<VisitorEntries> entryFromJson(String str) =>
+    List<VisitorEntries>.from(json.decode(str).map((x) => VisitorEntries.fromJson(x)));
 
-String entryToJson(List<Entry> data) =>
+String entryToJson(List<VisitorEntries> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class Entry {
+class VisitorEntries {
   final String? id;
   final String? name;
   final String? mobNumber;
@@ -37,7 +37,7 @@ class Entry {
   final String? gateName;
   final GatepassAptDetails? gatepassAptDetails;
 
-  Entry({
+  VisitorEntries({
     this.id,
     this.name,
     this.mobNumber,
@@ -65,7 +65,7 @@ class Entry {
     this.gatepassAptDetails,
   });
 
-  factory Entry.fromJson(Map<String, dynamic> json) => Entry(
+  factory VisitorEntries.fromJson(Map<String, dynamic> json) => VisitorEntries(
         id: json["_id"],
         name: json["name"],
         mobNumber: json["mobNumber"],

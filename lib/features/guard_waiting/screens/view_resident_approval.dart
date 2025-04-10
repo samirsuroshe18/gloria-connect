@@ -8,7 +8,7 @@ import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import '../models/entry.dart';
 
 class ViewResidentApproval extends StatefulWidget {
-  final Entry? data;
+  final VisitorEntries? data;
   const ViewResidentApproval({super.key, this.data});
 
   @override

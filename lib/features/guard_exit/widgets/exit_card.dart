@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import '../../guard_waiting/models/entry.dart';
 
 class ExitCard extends StatelessWidget {
-  final Entry data;
+  final VisitorEntries data;
   final String type;
 
   const ExitCard({super.key, required this.data, required this.type});
@@ -293,7 +293,7 @@ class ExitCard extends StatelessWidget {
     );
   }
 
-  void _showOutConfirmationDialog(BuildContext context, Entry data, String type) {
+  void _showOutConfirmationDialog(BuildContext context, VisitorEntries data, String type) {
     bool isLoading = false;
     showGeneralDialog(
       context: context,

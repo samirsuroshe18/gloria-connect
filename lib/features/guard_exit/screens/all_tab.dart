@@ -17,7 +17,7 @@ class AllTab extends StatefulWidget {
 
 class _AllTabState extends State<AllTab> with AutomaticKeepAliveClientMixin {
   final TextEditingController searchController = TextEditingController();
-  List<Entry> data = [];
+  List<VisitorEntries> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;

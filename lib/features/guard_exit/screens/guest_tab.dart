@@ -18,7 +18,7 @@ class GuestTab extends StatefulWidget {
 class _GuestTabState extends State<GuestTab>
     with AutomaticKeepAliveClientMixin {
   final TextEditingController searchController = TextEditingController();
-  List<Entry> data = [];
+  List<VisitorEntries> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;

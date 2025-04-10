@@ -9,7 +9,7 @@ final class GuardExitInitial extends GuardExitState{}
 final class ExitGetAllowedEntriesLoading extends GuardExitState{}
 
 final class ExitGetAllowedEntriesSuccess extends GuardExitState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   ExitGetAllowedEntriesSuccess({required this.response});
 }
 
@@ -24,7 +24,7 @@ final class ExitGetAllowedEntriesFailure extends GuardExitState{
 final class ExitGetGuestEntriesLoading extends GuardExitState{}
 
 final class ExitGetGuestEntriesSuccess extends GuardExitState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   ExitGetGuestEntriesSuccess({required this.response});
 }
 
@@ -39,7 +39,7 @@ final class ExitGetGuestEntriesFailure extends GuardExitState{
 final class ExitGetCabEntriesLoading extends GuardExitState{}
 
 final class ExitGetCabEntriesSuccess extends GuardExitState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   ExitGetCabEntriesSuccess({required this.response});
 }
 
@@ -54,7 +54,7 @@ final class ExitGetCabEntriesFailure extends GuardExitState{
 final class ExitGetDeliveryEntriesLoading extends GuardExitState{}
 
 final class ExitGetDeliveryEntriesSuccess extends GuardExitState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   ExitGetDeliveryEntriesSuccess({required this.response});
 }
 
@@ -69,7 +69,7 @@ final class ExitGetDeliveryEntriesFailure extends GuardExitState{
 final class ExitGetServiceEntriesLoading extends GuardExitState{}
 
 final class ExitGetServiceEntriesSuccess extends GuardExitState{
-  final List<Entry> response;
+  final List<VisitorEntries> response;
   ExitGetServiceEntriesSuccess({required this.response});
 }
 

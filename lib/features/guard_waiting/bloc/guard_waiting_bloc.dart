@@ -16,7 +16,7 @@ class GuardWaitingBloc extends Bloc<GuardWaitingEvent, GuardWaitingState> {
     on<WaitingGetEntries>((event, emit) async {
       emit(WaitingGetEntriesLoading());
       try {
-        final List<Entry> response = await _guardWaitingRepository.getEntries();
+        final List<VisitorEntries> response = await _guardWaitingRepository.getEntries();
         emit(WaitingGetEntriesSuccess(response: response));
       } catch (e) {
         if (e is ApiError) {

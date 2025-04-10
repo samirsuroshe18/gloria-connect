@@ -126,7 +126,7 @@ class AppRoutes {
           return _animatedRoute(const ApartmentSelectionScreen(), name: '/apartment-selection-screen');
         }
       case '/view-resident-approval':
-        if (args != null && args is Entry) {
+        if (args != null && args is VisitorEntries) {
           return _animatedRoute(ViewResidentApproval(data: args,), name: '/view-resident-approval');
         } else {
           return _animatedRoute(const ViewResidentApproval(), name: '/view-resident-approval');
@@ -152,7 +152,7 @@ class AppRoutes {
           return _animatedRoute(const DeliveryApprovalScreen(), name: '/delivery-approval-screen');
         }
       case '/delivery-approval-inside':
-        if (args != null && args is Entry) {
+        if (args != null && args is VisitorEntries) {
           return _animatedRoute(DeliveryApprovalInside(payload: args,), name: '/delivery-approval-inside');
         } else {
           return _animatedRoute(const DeliveryApprovalInside(), name: '/delivery-approval-inside');

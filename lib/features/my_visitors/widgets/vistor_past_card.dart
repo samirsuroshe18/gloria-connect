@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../guard_waiting/models/entry.dart';
 
 class VisitorPastCard extends StatelessWidget {
   final Entry data;

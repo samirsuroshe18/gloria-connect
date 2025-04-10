@@ -15,7 +15,7 @@ class GuardExitBloc extends Bloc<GuardExitEvent, GuardExitState>{
     on<ExitGetAllowedEntries>((event, emit) async {
       emit(ExitGetAllowedEntriesLoading());
       try{
-        final List<Entry> response = await _guardExitRepository.getAllowedEntries();
+        final List<VisitorEntries> response = await _guardExitRepository.getAllowedEntries();
         emit(ExitGetAllowedEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -29,7 +29,7 @@ class GuardExitBloc extends Bloc<GuardExitEvent, GuardExitState>{
     on<ExitGetGuestEntries>((event, emit) async {
       emit(ExitGetGuestEntriesLoading());
       try{
-        final List<Entry> response = await _guardExitRepository.getGuestEntries();
+        final List<VisitorEntries> response = await _guardExitRepository.getGuestEntries();
         emit(ExitGetGuestEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -43,7 +43,7 @@ class GuardExitBloc extends Bloc<GuardExitEvent, GuardExitState>{
     on<ExitGetCabEntries>((event, emit) async {
       emit(ExitGetCabEntriesLoading());
       try{
-        final List<Entry> response = await _guardExitRepository.getCabEntries();
+        final List<VisitorEntries> response = await _guardExitRepository.getCabEntries();
         emit(ExitGetCabEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -57,7 +57,7 @@ class GuardExitBloc extends Bloc<GuardExitEvent, GuardExitState>{
     on<ExitGetDeliveryEntries>((event, emit) async {
       emit(ExitGetDeliveryEntriesLoading());
       try{
-        final List<Entry> response = await _guardExitRepository.getDeliveryEntries();
+        final List<VisitorEntries> response = await _guardExitRepository.getDeliveryEntries();
         emit(ExitGetDeliveryEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -71,7 +71,7 @@ class GuardExitBloc extends Bloc<GuardExitEvent, GuardExitState>{
     on<ExitGetServiceEntries>((event, emit) async {
       emit(ExitGetServiceEntriesLoading());
       try{
-        final List<Entry> response = await _guardExitRepository.getServiceEntries();
+        final List<VisitorEntries> response = await _guardExitRepository.getServiceEntries();
         emit(ExitGetServiceEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {

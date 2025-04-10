@@ -23,7 +23,7 @@ class CurrentVisitorsScreen extends StatefulWidget {
 class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
     with AutomaticKeepAliveClientMixin {
   ReceivedAction? initialAction;
-  List<Entry> data = [];
+  List<VisitorEntries> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;

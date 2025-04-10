@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 import 'package:gloria_connect/features/my_visitors/repository/my_visitors_repository.dart';
 
 import '../../../utils/api_error.dart';
@@ -44,7 +45,7 @@ class MyVisitorsBloc extends Bloc<MyVisitorsEvent, MyVisitorsState>{
     on<GetPastEntries>((event, emit) async {
       emit(GetPastEntriesLoading());
       try{
-        final response = await _myVisitorsRepository.getPastEntries();
+        final response = await _myVisitorsRepository.getPastEntries(queryParams: event.queryParams);
         emit(GetPastEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -58,7 +59,7 @@ class MyVisitorsBloc extends Bloc<MyVisitorsEvent, MyVisitorsState>{
     on<GetDeniedEntries>((event, emit) async {
       emit(GetDeniedEntriesLoading());
       try{
-        final List<Entry> response = await _myVisitorsRepository.getDeniedEntries();
+        final List<VisitorEntries> response = await _myVisitorsRepository.getDeniedEntries();
         emit(GetDeniedEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -72,7 +73,7 @@ class MyVisitorsBloc extends Bloc<MyVisitorsEvent, MyVisitorsState>{
     on<GetServiceRequest>((event, emit) async {
       emit(GetServiceRequestLoading());
       try{
-        final Entry response = await _myVisitorsRepository.getServiceRequest();
+        final VisitorEntries response = await _myVisitorsRepository.getServiceRequest();
         emit(GetServiceRequestSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
