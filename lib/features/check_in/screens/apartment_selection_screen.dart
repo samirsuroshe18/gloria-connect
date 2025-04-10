@@ -7,8 +7,9 @@ import '../bloc/check_in_bloc.dart';
 class ApartmentSelectionScreen extends StatefulWidget {
   final String? entryType;
   final String? blockName;
+  final String? categoryOption;
   final Map<String, dynamic>? formData;
-  const ApartmentSelectionScreen({super.key, this.blockName, this.entryType, this.formData});
+  const ApartmentSelectionScreen({super.key, this.blockName, this.entryType, this.formData, this.categoryOption});
 
   @override
   State<ApartmentSelectionScreen> createState() => _ApartmentSelectionScreenState();
@@ -338,7 +339,7 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
 
     }else if (selectedFlats.isNotEmpty) {
       Navigator.pushNamed(context, '/mobile-no-screen',
-          arguments: {'entryType': widget.entryType});
+          arguments: {'entryType': widget.entryType, 'categoryOption': widget.categoryOption});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please select apartment'),

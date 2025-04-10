@@ -41,7 +41,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.black.withOpacity(0.2),
-        elevation: 0,
         title: Row(
           children: [
             Image.asset('assets/app_logo/app_logo.png', height: 40),

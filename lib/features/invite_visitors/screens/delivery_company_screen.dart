@@ -103,7 +103,7 @@ class _DeliveryCompanyScreenState extends State<DeliveryCompanyScreen> {
             Expanded(
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: filteredCompanies.length,
                   itemBuilder: (context, index) {
                     final company = filteredCompanies[index];
@@ -157,6 +157,7 @@ class _DeliveryCompanyScreenState extends State<DeliveryCompanyScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.deepPurple,
           insetPadding: const EdgeInsets.all(10),
           child: SingleChildScrollView(
             child: Padding(
@@ -171,17 +172,22 @@ class _DeliveryCompanyScreenState extends State<DeliveryCompanyScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: name,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Enter delivery service name',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      fillColor: Colors.white.withOpacity(0.2)
                     ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                    ),
                     onPressed: () {
                       Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'delivery', 'image': image, 'companyName': name.text});
                     },
-                    child: const Text('Next'),
+                    child: const Text('Next', style: TextStyle(color: Colors.white),),
                   ),
                 ],
               ),

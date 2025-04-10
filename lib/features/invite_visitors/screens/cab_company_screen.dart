@@ -83,7 +83,7 @@ class _CabCompanyScreenState extends State<CabCompanyScreen> {
             Expanded(
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: filteredCab.length,
                   itemBuilder: (context, index) {
                     final cab = filteredCab[index];
@@ -137,6 +137,7 @@ class _CabCompanyScreenState extends State<CabCompanyScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.deepPurple,
           insetPadding: const EdgeInsets.all(10),
           child: SingleChildScrollView(
             child: Padding(
@@ -151,17 +152,22 @@ class _CabCompanyScreenState extends State<CabCompanyScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: name,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Enter cab service name',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      fillColor: Colors.white.withOpacity(0.2)
                     ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                    ),
                     onPressed: () {
                       Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'cab', 'image': image, 'companyName': name.text});
                     },
-                    child: const Text('Next'),
+                    child: const Text('Next', style: TextStyle(color: Colors.white),),
                   ),
                 ],
               ),

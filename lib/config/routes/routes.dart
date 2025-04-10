@@ -109,19 +109,19 @@ class AppRoutes {
         }
       case '/mobile-no-screen':
         if (args != null && args is Map<String, dynamic>) {
-          return _animatedRoute(MobileNoScreen(entryType: args['entryType'],), name: '/mobile-no-screen');
+          return _animatedRoute(MobileNoScreen(entryType: args['entryType'], categoryOption: args['categoryOption'],), name: '/mobile-no-screen');
         } else {
           return _animatedRoute(const MobileNoScreen(), name: '/mobile-no-screen');
         }
       case '/block-selection-screen':
         if (args != null && args is Map<String, dynamic>) {
-          return _animatedRoute(BlockSelectionScreen(entryType: args['entryType'], formData: args,), name: '/block-selection-screen');
+          return _animatedRoute(BlockSelectionScreen(entryType: args['entryType'], formData: args, categoryOption: args['categoryOption'],), name: '/block-selection-screen');
         } else {
           return _animatedRoute(const BlockSelectionScreen(), name: '/block-selection-screen');
         }
       case '/apartment-selection-screen':
         if (args != null && args is Map<String, dynamic>) {
-          return _animatedRoute(ApartmentSelectionScreen(blockName: args['blockName'], entryType: args['entryType'], formData: args['formData'],), name: '/apartment-selection-screen');
+          return _animatedRoute(ApartmentSelectionScreen(blockName: args['blockName'], entryType: args['entryType'], formData: args['formData'], categoryOption: args['categoryOption']), name: '/apartment-selection-screen');
         } else {
           return _animatedRoute(const ApartmentSelectionScreen(), name: '/apartment-selection-screen');
         }
@@ -185,7 +185,7 @@ class AppRoutes {
         }
       case '/other-approval-profile':
         if (args != null && args is Map<String, dynamic>) {
-          return _animatedRoute(OtherApprovalProfile(mobNumber: args['mobNumber'],), name: '/other-approval-profile');
+          return _animatedRoute(OtherApprovalProfile(mobNumber: args['mobNumber'], categoryOption: args['categoryOption']), name: '/other-approval-profile');
         } else {
           return _animatedRoute(const OtherApprovalProfile(), name: '/other-approval-profile');
         }

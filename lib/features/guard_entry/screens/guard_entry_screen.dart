@@ -288,46 +288,86 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
   }
 
   GridView _buildCategoryGrid() {
-    return GridView.count(
-      crossAxisCount: 3,
+    // Use GridView.builder for more flexibility
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        childAspectRatio: 0.85, // Adjust this value to change height/width ratio
+        mainAxisSpacing: 15,
+        crossAxisSpacing: 10,
+      ),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 20,
-      crossAxisSpacing: 20,
-      children: [
-        _buildCategoryItem(Icons.delivery_dining, 'Delivery', _onCategoryTap),
-        _buildCategoryItem(Icons.person, 'Guest', _onCategoryTap),
-        _buildCategoryItem(Icons.local_taxi, 'Cab', _onCategoryTap),
-        _buildCategoryItem(Icons.miscellaneous_services, 'Others', _onCategoryTap),
-      ],
+      itemCount: 8,
+      itemBuilder: (context, index) {
+        // Define category data
+        final categories = [
+          {'icon': Icons.cleaning_services, 'title': 'Maid'},
+          {'icon': Icons.delivery_dining, 'title': 'Delivery'},
+          {'icon': Icons.person, 'title': 'Guest'},
+          {'icon': Icons.local_laundry_service, 'title': 'Loundry'},
+          {'icon': Icons.local_drink, 'title': 'Milkman'},
+          {'icon': Icons.propane_tank, 'title': 'Gas'},
+          {'icon': Icons.local_taxi, 'title': 'Cab'},
+          {'icon': Icons.miscellaneous_services, 'title': 'Others'},
+        ];
+
+        return _buildCategoryItem(
+            categories[index]['icon'] as IconData,
+            categories[index]['title'] as String,
+            _onCategoryTap
+        );
+      },
     );
   }
 
-  InkWell _buildCategoryItem(IconData icon, String title, Function(String) onTap) {
+  Widget _buildCategoryItem(IconData icon, String title, Function(String) onTap) {
     return InkWell(
       onTap: () => onTap(title),
-      child: Column(
-        children: [
-          Material(
-            color: Colors.transparent,
-            elevation: 8,
-            shape: const CircleBorder(),
-            child: CircleAvatar(
-              radius: 30,
-              backgroundColor: Colors.white.withOpacity(0.2),
-              child: Icon(icon, size: 30, color: Colors.white70),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Use minimum space needed
+          mainAxisAlignment: MainAxisAlignment.center, // Center contents
+          children: [
+            Material(
+              color: Colors.transparent,
+              elevation: 8,
+              shape: const CircleBorder(),
+              child: CircleAvatar(
+                radius: 25, // Smaller radius to fit better
+                backgroundColor: Colors.white.withOpacity(0.2),
+                child: Icon(icon, size: 25, color: Colors.white70),
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(title, style: const TextStyle(fontSize: 16, color: Colors.white60)),
-        ],
+            const SizedBox(height: 6), // Reduced spacing
+            Flexible(
+              child: Text(
+                title,
+                style: const TextStyle(fontSize: 14, color: Colors.white60),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis, // Prevent text overflow
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   void _onCategoryTap(String category) {
     context.read<CheckInBloc>().add(ClearFlat());
-    if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': category.toLowerCase()},);
+    if(category=='Maid'){
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+    }else if(category=='Laundry'){
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+    }else if(category=='Milkman'){
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+    }else if(category=='Gas'){
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+    } else{
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': category.toLowerCase()},);
+    }
   }
 
   void _handleSuccess(String message) {

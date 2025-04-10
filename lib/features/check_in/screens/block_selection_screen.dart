@@ -5,8 +5,9 @@ import 'package:lottie/lottie.dart';
 
 class BlockSelectionScreen extends StatefulWidget {
   final String? entryType;
+  final String? categoryOption;
   final Map<String, dynamic>? formData;
-  const BlockSelectionScreen({super.key, this.entryType, this.formData});
+  const BlockSelectionScreen({super.key, this.entryType, this.formData, this.categoryOption});
 
   @override
   State<BlockSelectionScreen> createState() => _BlockSelectionScreenState();
@@ -202,7 +203,7 @@ class _BlockSelectionScreenState extends State<BlockSelectionScreen> {
   }
 
   void onBlockPressed(String blockName) {
-    Navigator.pushNamed(context, '/apartment-selection-screen', arguments: {'blockName' : blockName, 'entryType' : widget.entryType, 'formData': widget.formData});
+    Navigator.pushNamed(context, '/apartment-selection-screen', arguments: {'blockName' : blockName, 'entryType' : widget.entryType, 'formData': widget.formData, 'categoryOption': widget.categoryOption});
   }
 }
 

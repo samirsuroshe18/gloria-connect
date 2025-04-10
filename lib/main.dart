@@ -111,6 +111,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: newToken));
       }
     });
+
+    NotificationController().getDeviceTokenAndSaveToDb(context);
   }
 
   @override

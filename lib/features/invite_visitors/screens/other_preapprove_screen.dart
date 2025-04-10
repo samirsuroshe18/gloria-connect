@@ -105,7 +105,7 @@ class _OtherPreapproveScreenState extends State<OtherPreapproveScreen> {
             Expanded(
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: filteredServices.length,
                   itemBuilder: (context, index) {
                     final service = filteredServices[index];
@@ -159,6 +159,7 @@ class _OtherPreapproveScreenState extends State<OtherPreapproveScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.deepPurple,
           insetPadding: const EdgeInsets.all(10),
           child: SingleChildScrollView(
             child: Padding(
@@ -173,17 +174,22 @@ class _OtherPreapproveScreenState extends State<OtherPreapproveScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: name,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Enter other service name',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      fillColor: Colors.white.withOpacity(0.2)
                     ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple,
+                    ),
                     onPressed: () {
                       Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'other', 'image': image, 'companyName': name.text});
                     },
-                    child: const Text('Next'),
+                    child: const Text('Next', style: TextStyle(color: Colors.white),),
                   ),
                 ],
               ),
