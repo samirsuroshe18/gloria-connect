@@ -6,7 +6,8 @@ import '../../auth/widgets/text_form_field.dart';
 
 class MobileNoScreen extends StatefulWidget {
   final String? entryType;
-  const MobileNoScreen({super.key, this.entryType});
+  final String? categoryOption;
+  const MobileNoScreen({super.key, this.entryType, this.categoryOption});
 
   @override
   State<MobileNoScreen> createState() => _MobileNoScreenState();
@@ -31,7 +32,7 @@ class _MobileNoScreenState extends State<MobileNoScreen> {
             arguments: {'mobNumber': _phoneController.text});
       } else if (widget.entryType == 'others') {
         Navigator.pushNamed(context, '/other-approval-profile',
-            arguments: {'mobNumber': _phoneController.text});
+            arguments: {'mobNumber': _phoneController.text, 'categoryOption': widget.categoryOption});
       }
     }
   }

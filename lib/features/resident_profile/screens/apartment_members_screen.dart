@@ -63,7 +63,7 @@ class _ApartmentMembersScreenState extends State<ApartmentMembersScreen> {
               onRefresh: _onRefresh,  // Method to refresh user data
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: data.length,
                   padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                   itemBuilder: (context, index) {

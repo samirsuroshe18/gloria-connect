@@ -117,7 +117,7 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
             onRefresh: _onRefresh,
             child: AnimationLimiter(
               child: ListView.builder(
-                physics: const BouncingScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: data.length,
                 padding: const EdgeInsets.all(8.0),
                 itemBuilder: (BuildContext context, int index) {

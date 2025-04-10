@@ -365,7 +365,7 @@ class _PastVisitorsScreenState extends State<PastVisitorsScreen> with AutomaticK
 
     return ListView.builder(
         controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: groupedEntries.keys.length + 1,
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         itemBuilder: (context, index) {

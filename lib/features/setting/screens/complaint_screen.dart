@@ -69,7 +69,9 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
   Future<void> _raiseComplaint(BuildContext context) async {
     final data = await Navigator.pushNamed(context, '/complaint-form-screen');
     if(data is Map<String, dynamic>){
-      _filteredData.add(ComplaintModel.fromJson(data));
+      setState(() {
+        _filteredData.add(ComplaintModel.fromJson(data));
+      });
     }
   }
 
@@ -124,9 +126,9 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
               Text(
                 complaint.category ?? '',
                 style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70
                 ),
               ),
               const SizedBox(height: 8),
@@ -338,18 +340,15 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
               }
 
               if (_isError && statusCode == 401) {
-                return _buildErrorState();
-              }
-
-              if (_filteredData.isEmpty) {
-                return _buildEmptyState();
+                return _buildTabBarViewWithContent(_buildErrorState);
               }
 
               return TabBarView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 controller: _tabController,
                 children: [
-                  _buildComplaintList(_getFilteredComplaints('pending')),
-                  _buildComplaintList(_getFilteredComplaints('resolved')),
+                  _filteredData.isEmpty ? _buildEmptyState() : _buildComplaintList(_getFilteredComplaints('pending')),
+                  _filteredData.isEmpty ? _buildEmptyState() : _buildComplaintList(_getFilteredComplaints('resolved')),
                 ],
               );
             },
@@ -368,6 +367,17 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
     );
   }
 
+  Widget _buildTabBarViewWithContent(Widget Function() contentBuilder) {
+    return TabBarView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      controller: _tabController,
+      children: [
+        contentBuilder(),
+        contentBuilder(),
+      ],
+    );
+  }
+
   Widget _buildComplaintList(List<ComplaintModel> complaints) {
     return complaints.isEmpty
         ? _buildEmptyState()
@@ -375,7 +385,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
       onRefresh: _onRefresh,
       child: AnimationLimiter(
         child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           itemCount: complaints.length,
           padding: const EdgeInsets.only(bottom: 80),
           itemBuilder: (context, index) => StaggeredListAnimation(index: index, child: _buildComplaintCard(complaints[index])),
@@ -387,32 +397,34 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
   Widget _buildEmptyState() {
     return RefreshIndicator(
       onRefresh: _onRefresh,
-      child: SingleChildScrollView(
+      child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Container(
-          height: MediaQuery.of(context).size.height - 200,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Lottie.asset(
-                'assets/animations/no_data.json',
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "No complaints found",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height - 200,
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  'assets/animations/no_data.json',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                const Text(
+                  "No complaints found",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -420,32 +432,34 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
   Widget _buildErrorState() {
     return RefreshIndicator(
       onRefresh: _onRefresh,
-      child: SingleChildScrollView(
+      child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Container(
-          height: MediaQuery.of(context).size.height - 200,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Lottie.asset(
-                'assets/animations/error.json',
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Something went wrong!",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black54,
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height - 200,
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  'assets/animations/error.json',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                const Text(
+                  "Something went wrong!",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

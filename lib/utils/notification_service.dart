@@ -263,6 +263,12 @@ class NotificationController {
     return await FirebaseMessaging.instance.getToken();
   }
 
+  Future<void> getDeviceTokenAndSaveToDb(BuildContext context) async {
+    final token = await FirebaseMessaging.instance.getToken();
+    // ignore: use_build_context_synchronously
+    context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: token!));
+  }
+
   Future<void> updateDeviceToken(BuildContext context,) async {
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
       // ignore: use_build_context_synchronously

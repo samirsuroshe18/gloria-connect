@@ -85,7 +85,7 @@ class _CabMoreOptionState extends State<CabMoreOption> {
             Expanded(
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: filteredCompanies.length,
                   itemBuilder: (context, index) {
                     final company = filteredCompanies[index];

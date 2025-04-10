@@ -45,6 +45,7 @@ class _OtherMoreOptionState extends State<OtherMoreOption> {
     {'name': 'AC Service', 'image': 'assets/images/other/ac.png'},
     {'name': 'Blood Test', 'image': 'assets/images/other/blood_test.png'},
     {'name': 'Staff', 'image': 'assets/images/other/staff.png'},
+    {'name': 'Gas', 'image': 'assets/images/other/propane_tank.png'},
     {'name': 'Other', 'image': 'assets/images/other/more_options.png'},
   ];
 
@@ -109,7 +110,7 @@ class _OtherMoreOptionState extends State<OtherMoreOption> {
             Expanded(
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: filteredServices.length,
                   itemBuilder: (context, index) {
                     final service = filteredServices[index];

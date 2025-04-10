@@ -14,7 +14,8 @@ import '../widgets/vehicle_option.dart';
 
 class OtherApprovalProfile extends StatefulWidget {
   final String? mobNumber;
-  const OtherApprovalProfile({super.key, this.mobNumber});
+  final String? categoryOption;
+  const OtherApprovalProfile({super.key, this.mobNumber, this.categoryOption});
 
   @override
   State<OtherApprovalProfile> createState() => _OtherApprovalProfileState();
@@ -43,7 +44,31 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
   void initState() {
     super.initState();
     otherPhoneController.text = widget.mobNumber ?? '';
+
+    switch (widget.categoryOption) {
+      case "Maid":
+        _selectedCompanyIndex = 0;
+        serviceName = 'Maid';
+        serviceLogo = 'assets/images/other/cleaning.png';
+        break;
+      case "Laundry":
+        _selectedCompanyIndex = 1;
+        serviceName = 'Laundry';
+        serviceLogo = 'assets/images/other/laundry.png';
+        break;
+      case "Milkman":
+        _selectedCompanyIndex = 2;
+        serviceName = 'Milkman';
+        serviceLogo = 'assets/images/other/milkman.png';
+        break;
+      case "Gas":
+        _selectedCompanyIndex = 3;
+        serviceName = 'Gas';
+        serviceLogo = 'assets/images/other/propane_tank.png';
+        break;
+    }
   }
+
 
   @override
   void dispose() {
@@ -272,11 +297,11 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
                       : 'assets/images/other/cleaning.png'),
             ),
             CompanyTile(
-              companyName: 'Cook',
-              logo: 'assets/images/other/cook.png',
+              companyName: 'Laundry',
+              logo: 'assets/images/other/laundry.png',
               isSelected: _selectedCompanyIndex == 1,
-              onTap: () =>
-                  _selectCompany(1, 'Cook', 'assets/images/other/cook.png'),
+              onTap: () => _selectCompany(
+                  1, 'Plumber', 'assets/images/other/plumber.png'),
             ),
             CompanyTile(
               companyName: 'Milkman',
@@ -286,11 +311,11 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
                   2, 'Milkman', 'assets/images/other/milkman.png'),
             ),
             CompanyTile(
-              companyName: 'Plumber',
-              logo: 'assets/images/other/plumber.png',
+              companyName: 'Gas',
+              logo: 'assets/images/other/propane_tank.png',
               isSelected: _selectedCompanyIndex == 3,
-              onTap: () => _selectCompany(
-                  3, 'Plumber', 'assets/images/other/plumber.png'),
+              onTap: () =>
+                  _selectCompany(3, 'Cook', 'assets/images/other/cook.png'),
             ),
             CompanyTile(
               companyName: 'Housekeeping',

@@ -103,7 +103,7 @@ class _DeliveryMoreOptionState extends State<DeliveryMoreOption> {
             Expanded(
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: filteredCompanies.length,
                   itemBuilder: (context, index) {
                     final company = filteredCompanies[index];

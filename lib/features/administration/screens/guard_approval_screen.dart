@@ -105,7 +105,7 @@ class _GuardApprovalScreenState extends State<GuardApprovalScreen> {
               onRefresh: _refreshUserData,
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: data.length,
                   itemBuilder: (context, index) {
                     return StaggeredListAnimation(index: index, child: VerificationRequestCard(

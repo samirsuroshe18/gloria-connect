@@ -144,7 +144,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
               color: const Color(0xFF3498DB),
               child: AnimationLimiter(
                 child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: _filteredData.length,
                   padding: const EdgeInsets.all(16.0),
                   itemBuilder: (BuildContext context, int index) {

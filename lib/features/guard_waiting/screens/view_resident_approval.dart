@@ -88,7 +88,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
                   Expanded(
                     child: AnimationLimiter(
                       child: ListView.builder(
-                        physics: const BouncingScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: widget.data?.societyDetails?.societyApartments
                                 ?.length ??
                             0,

@@ -135,7 +135,7 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
                 onRefresh: _refreshUserData,  // Method to refresh user data
                 child: AnimationLimiter(
                   child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: filteredResidents.length,
                     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                     itemBuilder: (context, index) {

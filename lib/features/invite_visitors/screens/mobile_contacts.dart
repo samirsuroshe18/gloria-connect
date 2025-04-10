@@ -154,7 +154,7 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
               )
                   : AnimationLimiter(
                     child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     itemCount: filteredContacts.length,
                                     itemBuilder: (context, index) {
