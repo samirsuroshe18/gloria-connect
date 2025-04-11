@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/admin_profile/screens/admin_profile_screen.dart';
 import 'package:gloria_connect/features/administration/screens/administration_screen.dart';
-import 'package:gloria_connect/features/invite_visitors/screens/invite_visitors_screen.dart';
-import 'package:gloria_connect/features/my_visitors/screens/my_visitors_screen.dart';
+import 'package:gloria_connect/features/home/screens/landing_screen.dart';
 
 import '../../../utils/notification_service.dart';
 
@@ -17,8 +16,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _adminPages = [
-    const MyVisitorsScreen(),
-    const InviteVisitorsScreen(),
+    const LandingScreen(),
     const AdministrationScreen(),
     const AdminProfileScreen(),
   ];
@@ -39,47 +37,32 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
-        title: Row(
-          children: [
-            Image.asset('assets/app_logo/app_logo.png', height: 40),
-            const SizedBox(width: 8),
-            const Text(
-              'Gloria Connect',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-            onPressed: () {
-              // Handle notifications
-              Navigator.pushNamed(context, '/general-notice-board-screen');
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: _adminPages,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(30),
-            topLeft: Radius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+          // A gradient that complements your background but stays more subtle
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.indigo.shade900.withOpacity(0.85),
+              Colors.deepPurple.shade900.withOpacity(0.85),
+            ],
           ),
-          color: Colors.black.withOpacity(0.2),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
             child: NavigationBar(
               selectedIndex: _selectedIndex,
               onDestinationSelected: (index) {
@@ -87,30 +70,26 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   _selectedIndex = index;
                 });
               },
-              backgroundColor: Colors.transparent, // Keeps the gradient visible
+              backgroundColor: Colors.transparent,
               elevation: 0,
+              height: 60,
               labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-              indicatorColor: Colors.amberAccent.shade200.withOpacity(0.4), // Elegant gold accent
-              animationDuration: const Duration(milliseconds: 500),
+              indicatorColor: Colors.white.withOpacity(0.12), // More subtle indicator
+              animationDuration: const Duration(milliseconds: 400),
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.people_outline, color: Colors.white70),
-                  selectedIcon: Icon(Icons.people, color: Colors.amberAccent),
-                  label: 'Visitors',
+                  icon: Icon(Icons.home_outlined, color: Colors.white70, size: 24),
+                  selectedIcon: Icon(Icons.home, color: Colors.white, size: 24),
+                  label: 'Home',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.person_add_outlined, color: Colors.white70),
-                  selectedIcon: Icon(Icons.person_add, color: Colors.amberAccent),
-                  label: 'Invite',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.admin_panel_settings_outlined, color: Colors.white70),
-                  selectedIcon: Icon(Icons.admin_panel_settings, color: Colors.amberAccent),
+                  icon: Icon(Icons.admin_panel_settings_outlined, color: Colors.white70, size: 24),
+                  selectedIcon: Icon(Icons.admin_panel_settings, color: Colors.white, size: 24),
                   label: 'Admin',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.person_outline, color: Colors.white70),
-                  selectedIcon: Icon(Icons.person, color: Colors.amberAccent),
+                  icon: Icon(Icons.person_outline, color: Colors.white70, size: 24),
+                  selectedIcon: Icon(Icons.person, color: Colors.white, size: 24),
                   label: 'Profile',
                 ),
               ],

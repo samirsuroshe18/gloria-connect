@@ -40,10 +40,12 @@ import 'package:gloria_connect/features/guard_waiting/screens/view_resident_appr
 import 'package:gloria_connect/features/home/screens/admin_home_screen.dart';
 import 'package:gloria_connect/features/guard_profile/screens/edit_profile_screen.dart';
 import 'package:gloria_connect/features/home/screens/guard_home_screen.dart';
+import 'package:gloria_connect/features/home/screens/landing_screen.dart';
 import 'package:gloria_connect/features/home/screens/resident_home_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/cab_company_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/delivery_company_screen.dart';
+import 'package:gloria_connect/features/invite_visitors/screens/invite_visitors_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/manual_contacts.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/contact_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/invite_guest_screen.dart';
@@ -52,6 +54,7 @@ import 'package:gloria_connect/features/administration/screens/resident_approval
 import 'package:gloria_connect/features/auth/screens/complete_profile_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/other_preapprove_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/otp_banner.dart';
+import 'package:gloria_connect/features/my_visitors/screens/my_visitors_screen.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/features/notice_board/screens/create_notice_page.dart';
 import 'package:gloria_connect/features/notice_board/screens/general_notice_board_page.dart';
@@ -83,6 +86,12 @@ class AppRoutes {
         return _animatedRoute(const ForgotPasswordScreen(), name: '/forgot-password');
       case '/user-input':
         return _animatedRoute(const CompleteProfileScreen(), name: '/user-input');
+      case '/landing-screen':
+        return _animatedRoute(const LandingScreen(), name: '/landing-screen');
+      case '/visitors-screen':
+        return _animatedRoute(const MyVisitorsScreen(), name: '/visitors-screen');
+      case '/pre-approve-screen':
+        return _animatedRoute(const InviteVisitorsScreen(), name: '/pre-approve-screen');
       case '/resident-approval':
         return _animatedRoute(const ResidentApprovalScreen(), name: '/resident-approval');
       case '/guard-approval':

@@ -32,8 +32,17 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2),
+        centerTitle: true,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.white
+          ),
+        ),
+      ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthGetUserLoading) {

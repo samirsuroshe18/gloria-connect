@@ -1,13 +1,8 @@
-import 'dart:convert';
-
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/visitor_current_card.dart';
-import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
-import 'package:gloria_connect/utils/notification_service.dart';
 import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 
@@ -22,67 +17,15 @@ class CurrentVisitorsScreen extends StatefulWidget {
 
 class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
     with AutomaticKeepAliveClientMixin {
-  ReceivedAction? initialAction;
   List<VisitorEntries> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;
 
-  void getInitialAction() async {
-    initialAction = NotificationController.initialAction;
-    if (mounted) {
-      if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/resident-approval',
-          (route) => route.isFirst,
-        );
-      } else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'VERIFY_GUARD_PROFILE_TYPE') {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/guard-approval',
-          (route) => route.isFirst,
-        );
-      } else if (initialAction != null &&
-          initialAction?.payload?['action'] == 'VERIFY_DELIVERY_ENTRY') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/delivery-approval-screen', (route) => route.isFirst,
-            arguments: initialAction?.payload);
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/notice-board-details-screen', (route) => route.isFirst,
-            arguments: NoticeBoardModel.fromJson(jsonDecode(initialAction!.payload!['data']!)));
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
-      } else {
-        context.read<MyVisitorsBloc>().add(GetServiceRequest());
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     context.read<MyVisitorsBloc>().add(GetCurrentEntries());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      getInitialAction();
-    });
   }
 
   @override
@@ -91,10 +34,6 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
     return Scaffold(
         body: BlocConsumer<MyVisitorsBloc, MyVisitorsState>(
       listener: (context, state) {
-        if (state is GetServiceRequestSuccess) {
-          Navigator.pushNamed(context, '/delivery-approval-inside',
-              arguments: state.response);
-        }
         if (state is GetCurrentEntriesLoading) {
           _isLoading = true;
           _isError = false;
@@ -197,7 +136,6 @@ class _CurrentVisitorsScreenState extends State<CurrentVisitorsScreen>
   }
 
   Future<void> _onRefresh() async {
-    context.read<MyVisitorsBloc>().add(GetServiceRequest());
     context.read<MyVisitorsBloc>().add(GetCurrentEntries());
   }
 

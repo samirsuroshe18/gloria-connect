@@ -50,9 +50,9 @@ class GuardEntryRepository {
     try {
       // Determine which API URL to use based on whether it's a multipart request
       const apiUrlString =
-          'https://invite.iotsense.in/api/v1/delivery-entry/add-delivery-entry-2';
+          'http://192.168.190.221:8000/api/v1/delivery-entry/add-delivery-entry-2';
       const apiUrlFile =
-          'https://invite.iotsense.in/api/v1/delivery-entry/add-delivery-entry';
+          'http://192.168.190.221:8000/api/v1/delivery-entry/add-delivery-entry';
 
       http.Response response;
 

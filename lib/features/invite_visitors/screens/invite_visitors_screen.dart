@@ -12,6 +12,12 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2),
+        title: const Text(
+          "Pre-Approve"
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
