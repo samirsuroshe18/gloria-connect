@@ -47,6 +47,16 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          SliverAppBar(
+            centerTitle: true,
+            backgroundColor: Colors.black.withOpacity(0.2),
+            title: const Text(
+              'Administration',
+              style: TextStyle(
+                color: Colors.white
+              ),
+            ),
+          ),
           SliverPadding(
             padding: const EdgeInsets.all(16.0),
             sliver: SliverGrid(
@@ -78,7 +88,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
 
   Widget _buildMenuItem(AdminMenuItem item) {
     return Material(
-      color: Colors.blue.shade50.withOpacity(0.2),
+      color: Colors.black.withOpacity(0.2),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -127,7 +137,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
 
   Widget _buildQuickActions() {
     return Card(
-      color: Colors.blue.shade50.withOpacity(0.2),
+      color: Colors.black.withOpacity(0.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

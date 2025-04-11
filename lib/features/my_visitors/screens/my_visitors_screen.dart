@@ -17,6 +17,15 @@ class _MyVisitorsScreenState extends State<MyVisitorsScreen> {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.black.withOpacity(0.2),
+          title: const Text(
+            'My Visitors',
+            style: TextStyle(
+              color: Colors.white
+            ),
+          ),
+        ),
         body: Column(
           children: [
             Container(
