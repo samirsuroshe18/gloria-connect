@@ -47,10 +47,6 @@ class _ServiceTabState extends State<ServiceTab>
             _isError = true;
             statusCode = state.status;
             data = [];
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.redAccent,
-            ));
           }
         },
         builder: (context, state) {

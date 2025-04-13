@@ -148,47 +148,44 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         builder: (context, state) {
           return Scaffold(
-            extendBodyBehindAppBar: true,
-            body: GradientColor(
-              child: SafeArea(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: Stack(
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                _header(),
-                                SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.02),
-                                _inputField(context),
-                                const SizedBox(height: 20),
-                                _forgotPassword(context),
-                                _signup(context),
-                                _privacyPolicy(),
-                              ],
-                            ),
-                            if (_isGoogleLoading)
-                              Center(
-                                child: Lottie.asset(
-                                  'assets/animations/loader.json',
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.contain,
-                                ),
-                              )
-                          ],
-                        ),
+            body: SafeArea(
+              child: CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Stack(
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              _header(),
+                              SizedBox(
+                                  height: MediaQuery.of(context).size.height *
+                                      0.02),
+                              _inputField(context),
+                              const SizedBox(height: 20),
+                              _forgotPassword(context),
+                              _signup(context),
+                              _privacyPolicy(),
+                            ],
+                          ),
+                          if (_isGoogleLoading)
+                            Center(
+                              child: Lottie.asset(
+                                'assets/animations/loader.json',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );

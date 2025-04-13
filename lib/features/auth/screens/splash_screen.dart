@@ -28,7 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthGetUserSuccess) {
@@ -52,6 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 Image.asset(
                   'assets/images/branding_img.png',
                   height: 100,
+                  color: Colors.white70,
                 ),
                 const SizedBox(height: 30),
               ],

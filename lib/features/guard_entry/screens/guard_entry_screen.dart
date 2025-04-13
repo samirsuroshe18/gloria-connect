@@ -305,11 +305,11 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           {'icon': Icons.cleaning_services, 'title': 'Maid'},
           {'icon': Icons.delivery_dining, 'title': 'Delivery'},
           {'icon': Icons.person, 'title': 'Guest'},
-          {'icon': Icons.local_laundry_service, 'title': 'Loundry'},
+          {'icon': Icons.local_laundry_service, 'title': 'Laundry'},
           {'icon': Icons.local_drink, 'title': 'Milkman'},
           {'icon': Icons.propane_tank, 'title': 'Gas'},
           {'icon': Icons.local_taxi, 'title': 'Cab'},
-          {'icon': Icons.miscellaneous_services, 'title': 'Others'},
+          {'icon': Icons.miscellaneous_services, 'title': 'Other'},
         ];
 
         return _buildCategoryItem(
@@ -358,13 +358,13 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
   void _onCategoryTap(String category) {
     context.read<CheckInBloc>().add(ClearFlat());
     if(category=='Maid'){
-      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'other', 'categoryOption':category},);
     }else if(category=='Laundry'){
-      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'other', 'categoryOption':category},);
     }else if(category=='Milkman'){
-      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'other', 'categoryOption':category},);
     }else if(category=='Gas'){
-      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'others', 'categoryOption':category},);
+      if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': 'other', 'categoryOption':category},);
     } else{
       if(mounted)_navigator?.pushNamed('/block-selection-screen', arguments: {'entryType': category.toLowerCase()},);
     }

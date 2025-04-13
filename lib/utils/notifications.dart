@@ -3,6 +3,7 @@ part of 'notification_service.dart';
 Future<void> showNotificationWithActions(payloadString) async {
   final payload = jsonDecode(payloadString);
 
+  Map<String, String> message =  _getVerifyNotification(payload['entryType'], payload['societyDetails']['societyGates']);
   int notificationId = payload['notificationId'] ?? 'NA';
   String profileImg = payload['profileImg'] ?? 'NA';
   String name = payload['name'] ?? 'NA';
@@ -11,8 +12,8 @@ Future<void> showNotificationWithActions(payloadString) async {
     content: NotificationContent(
       id: notificationId,
       channelKey: 'app_notifications',
-      title: 'Verify delivery',
-      body: 'You have got a Delivery at the main gate.\n$name',
+      title: message['title'],
+      body: '${message['body']}\n$name',
       notificationLayout: NotificationLayout.BigPicture,
       bigPicture: profileImg,
       largeIcon: 'asset://assets/images/app_logo.png',
@@ -94,16 +95,19 @@ Future<void> guardVerifyNotification(payloadString) async {
 Future<void> deliveryEntryApprovedNotification(stringPayload) async {
   final payload = jsonDecode(stringPayload);
 
-  String companyName = payload['companyName'] ?? 'NA';
-  String deliveryName = payload['deliveryName'] ?? 'NA';
+  String? companyName = payload['companyName'] ?? 'NA';
+  String? serviceName = payload['serviceName'] ?? 'NA';
+  String visitorName = payload['visitorName'] ?? 'NA';
   String userName = payload['userName'] ?? 'NA';
+  String entryType = payload['entryType'] ?? 'NA';
+  String bodyMessage = deliveryEntryApprovedNotificationMessage(entryType, userName, visitorName, serviceName, companyName);
 
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Entry Approved',
-      body: 'The delivery entry for $companyName ($deliveryName) has been approved by $userName.',
+      body: bodyMessage,
       notificationLayout: NotificationLayout.Default,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
@@ -118,16 +122,19 @@ Future<void> deliveryEntryApprovedNotification(stringPayload) async {
 Future<void> deliveryEntryRejectedNotification(stringPayload) async {
   final payload = jsonDecode(stringPayload);
 
-  String companyName = payload['companyName'] ?? 'NA';
-  String deliveryName = payload['deliveryName'] ?? 'NA';
+  String? companyName = payload['companyName'] ?? 'NA';
+  String? serviceName = payload['serviceName'] ?? 'NA';
+  String visitorName = payload['visitorName'] ?? 'NA';
   String userName = payload['userName'] ?? 'NA';
+  String entryType = payload['entryType'] ?? 'NA';
+  String bodyMessage = deliveryEntryDeniedNotificationMessage(entryType, userName, visitorName, serviceName, companyName);
 
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       channelKey: 'alert_notification',
       title: 'Entry Rejected',
-      body: 'The delivery entry for $companyName ($deliveryName) has been rejected by $userName.',
+      body: bodyMessage,
       notificationLayout: NotificationLayout.Inbox,
       largeIcon: 'asset://assets/images/app_logo.png',
       wakeUpScreen: true,
@@ -138,6 +145,7 @@ Future<void> deliveryEntryRejectedNotification(stringPayload) async {
     ),
   );
 }
+
 
 Future<void> notifyGuardApprove(stringPayload) async {
   final payload = jsonDecode(stringPayload);
@@ -480,5 +488,43 @@ String _getTitle(String action) {
     return "Security Guard Profile Approved";
   } else{
     return "Security Guard Profile Rejected";
+  }
+}
+
+// Helper method to generate a message based on entryType
+Map<String, String> _getVerifyNotification(String entryType, String gate) {
+  if (entryType == 'delivery') {
+    return {'title': 'Verify delivery', 'body': 'You have got a Delivery at the $gate.'};
+  } else if(entryType == 'guest'){
+    return {'title': 'Verify Guest', 'body': 'You have got a Guest at the $gate.'};
+  } else if(entryType == 'other'){
+    return {'title': 'Verify Other Services', 'body': 'You have got a Other service at the $gate.'};
+  } else{
+    return {'title': 'Verify Cab', 'body': 'You have got a Cab at the $gate.'};
+  }
+}
+
+// Helper method to generate a message based on entryType
+String deliveryEntryApprovedNotificationMessage(String entryType, String userName, String visitorName, String? serviceName, String? companyName, ) {
+  if (entryType == 'delivery') {
+    return 'The delivery entry for $companyName ($visitorName) has been approved by $userName.';
+  } else if(entryType == 'guest'){
+    return 'The guest entry ($visitorName) has been approved by $userName.';
+  } else if(entryType == 'other'){
+    return 'The other services entry for $serviceName ($visitorName) has been approved by $userName.';
+  } else{
+    return 'The cab entry for $companyName ($visitorName) has been approved by $userName.';
+  }
+}
+
+String deliveryEntryDeniedNotificationMessage(String entryType, String userName, String visitorName, String? serviceName, String? companyName) {
+  if (entryType == 'delivery') {
+    return 'The delivery entry for $companyName ($visitorName) has been rejected by $userName.';
+  } else if(entryType == 'guest'){
+    return 'The guest entry ($visitorName) has been rejected by $userName.';
+  } else if(entryType == 'other'){
+    return 'The other services entry for $serviceName ($visitorName) has been rejected by $userName.';
+  } else{
+    return 'The cab entry for $companyName ($visitorName) has been rejected by $userName.';
   }
 }

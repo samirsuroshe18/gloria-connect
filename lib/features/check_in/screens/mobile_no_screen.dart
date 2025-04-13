@@ -30,7 +30,7 @@ class _MobileNoScreenState extends State<MobileNoScreen> {
       } else if (widget.entryType == 'cab') {
         Navigator.pushNamed(context, '/cab-approval-profile',
             arguments: {'mobNumber': _phoneController.text});
-      } else if (widget.entryType == 'others') {
+      } else if (widget.entryType == 'other') {
         Navigator.pushNamed(context, '/other-approval-profile',
             arguments: {'mobNumber': _phoneController.text, 'categoryOption': widget.categoryOption});
       }
