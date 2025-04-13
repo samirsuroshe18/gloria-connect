@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:gloria_connect/utils/gradient_color.dart';
+import 'package:lottie/lottie.dart';
 
 import '../bloc/auth_bloc.dart';
 import '../models/user_model.dart';
@@ -23,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
   late final UserModel userModel;
 
   @override
@@ -66,7 +69,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _isLoading = false;
           }
 
+          if (state is AuthGoogleSigningLoading) {
+            _isGoogleLoading = true;
+          }
+
           if(state is AuthGoogleSigningSuccess){
+            _isGoogleLoading = false;
             if(state.response.phoneNo == null){
               Navigator.pushReplacementNamed(context, '/user-input');
             }else if(state.response.role == 'admin'){
@@ -82,46 +90,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
             }
           }
 
-          if(state is AuthGoogleSigningFailure && state.status == 409){
-            _showDialogBox();
+          if(state is AuthGoogleSigningFailure){
+            _isGoogleLoading = false;
+            if (state.status == 409) {
+              _showDialogBox();
+            }
           }
 
           if (state is AuthGoogleLinkedSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.response['message']),
-                backgroundColor: Colors.green,
-              ),
-            );
+            CustomSnackbar.show(context: context, message: state.response['message'], type: SnackbarType.success);
           }
 
         },
         builder: (context, state) {
-          return GradientColor(
-            child: SafeArea(
-              child: CustomScrollView(
-                slivers: <Widget>[
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.05, // Adjust if needed
-                          ),
-                          ..._header(),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          ..._form(),
-                          ..._footer(),
-                          _privacyPolicy(),
-                        ],
+          return Stack(
+            children: [
+              SafeArea(
+                child: CustomScrollView(
+                  slivers: <Widget>[
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate(
+                          [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.05, // Adjust if needed
+                            ),
+                            ..._header(),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.02,
+                            ),
+                            ..._form(),
+                            ..._footer(),
+                            _privacyPolicy(),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              if (_isGoogleLoading)
+                Center(
+                  child: Lottie.asset(
+                    'assets/animations/loader.json',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.contain,
+                  ),
+                )
+            ],
           );
         },
       )

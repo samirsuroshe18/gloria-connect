@@ -66,22 +66,22 @@ class _GuardHomeScreenState extends State<GuardHomeScreen> {
               destinations: const [
                 NavigationDestination(
                   icon: Icon(Icons.home_outlined, color: Colors.white70),
-                  selectedIcon: Icon(Icons.person, color: Colors.amberAccent),
+                  selectedIcon: Icon(Icons.home, color: Colors.amberAccent),
                   label: 'Home',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.hourglass_empty_outlined, color: Colors.white70),
-                  selectedIcon: Icon(Icons.person, color: Colors.amberAccent),
+                  selectedIcon: Icon(Icons.hourglass_bottom, color: Colors.amberAccent),
                   label: 'Waiting',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.exit_to_app_outlined, color: Colors.white70),
-                  selectedIcon: Icon(Icons.person, color: Colors.amberAccent),
+                  selectedIcon: Icon(Icons.exit_to_app, color: Colors.amberAccent),
                   label: 'Exit',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.security_outlined, color: Colors.white70),
-                  selectedIcon: Icon(Icons.person, color: Colors.amberAccent),
+                  selectedIcon: Icon(Icons.security, color: Colors.amberAccent),
                   label: 'Profile',
                 ),
               ],
