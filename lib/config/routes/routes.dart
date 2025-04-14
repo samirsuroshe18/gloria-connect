@@ -11,6 +11,7 @@ import 'package:gloria_connect/features/approval_screens/screens/delivery_approv
 import 'package:gloria_connect/features/approval_screens/screens/delivery_approval_screen.dart';
 import 'package:gloria_connect/features/approval_screens/screens/verification_pending_screen.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
+import 'package:gloria_connect/features/guard_duty/screens/duty_login_screen.dart';
 import 'package:gloria_connect/features/auth/screens/forgot_password_screen.dart';
 import 'package:gloria_connect/features/auth/screens/login_screen.dart';
 import 'package:gloria_connect/features/auth/screens/pdf_preview_screen.dart';
@@ -80,6 +81,8 @@ class AppRoutes {
         return _animatedRoute(const SplashScreen(), name: '/');
       case '/login':
         return _animatedRoute(const LoginScreen(), name: '/login');
+      case '/duty-login':
+        return _animatedRoute(const DutyLoginScreen(), name: '/duty-login');
       case '/register':
         return _animatedRoute(const RegisterScreen(), name: '/register');
       case '/forgot-password':

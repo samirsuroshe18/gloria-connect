@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
+import 'package:gloria_connect/features/guard_duty/bloc/guard_duty_bloc.dart';
 import 'package:gloria_connect/features/guard_entry/bloc/guard_entry_bloc.dart';
 import 'package:gloria_connect/features/guard_exit/bloc/guard_exit_bloc.dart';
 import 'package:gloria_connect/features/guard_profile/bloc/guard_profile_bloc.dart';
@@ -77,6 +78,9 @@ void main() async {
             ),
             BlocProvider(
               create: (_) => serviceLocator<NoticeBoardBloc>(),
+            ),
+            BlocProvider(
+              create: (_) => serviceLocator<GuardDutyBloc>(),
             ),
           ],
           child: const MyApp()

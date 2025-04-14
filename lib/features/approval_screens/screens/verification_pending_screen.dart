@@ -69,7 +69,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
             } else if (state.response.profileType == 'Security') {
               status = state.response.guardStatus!;
               if (state.response.guardStatus == 'approve') {
-                Navigator.pushReplacementNamed(context, '/guard-home');
+                Navigator.pushReplacementNamed(context, '/duty-login');
               }
             } else if (state.response.profileType == 'Resident') {
               status = state.response.residentStatus!;

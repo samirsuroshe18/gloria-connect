@@ -13,6 +13,7 @@ class GetUserModel {
   final String? role;
   final String? userType;
   final bool? isUserTypeVerified;
+  final bool? isOnDuty;
   final String? profileType;
   final String? societyName;
   final String? societyBlock;
@@ -32,6 +33,7 @@ class GetUserModel {
     this.role,
     this.userType,
     this.isUserTypeVerified,
+    this.isOnDuty,
     this.createdAt,
     this.updatedAt,
     this.phoneNo,
@@ -54,6 +56,7 @@ class GetUserModel {
     role: json["role"],
     userType: json['userType'],
     isUserTypeVerified: json['isUserTypeVerified'],
+    isOnDuty: json['isOnDuty'],
     profileType: json["profileType"],
     societyName: json["societyName"],
     societyBlock: json["societyBlock"],
@@ -75,6 +78,7 @@ class GetUserModel {
     "role": role,
     "userType": userType,
     "isUserTypeVerified": isUserTypeVerified,
+    "isOnDuty": isOnDuty,
     "profileType": profileType,
     "societyName": societyName,
     "societyBlock": societyBlock,
