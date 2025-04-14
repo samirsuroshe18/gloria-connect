@@ -85,6 +85,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Navigator.pushReplacementNamed(context, '/verification-pending-screen');
             }else if(state.response.role == 'user' && state.response.userType == 'Resident' && state.response.isUserTypeVerified==true){
               Navigator.pushReplacementNamed(context, '/resident-home');
+            } else if (state.response.role == 'user' &&
+                state.response.userType == 'Security' &&
+                state.response.isUserTypeVerified == true &&
+                state.response.isOnDuty == false) {
+              Navigator.pushReplacementNamed(context, '/duty-login');
             }else if(state.response.role == 'user' && state.response.userType == 'Security' && state.response.isUserTypeVerified==true) {
               Navigator.pushReplacementNamed(context, '/guard-home');
             }

@@ -75,6 +75,11 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushNamedAndRemoveUntil(context, '/verification-pending-screen', (Route<dynamic> route) => false);
     } else if (state.response.role == 'user' && state.response.userType == 'Resident' && state.response.isUserTypeVerified == true) {
       Navigator.pushNamedAndRemoveUntil(context, '/resident-home', (Route<dynamic> route) => false);
+    } else if (state.response.role == 'user' &&
+        state.response.userType == 'Security' &&
+        state.response.isUserTypeVerified == true &&
+        state.response.isOnDuty == false) {
+      Navigator.pushReplacementNamed(context, '/duty-login');
     } else if (state.response.role == 'user' && state.response.userType == 'Security' && state.response.isUserTypeVerified == true) {
       Navigator.pushNamedAndRemoveUntil(context, '/guard-home', (Route<dynamic> route) => false);
     }

@@ -4,6 +4,8 @@ import 'package:gloria_connect/features/administration/bloc/administration_bloc.
 import 'package:gloria_connect/features/administration/repository/administration_repository.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import 'package:gloria_connect/features/check_in/repository/check_in_repository.dart';
+import 'package:gloria_connect/features/guard_duty/bloc/guard_duty_bloc.dart';
+import 'package:gloria_connect/features/guard_duty/repository/guard_duty_repository.dart';
 import 'package:gloria_connect/features/guard_entry/bloc/guard_entry_bloc.dart';
 import 'package:gloria_connect/features/guard_entry/repository/guard_entry_repository.dart';
 import 'package:gloria_connect/features/guard_exit/bloc/guard_exit_bloc.dart';
@@ -39,6 +41,7 @@ Future<void> initDependencies()async {
   _initResidentProfile();
   _initSetting();
   _initNoticeBoard();
+  _initGuardDuty();
 }
 
 void _initAuth(){
@@ -99,4 +102,9 @@ void _initSetting(){
 void _initNoticeBoard(){
   serviceLocator.registerLazySingleton<NoticeBoardRepository>(() => NoticeBoardRepository());
   serviceLocator.registerLazySingleton(()=> NoticeBoardBloc(noticeBoardRepository: serviceLocator()));
+}
+
+void _initGuardDuty(){
+  serviceLocator.registerLazySingleton<GuardDutyRepository>(() => GuardDutyRepository());
+  serviceLocator.registerLazySingleton(()=> GuardDutyBloc(guardDutyRepository: serviceLocator()));
 }
