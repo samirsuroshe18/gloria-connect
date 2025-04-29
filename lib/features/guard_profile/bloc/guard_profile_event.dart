@@ -10,7 +10,11 @@ final class GuardUpdateDetails extends GuardProfileEvent {
   GuardUpdateDetails({this.userName, this.profile});
 }
 
-final class GetCheckoutHistory extends GuardProfileEvent {}
+final class GetCheckoutHistory extends GuardProfileEvent {
+  final Map<String, dynamic> queryParams;
+
+  GetCheckoutHistory({required this.queryParams});
+}
 
 final class AddGatePass extends GuardProfileEvent {
   final String? name;
@@ -44,4 +48,8 @@ final class AddGatePass extends GuardProfileEvent {
   });
 }
 
-final class GetGatePass extends GuardProfileEvent {}
+final class GetGatePass extends GuardProfileEvent {
+  final Map<String, dynamic> queryParams;
+
+  GetGatePass({required this.queryParams});
+}

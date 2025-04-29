@@ -8,8 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/api_error.dart';
 
 class NoticeBoardRepository {
-  Future<NoticeBoardModel> createNotice(
-      {required String title, required String description, required String category, File? file}) async {
+
+  Future<NoticeBoardModel> createNotice({required String title, required String description, required String category, File? file}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
@@ -49,12 +49,7 @@ class NoticeBoardRepository {
     }
   }
 
-  Future<NoticeBoardModel> updateNotice(
-      {required String id,
-      required String title,
-      required String description,
-      File? file,
-      String? image}) async {
+  Future<NoticeBoardModel> updateNotice({required String id, required String title, required String description, File? file, String? image}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
@@ -94,14 +89,14 @@ class NoticeBoardRepository {
     }
   }
 
-  Future<List<NoticeBoardModel>> getAllNotices() async {
+  Future<NoticeBoardModel> getAllNotices({ required Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl = 'https://invite.iotsense.in/api/v1/notice/get-notices';
+      final apiUrl = Uri.http('192.168.226.221:8000', '/api/v1/notice/get-notices', queryParams);
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -110,9 +105,7 @@ class NoticeBoardRepository {
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return (jsonBody['data'] as List)
-            .map((data) => NoticeBoardModel.fromJson(data))
-            .toList();
+        return NoticeBoardModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

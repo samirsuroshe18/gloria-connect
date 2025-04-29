@@ -22,7 +22,11 @@ final class NoticeBoardUpdateNotice extends NoticeBoardEvent{
   NoticeBoardUpdateNotice({required this.id, required this.title, required this.description, this.file, this.image});
 }
 
-final class NoticeBoardGetAllNotices extends NoticeBoardEvent{}
+final class NoticeBoardGetAllNotices extends NoticeBoardEvent{
+  final Map<String, dynamic> queryParams;
+
+  NoticeBoardGetAllNotices({required this.queryParams});
+}
 
 final class NoticeBoardDeleteNotice extends NoticeBoardEvent{
   final String id;

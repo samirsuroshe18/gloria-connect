@@ -24,7 +24,7 @@ final class GuardUpdateDetailsFailure extends GuardProfileState{
 final class GetCheckoutHistoryLoading extends GuardProfileState{}
 
 final class GetCheckoutHistorySuccess extends GuardProfileState{
-  final List<CheckoutHistory> response;
+  final CheckoutHistoryModel response;
   GetCheckoutHistorySuccess({required this.response});
 }
 
@@ -54,7 +54,7 @@ final class AddGatePassFailure extends GuardProfileState{
 final class GetGatePassLoading extends GuardProfileState{}
 
 final class GetGatePassSuccess extends GuardProfileState{
-  final List<GatePassBanner> response;
+  final GatePassModel response;
   GetGatePassSuccess({required this.response});
 }
 

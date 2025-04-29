@@ -10,10 +10,7 @@ import '../../../utils/api_error.dart';
 
 class GuardProfileRepository{
 
-  Future<Map<String, dynamic>> updateDetails({
-    String? userName,
-    File? profile,
-  }) async {
+  Future<Map<String, dynamic>> updateDetails({String? userName, File? profile,}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
@@ -57,15 +54,14 @@ class GuardProfileRepository{
     }
   }
 
-  Future<List<CheckoutHistory>> getCheckoutHistory() async {
+  Future<CheckoutHistoryModel> getCheckoutHistory({ required Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-checkout-history';
+      final apiUrl = Uri.http('192.168.226.221:8000', '/api/v1/delivery-entry/get-checkout-history', queryParams);
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -74,9 +70,7 @@ class GuardProfileRepository{
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return (jsonBody['data'] as List)
-            .map((data) => CheckoutHistory.fromJson(data))
-            .toList();
+        return CheckoutHistoryModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -90,21 +84,7 @@ class GuardProfileRepository{
     }
   }
 
-  Future<GatePassBanner> addGatePass({
-    String? name,
-    File? profile,
-    String? mobNumber,
-    String? gender,
-    String? serviceName,
-    String? serviceLogo,
-    String? address,
-    File? addressProof,
-    List<Map<String, String>>? gatepassAptDetails,
-    String? checkInCodeStartDate,
-    String? checkInCodeExpiryDate,
-    String? checkInCodeStart,
-    String? checkInCodeExpiry,
-  }) async {
+  Future<GatePassBanner> addGatePass({String? name, File? profile, String? mobNumber, String? gender, String? serviceName, String? serviceLogo, String? address, File? addressProof, List<Map<String, String>>? gatepassAptDetails, String? checkInCodeStartDate, String? checkInCodeExpiryDate, String? checkInCodeStart, String? checkInCodeExpiry,}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
@@ -153,15 +133,14 @@ class GuardProfileRepository{
     }
   }
 
-  Future<List<GatePassBanner>> getGatePass() async {
+  Future<GatePassModel> getGatePass({ required Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/invite-visitors/get-gate-pass';
+      final apiUrl = Uri.http('192.168.226.221:8000', '/api/v1/invite-visitors/get-gate-pass', queryParams);
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -170,9 +149,7 @@ class GuardProfileRepository{
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return (jsonBody['data'] as List)
-            .map((data) => GatePassBanner.fromJson(data))
-            .toList();
+        return GatePassModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

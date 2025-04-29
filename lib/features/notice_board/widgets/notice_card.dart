@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 
 class NoticeCard extends StatelessWidget {
-  final NoticeBoardModel data;
+  final Notice data;
   const NoticeCard({super.key, required this.data});
 
   @override

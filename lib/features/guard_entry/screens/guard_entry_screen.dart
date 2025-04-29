@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/guard_duty/bloc/guard_duty_bloc.dart';
 import 'package:gloria_connect/features/guard_entry/bloc/guard_entry_bloc.dart';
@@ -29,7 +29,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
   String? _otp;
   bool _isLoading = false;
   bool _isCheckoutLoading = false;
-  ReceivedAction? initialAction;
+  NotificationAppLaunchDetails? notificationAppLaunchDetails;
 
   // Checkout reasons
   final List<String> _checkoutReasons = [
@@ -46,28 +46,20 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
   }
 
   void getInitialAction() async {
-    initialAction = NotificationController.initialAction;
+    notificationAppLaunchDetails = NotificationController.notificationAppLaunchDetails;
+    Map<String, dynamic>? payload;
+    if(notificationAppLaunchDetails?.notificationResponse?.payload != null){
+      payload = jsonDecode(notificationAppLaunchDetails!.notificationResponse!.payload!);
+    }
     if (mounted) {
-      if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/notice-board-details-screen', (route) => route.isFirst,
-            arguments: NoticeBoardModel.fromJson(jsonDecode(initialAction!.payload!['data']!)));
-      } else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: jsonDecode(initialAction!.payload!['data']!));
-      } else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: jsonDecode(initialAction!.payload!['data']!));
-      } else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: jsonDecode(initialAction!.payload!['data']!));
+      if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_NOTICE_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/notice-board-details-screen', (route) => route.isFirst, arguments: NoticeBoardModel.fromJson(payload!));
+      } else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_COMPLAINT_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: payload!);
+      } else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_RESIDENT_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: payload);
+      } else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_ADMIN_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: payload);
       } else {
         context.read<AuthBloc>().add(AuthGetUser());
       }

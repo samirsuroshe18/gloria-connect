@@ -11,255 +11,258 @@ class GatePassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Main Card
-        Card(
-          color: Colors.black.withOpacity(0.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Stack(
+        children: [
+          // Main Card
+          Card(
+            color: Colors.black.withOpacity(0.2),
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Header Section with Curved Background
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Header Section with Curved Background
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        // Profile Image
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white70, width: 2),
+                            borderRadius: BorderRadius.circular(35),
+                          ),
+                          child: CircleAvatar(
+                            radius: 35,
+                            backgroundColor: Colors.white,
+                            child: CircleAvatar(
+                              radius: 33,
+                              backgroundImage: CachedNetworkImageProvider(
+                                data.profileImg ?? '',
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Name and Service Details
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data.name ?? 'Visitor',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  data.serviceName ?? 'Service',
+                                  style: const TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Service Logo
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Image.asset(
+                            data.serviceLogo ?? 'assets/images/default_service.png',
+                            width: 40,
+                            height: 40,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      // Profile Image
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white70, width: 2),
-                          borderRadius: BorderRadius.circular(35),
-                        ),
-                        child: CircleAvatar(
-                          radius: 35,
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            radius: 33,
-                            backgroundImage: CachedNetworkImageProvider(
-                              data.profileImg ?? '',
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // Name and Service Details
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                  // Details Section
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Society and Entry Type
+                        Row(
                           children: [
-                            Text(
-                              data.name ?? 'Visitor',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white70,
-                              ),
+                            _buildInfoChip(
+                              Icons.location_city,
+                              data.societyName ?? 'N/A',
+                              Colors.white70,
                             ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                data.serviceName ?? 'Service',
-                                style: const TextStyle(
-                                  color: Colors.white60,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Service Logo
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Image.asset(
-                          data.serviceLogo ?? 'assets/images/default_service.png',
-                          width: 40,
-                          height: 40,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-    
-                // Details Section
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Society and Entry Type
-                      Row(
-                        children: [
-                          _buildInfoChip(
-                            Icons.location_city,
-                            data.societyName ?? 'N/A',
-                            Colors.white70,
-                          ),
-                          const SizedBox(width: 8),
-                          _buildInfoChip(
-                            Icons.door_front_door,
-                            data.entryType ?? 'N/A',
-                            Colors.white70,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-    
-                      // Apartments Section
-                      if (data.gatepassAptDetails?.societyApartments != null) ...[
-                        const Text(
-                          'Allowed Apartments',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white70,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            ...(data.gatepassAptDetails?.societyApartments
-                            as List<SocietyApartment>)
-                                .map((apt) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                '${apt.societyBlock}-${apt.apartment}',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
+                            const SizedBox(width: 8),
+                            _buildInfoChip(
+                              Icons.door_front_door,
+                              data.entryType ?? 'N/A',
+                              Colors.white70,
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
-                      ],
-    
-                      // Validity Timeline
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTimelineItem(
-                                    'Start',
-                                    data.checkInCodeStartDate,
-                                    data.checkInCodeStart,
-                                    Icons.play_circle,
-                                    Colors.green.shade600,
-                                  ),
-                                ),
-                                Container(
-                                  height: 1,
-                                  width: 40,
-                                  color: Colors.grey.shade300,
-                                ),
-                                Expanded(
-                                  child: _buildTimelineItem(
-                                    'End',
-                                    data.checkInCodeExpiryDate,
-                                    data.checkInCodeExpiry,
-                                    Icons.stop_circle,
-                                    Colors.red.shade600,
-                                  ),
-                                ),
-                              ],
+
+                        // Apartments Section
+                        if (data.gatepassAptDetails?.societyApartments != null) ...[
+                          const Text(
+                            'Allowed Apartments',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white70,
                             ),
-                          ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              ...(data.gatepassAptDetails?.societyApartments
+                              as List<SocietyApartment>)
+                                  .map((apt) => Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '${apt.societyBlock}-${apt.apartment}',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Validity Timeline
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildTimelineItem(
+                                      'Start',
+                                      data.checkInCodeStartDate,
+                                      data.checkInCodeStart,
+                                      Icons.play_circle,
+                                      Colors.green.shade600,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 1,
+                                    width: 40,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  Expanded(
+                                    child: _buildTimelineItem(
+                                      'End',
+                                      data.checkInCodeExpiryDate,
+                                      data.checkInCodeExpiry,
+                                      Icons.stop_circle,
+                                      Colors.red.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-    
-                // Check-in Code Section
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.qr_code, color: Colors.white70),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Check-in Code: ',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                        ),
+
+                  // Check-in Code Section
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
                       ),
-                      Text(
-                        data.checkInCode ?? 'N/A',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.qr_code, color: Colors.white70),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Check-in Code: ',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.share_rounded,
-                          color: Colors.white70,
+                        Text(
+                          data.checkInCode ?? 'N/A',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                        onPressed: () => _shareCheckInCode(context),
-                      ),
-                    ],
+                        const SizedBox(width: 16),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.share_rounded,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () => _shareCheckInCode(context),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

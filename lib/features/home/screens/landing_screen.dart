@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
@@ -19,7 +19,7 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   int _currentCarouselIndex = 0;
-  ReceivedAction? initialAction;
+  NotificationAppLaunchDetails? notificationAppLaunchDetails;
   final CarouselSliderController _carouselController = CarouselSliderController();
 
   // List of images for the carousel
@@ -80,47 +80,26 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
   ];
 
   void getInitialAction() async {
-    initialAction = NotificationController.initialAction;
-    if (mounted) {
-      if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/resident-approval',
-              (route) => route.isFirst,
-        );
-      } else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'VERIFY_GUARD_PROFILE_TYPE') {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/guard-approval',
-              (route) => route.isFirst,
-        );
-      } else if (initialAction != null &&
-          initialAction?.payload?['action'] == 'VERIFY_DELIVERY_ENTRY') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/delivery-approval-screen', (route) => route.isFirst,
-            arguments: initialAction?.payload);
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/notice-board-details-screen', (route) => route.isFirst,
-            arguments: NoticeBoardModel.fromJson(jsonDecode(initialAction!.payload!['data']!)));
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
-      }else if (initialAction != null &&
-          jsonDecode(initialAction!.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/complaint-details-screen', (route) => route.isFirst,
-            arguments: {'id': jsonDecode(initialAction!.payload!['data']!)['id']});
+    notificationAppLaunchDetails = NotificationController.notificationAppLaunchDetails;
+    Map<String, dynamic>? payload;
+    if(notificationAppLaunchDetails?.notificationResponse?.payload != null){
+      payload = jsonDecode(notificationAppLaunchDetails!.notificationResponse!.payload!);
+    }
+    if (mounted ) {
+      if (notificationAppLaunchDetails != null && payload?['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
+        Navigator.pushNamedAndRemoveUntil(context, '/resident-approval', (route) => route.isFirst,);
+      } else if (notificationAppLaunchDetails != null && payload?['action'] == 'VERIFY_GUARD_PROFILE_TYPE') {
+        Navigator.pushNamedAndRemoveUntil(context, '/guard-approval', (route) => route.isFirst,);
+      } else if (notificationAppLaunchDetails != null && payload?['action'] == 'VERIFY_DELIVERY_ENTRY') {
+        Navigator.pushNamedAndRemoveUntil(context, '/delivery-approval-screen', (route) => route.isFirst, arguments: payload);
+      }else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_NOTICE_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/notice-board-details-screen', (route) => route.isFirst, arguments: NoticeBoardModel.fromJson(payload!));
+      }else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_COMPLAINT_CREATED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: {'id': payload?['id']});
+      }else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_RESIDENT_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: {'id': payload?['id']});
+      }else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_ADMIN_REPLIED') {
+        Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: {'id': payload?['id']});
       } else {
         context.read<MyVisitorsBloc>().add(GetServiceRequest());
       }

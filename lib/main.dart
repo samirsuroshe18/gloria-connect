@@ -1,4 +1,5 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,6 +25,21 @@ import 'config/theme/app_themes.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'firebase_options.dart';
 
+@pragma('vm:entry-point')
+Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await NotificationController.initializeLocalNotifications();
+
+  final int? id = jsonDecode(message.data['payload'])['notificationId'];
+  if(message.data['action']=='CANCEL' && id!=null){
+    NotificationController.cancelLocalNotification(id);
+  }else{
+    NotificationController.showLocalNotification(message: message);
+  }
+}
+
 void main() async {
 
   ///ensureInitialized() is used in the main() to ensure that the Flutter framework is fully initialized before running any code that relies on it.
@@ -33,6 +49,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  /// FCM background handler
+  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
 
   ///Initializing notification
   await NotificationController.initializeLocalNotifications();
@@ -106,9 +125,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     NotificationController.isInForeground = true;
-    AwesomeNotifications().setListeners(
-      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-    );
     // FCM token refresh listener
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
       if (mounted) {
@@ -145,5 +161,3 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
   }
 }
-
-
