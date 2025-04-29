@@ -45,7 +45,7 @@ class NoticeBoardBloc extends Bloc<NoticeBoardEvent, NoticeBoardState>{
     on<NoticeBoardGetAllNotices>((event, emit) async {
       emit(NoticeBoardGetAllNoticesLoading());
       try{
-        final List<NoticeBoardModel> response = await _noticeBoardRepository.getAllNotices();
+        final NoticeBoardModel response = await _noticeBoardRepository.getAllNotices(queryParams: event.queryParams);
         emit(NoticeBoardGetAllNoticesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {

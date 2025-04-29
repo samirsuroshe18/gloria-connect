@@ -1,159 +1,171 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
-import 'package:gloria_connect/firebase_options.dart';
 import 'package:gloria_connect/utils/route_observer_with_stack.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../main.dart';
-
-part 'notifications.dart';
+import 'constants.dart';
 
 class NotificationController {
-  static ReceivedAction? initialAction;
+  static final _plugin = FlutterLocalNotificationsPlugin();
+  static NotificationAppLaunchDetails? notificationAppLaunchDetails;
   static bool isInForeground = false;
 
   static Future<void> initializeLocalNotifications() async {
-    AwesomeNotifications().initialize(
-      'resource://drawable/small_icon_gloria',
-      [
-        NotificationChannel(
-          channelKey: 'app_notifications',
-          channelName: 'App Notifications',
-          channelDescription: 'Notifications related to app activities and updates.',
-          soundSource: 'resource://raw/res_emergency_sound',
-          enableVibration: true,
-          importance: NotificationImportance.High,
-        )
-      ],
+    const androidInit = AndroidInitializationSettings('ic_notification');
+
+    const iosInit = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+      notificationCategories: [/* ... */],
     );
 
-    AwesomeNotifications().initialize(
-      'resource://drawable/small_icon_gloria',
-      [
-        NotificationChannel(
-          channelKey: 'alert_notification',
-          channelName: 'Alert Notifications',
-          channelDescription: 'Notifications related to app activities and updates.',
-          soundSource: 'resource://raw/res_bell_sound',
-          enableVibration: true,
-          importance: NotificationImportance.High,
-        )
-      ],
+    await _plugin.initialize(
+      const InitializationSettings(android: androidInit, iOS: iosInit),
+      onDidReceiveNotificationResponse: _onResponse,
+      onDidReceiveBackgroundNotificationResponse: _onResponseBackground,
     );
 
-    // Get initial notification action is optional
-    initialAction = await AwesomeNotifications().getInitialNotificationAction(removeFromActionEvents: true);
+    await _createChannels();
 
-    Future<void> markNotificationAsProcessed(String notificationId) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Set<String> processedNotifications = prefs.getStringList('processed_notifications')?.toSet() ?? <String>{};
-      processedNotifications.add(notificationId);
-      await prefs.setStringList('processed_notifications', processedNotifications.toList());
-    }
+    notificationAppLaunchDetails = await _plugin.getNotificationAppLaunchDetails();
 
-    Future<bool> isNotificationProcessed(String notificationId) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Set<String> processedNotifications = prefs.getStringList('processed_notifications')?.toSet() ?? <String>{};
-      return processedNotifications.contains(notificationId);
-    }
-
-    FirebaseMessaging.onMessage.listen((message) async {
-      String? notificationId = message.messageId;
-
-      // Check if this notification was already processed
-      bool isProcessed = await isNotificationProcessed(notificationId!);
-
-      if (!isProcessed) {
-        // Handle the notification (show it or perform actions)
-        NotificationController().handleNotification(message, "onMessage");
-
-        // Mark it as processed so it won't be handled again
-        await markNotificationAsProcessed(notificationId);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      final int? id = jsonDecode(message.data['payload'])['notificationId'];
+      if(message.data['action']=='CANCEL' && id!=null){
+        cancelLocalNotification(id);
+      }else{
+        NotificationController.showLocalNotification(message: message);
       }
     });
-
-    ///It is used to handle incoming Firebase Cloud Messaging (FCM) messages when the app is in the background or terminated.
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
 
-  ///your app can handle incoming FCM messages even when it's not in the foreground and you can ensure Firebase is correctly initialized and functional in the background context.
-  @pragma('vm:entry-point')
-  static Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    await NotificationController().handleNotification(message, "firebaseMessagingBackgroundHandler");
-  }
+  static Future<void> _createChannels() async {
+    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
-  Future<void> handleNotification(RemoteMessage message, String from) async {
-    if (message.data['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE') {
-      residentVerifyNotification(message.data['payload']);
-    } else if (message.data['action'] == 'VERIFY_GUARD_PROFILE_TYPE') {
-      guardVerifyNotification(message.data['payload']);
-    } else if (message.data['action'] == 'VERIFY_DELIVERY_ENTRY') {
-      showNotificationWithActions(message.data['payload']);
-    } else if (message.data['action'] == 'DELIVERY_ENTRY_APPROVE') {
-      deliveryEntryApprovedNotification(message.data['payload']);
-    } else if (message.data['action'] == 'DELIVERY_ENTRY_REJECTED') {
-      deliveryEntryRejectedNotification(message.data['payload']);
-    } else if (message.data['action'] == 'NOTIFY_GUARD_APPROVE') {
-      notifyGuardApprove(message.data['payload']);
-    } else if (message.data['action'] == 'NOTIFY_GUARD_REJECTED') {
-      notifyGuardReject(message.data['payload']);
-    } else if (message.data['action'] == 'NOTIFY_CHECKED_IN') {
-      notifyResidentCheckedIn(message.data['payload']);
-    } else if (message.data['action'] == 'NOTIFY_EXIT_ENTRY') {
-      notifyResident(message.data['payload']);
-    } else if (message.data['action'] == 'NOTIFY_CHECKED_IN_ENTRY') {
-      notifyCheckedInEntry(message.data['payload']);
-    } else if (message.data['action'] == 'RESIDENT_APPROVE') {
-      notifyRoleVerification(message.data['payload']);
-    } else if (message.data['action'] == 'RESIDENT_REJECT') {
-      notifyRoleVerification(message.data['payload']);
-    } else if (message.data['action'] == 'GUARD_APPROVE') {
-      notifyRoleVerification(message.data['payload']);
-    } else if (message.data['action'] == 'GUARD_REJECT') {
-      notifyRoleVerification(message.data['payload']);
-    }else if (message.data['action'] == 'NOTIFY_NOTICE_CREATED') {
-      notifyNoticeCreated(message.data['payload']);
-    }else if (message.data['action'] == 'NOTIFY_COMPLAINT_CREATED') {
-      notifyComplaintCreated(message.data['payload']);
-    }else if (message.data['action'] == 'NOTIFY_RESIDENT_REPLIED') {
-      notifyResidentReplied(message.data['payload']);
-    }else if (message.data['action'] == 'NOTIFY_ADMIN_REPLIED') {
-      notifyAdminReplied(message.data['payload']);
-    }else if (message.data['action'] == 'NOTIFY_COMPLAINT_REOPENED') {
-      notifyComplaintReopened(message.data['payload']);
-    }else if (message.data['action'] == 'NOTIFY_COMPLAINT_RESOLVED') {
-      notifyComplaintResolved(message.data['payload']);
-    }else if (message.data['action'] == 'CANCEL') {
-      await AwesomeNotifications().cancel(jsonDecode(message.data['payload'])['notificationId']);
+    if (android != null) {
+      await android.createNotificationChannel(const AndroidNotificationChannel(
+          actionChannelId, actionChannelName,
+          description: actionChannelDesc,
+          importance: Importance.max,
+          playSound: true,
+          sound: RawResourceAndroidNotificationSound('res_emergency_sound'),
+          enableLights: true,
+          enableVibration: true
+      ));
+
+      await android.createNotificationChannel(const AndroidNotificationChannel(
+          basicChannelId, basicChannelName,
+          description: basicChannelDesc,
+          playSound: true,
+          sound: RawResourceAndroidNotificationSound('res_bell_sound'),
+          importance: Importance.max,
+          enableLights: true,
+          enableVibration: true
+      ));
     }
   }
 
-  /// Use this method to detect when the user taps on a notification or action button
+  static Future<void> showLocalNotification({required RemoteMessage message}) async {
+    final payload = jsonDecode(message.data['payload']);
+    final action = message.data['action'];
+    BigPictureStyleInformation? style;
+
+    final id = payload['notificationId'] ?? DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    final title = getTitle(action, payload);
+    final body = getBody(action, payload);
+    final String? imageUrl = payload['profileImg'];
+    final withActions = shouldShowActions(action);
+
+    if (imageUrl != null && imageUrl.isNotEmpty && withActions==true) {
+      try {
+        final resp = await http.get(Uri.parse(imageUrl));
+        final bytes = resp.bodyBytes;
+        style = BigPictureStyleInformation(
+          ByteArrayAndroidBitmap(bytes),
+          largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+          contentTitle: title,
+          summaryText: body,
+          htmlFormatContentTitle: true,
+          htmlFormatSummaryText: true,
+        );
+      } catch (_) {}
+    }
+
+    final androidDetails = AndroidNotificationDetails(
+      withActions ? actionChannelId : basicChannelId,
+      withActions ? actionChannelName : basicChannelName,
+      channelDescription: withActions ? actionChannelDesc : basicChannelDesc,
+      playSound: true,
+      enableVibration: true,
+      enableLights: true,
+      visibility: NotificationVisibility.public,
+      importance: Importance.max,
+      priority: Priority.max,
+      category: AndroidNotificationCategory.alarm,
+      styleInformation: style,
+      largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+      actions: withActions
+          ? [
+        const AndroidNotificationAction('APPROVE', 'Approve'),
+        const AndroidNotificationAction('REJECT', 'Reject'),
+      ]
+          : null,
+    );
+
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: DarwinNotificationDetails(
+        categoryIdentifier: 'actionable',
+        attachments:
+        imageUrl != null ? [DarwinNotificationAttachment(imageUrl)] : null,
+      ),
+    );
+
+    await _plugin.show(id, title, body, details, payload: message.data['payload']);
+  }
+
+  static Future<void> cancelLocalNotification(int id) => _plugin.cancel(id);
+
+  static Future<void> cancelAllLocalNotification() => _plugin.cancelAll();
+
+  // Internal callbacks
+  static void _onResponse(NotificationResponse response) {
+    _handleAction(response);
+  }
+
   @pragma('vm:entry-point')
-  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+  static void _onResponseBackground(NotificationResponse response) {
+    _handleAction(response);
+  }
+
+  static void _handleAction(NotificationResponse response) async {
+    String? actionId = response.actionId;
+    Map<String, dynamic>? payload = response.payload!=null ? jsonDecode(response.payload!) : null;
+    if (actionId == null || payload == null) return;
+
     NavigatorState? currentState = MyApp.navigatorKey.currentState;
 
-    if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE' && isInForeground == true) {
+    if (payload['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE' && isInForeground == true) {
       currentState?.pushNamed('/resident-approval');
-    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'VERIFY_GUARD_PROFILE_TYPE' && isInForeground == true) {
+    } else if (payload['action'] == 'VERIFY_GUARD_PROFILE_TYPE' && isInForeground == true) {
       currentState?.pushNamed('/guard-approval');
-    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'VERIFY_DELIVERY_ENTRY') {
-      if (receivedAction.buttonKeyPressed == 'APPROVE') {
+    } else if (payload['action'] == 'VERIFY_DELIVERY_ENTRY') {
+      if (actionId == 'APPROVE') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? accessToken = prefs.getString('accessToken');
         const apiKey = 'https://invite.iotsense.in/api/v1/delivery-entry/approve-delivery';
         final Map<String, dynamic> data = {
-          'id': jsonDecode(receivedAction.payload!['data']!)['id'],
+          'id': payload['id'],
         };
 
         final response = await http.post(
@@ -170,12 +182,12 @@ class NotificationController {
         } else {
           debugPrint('error : statusCode: ${response.statusCode}, message: ${jsonDecode(response.body)['message']}');
         }
-      } else if (receivedAction.buttonKeyPressed == 'REJECT') {
+      } else if (actionId == 'REJECT') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? accessToken = prefs.getString('accessToken');
         const apiKey = 'https://invite.iotsense.in/api/v1/delivery-entry/reject-delivery';
         final Map<String, dynamic> data = {
-          'id': jsonDecode(receivedAction.payload!['data']!)['id'],
+          'id': payload['id'],
         };
 
         final response = await http.post(
@@ -193,61 +205,287 @@ class NotificationController {
           debugPrint('error : statusCode: ${response.statusCode}, message: ${jsonDecode(response.body)['message']}');
         }
       } else if (isInForeground == true) {
-        currentState?.pushNamedAndRemoveUntil('/delivery-approval-screen', (route) => route.isFirst, arguments: jsonDecode(receivedAction.payload!['data']!));
+        currentState?.pushNamedAndRemoveUntil('/delivery-approval-screen', (route) => route.isFirst, arguments: payload);
       }
-    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_NOTICE_CREATED' && isInForeground == true) {
+    } else if (payload['action'] == 'NOTIFY_NOTICE_CREATED' && isInForeground == true) {
       if(getCurrentRouteName() == '/create-notice-board-screen'){
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushReplacementNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));
+          currentState?.pushReplacementNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(payload));
         });
       }else{
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(jsonDecode(receivedAction.payload!['data']!)));
+          currentState?.pushNamed('/notice-board-details-screen', arguments: NoticeBoardModel.fromJson(payload));
         });
       }
-    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_COMPLAINT_CREATED' && isInForeground == true) {
+    } else if (payload['action'] == 'NOTIFY_COMPLAINT_CREATED' && isInForeground == true) {
       if(getCurrentRouteName() == '/complaint-details-screen'){
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': payload['id']});
         });
       }else{
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': payload['id']});
         });
       }
-    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_RESIDENT_REPLIED' && isInForeground == true) {
+    } else if (payload['action'] == 'NOTIFY_RESIDENT_REPLIED' && isInForeground == true) {
       if(getCurrentRouteName() == '/complaint-details-screen'){
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': payload['id']});
         });
       }else{
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': payload['id']});
         });
       }
-    } else if (jsonDecode(receivedAction.payload!['data']!)['action'] == 'NOTIFY_ADMIN_REPLIED' && isInForeground == true) {
+    } else if (payload['action'] == 'NOTIFY_ADMIN_REPLIED' && isInForeground == true) {
       if(getCurrentRouteName() == '/complaint-details-screen'){
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': payload['id']});
         });
       }else{
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': jsonDecode(receivedAction.payload!['data']!)['id']});
+          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': payload['id']});
         });
       }
+    }
+  }
+
+  static bool shouldShowActions(String action) {
+    // Define which notification types should have actions
+    switch (action) {
+      case "VERIFY_DELIVERY_ENTRY":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  static String getTitle(String action, Map<String, dynamic> payload) {
+    switch (action) {
+      case "VERIFY_RESIDENT_PROFILE_TYPE":
+        return "Verify resident profile";
+
+      case "VERIFY_GUARD_PROFILE_TYPE":
+        return "Verify security guard profile";
+
+      case "VERIFY_DELIVERY_ENTRY":
+        Map<String, String> message =  getVerifyNotification(payload['entryType'], payload['societyDetails']['societyGates']);
+        return message['title'] ?? 'Not available';
+
+      case "DELIVERY_ENTRY_APPROVE":
+        return "Entry Approved";
+
+      case "DELIVERY_ENTRY_REJECTED":
+        return "Entry Rejected";
+
+      case "NOTIFY_GUARD_APPROVE":
+        return "Entry Confirmed";
+
+      case "NOTIFY_GUARD_REJECTED":
+        return "Entry Confirmed";
+
+      case "NOTIFY_CHECKED_IN":
+        return "New Visitor Checked In";
+
+      case "NOTIFY_EXIT_ENTRY":
+        return "Entry Exited";
+
+      case "NOTIFY_CHECKED_IN_ENTRY":
+        String entryType = payload['entryType'] ?? 'NA';
+        return 'Entry Confirmed: $entryType';
+
+      case "RESIDENT_APPROVE":
+      case "RESIDENT_REJECT":
+      case "GUARD_APPROVE":
+      case "GUARD_REJECT":
+        String title = _getTitle(action);
+        return title;
+
+      case "NOTIFY_NOTICE_CREATED":
+        String societyName = payload['society'] ?? 'Unknown Society';
+        String noticeCategory = payload['category'] ?? 'General';
+
+        // Format the title based on category
+        String categoryLabel;
+        switch (noticeCategory.toLowerCase()) {
+          case "important":
+            categoryLabel = "📢 Important Notice";
+            break;
+          case "event":
+            categoryLabel = "🎉 Upcoming Event";
+            break;
+          case "maintenance":
+            categoryLabel = "🛠️ Maintenance Update";
+            break;
+          default:
+            categoryLabel = "📌 Notice Board";
+        }
+        return "$categoryLabel in $societyName";
+
+      case "NOTIFY_COMPLAINT_CREATED":
+        String complaintType = payload['category'] ?? 'Unknown';
+        String societyName = payload['societyName'] ?? 'Unknown';
+        return "New Complaint: $complaintType in $societyName";
+
+      case "NOTIFY_RESIDENT_REPLIED":
+        return "📩 New Reply on Complaint";
+
+      case "NOTIFY_ADMIN_REPLIED":
+        return "🛠️ Admin Responded to Your Complaint";
+
+      case "NOTIFY_COMPLAINT_REOPENED":
+        String complaintType = payload['category'] ?? 'Unknown';
+        bool isReopenedByResident = payload['isReopenedByResident'];
+        String title = isReopenedByResident ? "Complaint Reopened by Resident: $complaintType" : "Complaint Reopened: $complaintType";
+        return title;
+
+      case "NOTIFY_COMPLAINT_RESOLVED":
+        String complaintType = payload['category'] ?? 'Unknown';
+        bool isResolvedByResident = payload['isResolvedByResident'];
+        String title = isResolvedByResident ? "Complaint Resolved by Resident: $complaintType" : "Complaint Resolved: $complaintType";
+        return title;
+
+      case "GUARD_DUTY_CHECKIN":
+        return 'Guard duty started';
+
+      case "GUARD_DUTY_CHECKOUT":
+        return 'Guard duty ended';
+
+      default:
+        return payload['title'] ?? "Notification";
+    }
+  }
+
+  static String getBody(String action, Map<String, dynamic> payload) {
+    switch (action) {
+      case "VERIFY_RESIDENT_PROFILE_TYPE":
+        String societyBlock = payload['societyBlock'] ?? 'NA';
+        String societyName = payload['societyName'] ?? 'NA';
+        String apartment = payload['societyName'] ?? 'NA';
+        String ownership = payload['societyName'] ?? 'NA';
+        String userName = payload['userName'] ?? 'Anonymous';
+        return 'New resident profile submitted for verification. \n\nName: $userName \nSociety: $societyName \nBlock: $societyBlock \nApartment: $apartment \nOwnership: $ownership \n\n Please review and approve or reject the profile.';
+
+      case "VERIFY_GUARD_PROFILE_TYPE":
+        String userName = payload['userName'] ?? 'NA';
+        String societyName = payload['societyName'] ?? 'NA';
+        String gateAssign = payload['gateAssign'] ?? 'NA';
+        return 'New security guard profile submitted for verification. \n\nName: $userName \nSociety: $societyName \nGate assigned: $gateAssign \n\n Please review and approve or reject the profile.';
+
+      case "VERIFY_DELIVERY_ENTRY":
+        Map<String, String> message =  getVerifyNotification(payload['entryType'], payload['societyDetails']['societyGates']);
+        String name = payload['name'] ?? 'NA';
+        return '${message['body']}\n$name';
+
+      case "DELIVERY_ENTRY_APPROVE":
+        String? companyName = payload['companyName'] ?? 'NA';
+        String? serviceName = payload['serviceName'] ?? 'NA';
+        String visitorName = payload['visitorName'] ?? 'NA';
+        String userName = payload['userName'] ?? 'NA';
+        String entryType = payload['entryType'] ?? 'NA';
+        String bodyMessage = deliveryEntryApprovedNotificationMessage(entryType, userName, visitorName, serviceName, companyName);
+        return bodyMessage;
+
+      case "DELIVERY_ENTRY_REJECTED":
+        String? companyName = payload['companyName'] ?? 'NA';
+        String? serviceName = payload['serviceName'] ?? 'NA';
+        String visitorName = payload['visitorName'] ?? 'NA';
+        String userName = payload['userName'] ?? 'NA';
+        String entryType = payload['entryType'] ?? 'NA';
+        String bodyMessage = deliveryEntryDeniedNotificationMessage(entryType, userName, visitorName, serviceName, companyName);
+        return bodyMessage;
+
+      case "NOTIFY_GUARD_APPROVE":
+        String deliveryName = payload['deliveryName'] ?? 'NA';
+        String userName = payload['userName'] ?? 'NA';
+        return '$userName (Resident) has approved $deliveryName. Please proceed.';
+
+      case "NOTIFY_GUARD_REJECTED":
+        String deliveryName = payload['deliveryName'] ?? 'NA';
+        String userName = payload['userName'] ?? 'NA';
+        return '$userName (Resident) has rejected $deliveryName. Please proceed.';
+
+      case "NOTIFY_CHECKED_IN":
+        String name = payload['name'] ?? 'NA';
+        return '$name has checked in';
+
+      case "NOTIFY_EXIT_ENTRY":
+        String deliveryName = payload['deliveryName'] ?? 'NA';
+        return '$deliveryName has been checked out.';
+
+      case "NOTIFY_CHECKED_IN_ENTRY":
+        String entryType = payload['entryType'] ?? 'NA';
+        String deliveryName = payload['deliveryName'] ?? 'NA';
+        String guardName = payload['guardName'] ?? 'NA';
+        return 'The $entryType ($deliveryName) you pre-approved has been securely checked in by the guard ($guardName).';
+
+      case "RESIDENT_APPROVE":
+      case "RESIDENT_REJECT":
+      case "GUARD_APPROVE":
+      case "GUARD_REJECT":
+        String message = _getBody(action);
+        return message;
+
+      case "NOTIFY_NOTICE_CREATED":
+        String noticeTitle = payload['title'] ?? 'New Notice';
+        String publishedBy = payload['publishedBy']['userName'] ?? 'Admin';
+        return "$noticeTitle\nPublished by: $publishedBy";
+
+      case "NOTIFY_COMPLAINT_CREATED":
+        String userName = payload['raisedBy']['userName'] ?? 'Anonymous';
+        return '$userName has registered a complaint.';
+
+      case "NOTIFY_RESIDENT_REPLIED":
+        String complaintType = payload['category'] ?? 'Unknown';
+        String societyName = payload['societyName'] ?? 'Unknown';
+        String userName = payload['raisedBy']['userName'] ?? 'Anonymous';
+        return "$userName has responded to the complaint regarding $complaintType in $societyName. Check now for details.";
+
+      case "NOTIFY_ADMIN_REPLIED":
+        String complaintType = payload['category'] ?? 'Unknown';
+        String societyName = payload['societyName'] ?? 'Unknown';
+        return "Your complaint regarding $complaintType in $societyName has received a response from the admin. Check now for updates.";
+
+      case "NOTIFY_COMPLAINT_REOPENED":
+        String complaintType = payload['category'] ?? 'Unknown';
+        String societyName = payload['societyName'] ?? 'Unknown';
+        String reopenedBy = payload['reopenedBy'] ?? 'Unknown';
+        bool isReopenedByResident = payload['isReopenedByResident'];
+        String body = isReopenedByResident ? "$reopenedBy has reopened the complaint regarding $complaintType in $societyName." : "Your complaint regarding $complaintType has been reopened by $reopenedBy.";
+        return body;
+
+      case "NOTIFY_COMPLAINT_RESOLVED":
+        String complaintType = payload['category'] ?? 'Unknown';
+        String resolvedBy = payload['resolvedBy'] ?? 'Unknown';
+        bool isResolvedByResident = payload['isResolvedByResident'];
+        String body = isResolvedByResident ? "$resolvedBy has marked the complaint regarding $complaintType as resolved." : "Your complaint regarding $complaintType has been resolved by $resolvedBy.";
+        return body;
+
+      case "GUARD_DUTY_CHECKIN":
+        String guardName = payload['guardName'] ?? 'Unknown';
+        String guardGate = payload['guardGate'];
+        return '$guardName has started duty at $guardGate.';
+
+      case "GUARD_DUTY_CHECKOUT":
+        String guardName = payload['guardName'] ?? 'Unknown';
+        String guardGate = payload['guardGate'];
+        return '$guardName has ended duty at $guardGate.';
+
+      default:
+        return payload['body'] ?? "You have a new notification";
     }
   }
 
   Future<void> requestNotificationPermission() async {
     NotificationSettings settings = await FirebaseMessaging.instance
         .requestPermission(
-            alert: true,
-            announcement: true,
-            badge: true,
-            carPlay: true,
-            criticalAlert: true,
-            provisional: true,
-            sound: true);
+        alert: true,
+        announcement: true,
+        badge: true,
+        carPlay: true,
+        criticalAlert: true,
+        provisional: true,
+        sound: true);
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('user granted permission');
@@ -274,5 +512,69 @@ class NotificationController {
       // ignore: use_build_context_synchronously
       context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: newToken));
     });
+  }
+
+  // Helper method to generate a message based on entryType
+  static Map<String, String> getVerifyNotification(String entryType, String gate) {
+    if (entryType == 'delivery') {
+      return {'title': 'Verify delivery', 'body': 'You have got a Delivery at the $gate.'};
+    } else if(entryType == 'guest'){
+      return {'title': 'Verify Guest', 'body': 'You have got a Guest at the $gate.'};
+    } else if(entryType == 'other'){
+      return {'title': 'Verify Other Services', 'body': 'You have got a Other service at the $gate.'};
+    } else{
+      return {'title': 'Verify Cab', 'body': 'You have got a Cab at the $gate.'};
+    }
+  }
+
+  // Helper method to generate a message based on entryType
+  static String deliveryEntryApprovedNotificationMessage(String entryType, String userName, String visitorName, String? serviceName, String? companyName, ) {
+    if (entryType == 'delivery') {
+      return 'The delivery entry for $companyName ($visitorName) has been approved by $userName.';
+    } else if(entryType == 'guest'){
+      return 'The guest entry ($visitorName) has been approved by $userName.';
+    } else if(entryType == 'other'){
+      return 'The other services entry for $serviceName ($visitorName) has been approved by $userName.';
+    } else{
+      return 'The cab entry for $companyName ($visitorName) has been approved by $userName.';
+    }
+  }
+
+  static String deliveryEntryDeniedNotificationMessage(String entryType, String userName, String visitorName, String? serviceName, String? companyName) {
+    if (entryType == 'delivery') {
+      return 'The delivery entry for $companyName ($visitorName) has been rejected by $userName.';
+    } else if(entryType == 'guest'){
+      return 'The guest entry ($visitorName) has been rejected by $userName.';
+    } else if(entryType == 'other'){
+      return 'The other services entry for $serviceName ($visitorName) has been rejected by $userName.';
+    } else{
+      return 'The cab entry for $companyName ($visitorName) has been rejected by $userName.';
+    }
+  }
+
+  // Helper method to generate a message based on action
+  static String _getBody(String action) {
+    if (action == 'RESIDENT_APPROVE') {
+      return "Congratulations! Your resident profile has been successfully approved.";
+    } else if(action == 'RESIDENT_REJECT'){
+      return "Unfortunately, your resident profile was not approved. For more information, please reach out to us.";
+    } else if(action == 'GUARD_APPROVE'){
+      return "Congratulations! Your guard profile has been successfully approved.";
+    } else{
+      return "Unfortunately, your guard profile was not approved. For more information, please reach out to us.";
+    }
+  }
+
+// Helper method to generate a message based on action
+  static String _getTitle(String action) {
+    if (action == 'RESIDENT_APPROVE') {
+      return "Resident Profile Approved";
+    } else if(action == 'RESIDENT_REJECT'){
+      return "Resident Profile Rejected";
+    } else if(action == 'GUARD_APPROVE'){
+      return "Security Guard Profile Approved";
+    } else{
+      return "Security Guard Profile Rejected";
+    }
   }
 }

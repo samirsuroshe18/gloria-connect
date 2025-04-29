@@ -55,7 +55,7 @@ final class NoticeBoardGetNoticeFailure extends NoticeBoardState{
 final class NoticeBoardGetAllNoticesLoading extends NoticeBoardState{}
 
 final class NoticeBoardGetAllNoticesSuccess extends NoticeBoardState{
-  final List<NoticeBoardModel> response;
+  final NoticeBoardModel response;
   NoticeBoardGetAllNoticesSuccess({required this.response});
 }
 

@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/checkout_history.dart';
 
 class CheckoutHistoryCard extends StatelessWidget {
-  final CheckoutHistory data;
+  final CheckoutEntry data;
 
   const CheckoutHistoryCard({super.key, required this.data});
 

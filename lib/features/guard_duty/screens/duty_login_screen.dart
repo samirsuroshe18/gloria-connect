@@ -14,6 +14,7 @@ class DutyLoginScreen extends StatefulWidget {
 class _DutyLoginScreenState extends State<DutyLoginScreen> {
   String? _selectedGate;
   String? checkinReason;
+  String? checkinShift;
   bool _isLoading = false;
 
   // Mock data for gates
@@ -30,6 +31,8 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
     '⏰ Covering someone’s absence',
     '📝 Manual check-in (forgot earlier)'
   ];
+
+  final List<String> _shifts = ['All Shifts', 'Morning', 'Evening', 'Night'];
 
   @override
   Widget build(BuildContext context) {
@@ -167,6 +170,54 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
                         ),
                       ),
 
+                      const SizedBox(height: 10,),
+
+                      // Gate Selection Dropdown
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Select Shift',
+                          labelStyle: TextStyle(
+                            color: Colors.white60,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          hintText: 'Choose your Shift',
+                          prefixIcon: Icon(Icons.access_time, color: Colors.white70),
+                          border: OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white70, width: 1.5),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white, width: 2),
+                          ),
+                        ),
+                        value: checkinShift,
+                        isExpanded: true,
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
+                        items: _shifts.map<DropdownMenuItem<String>>((String gate) {
+                          return DropdownMenuItem<String>(
+                            value: gate,
+                            child: Text(gate),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            checkinShift = newValue;
+                          });
+                        },
+                      ),
+
+                      // Info text
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8.0, left: 8.0),
+                        child: Text(
+                          'Please select your shift before check-in.',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+
                       // Spacer
                       const Spacer(),
 
@@ -174,30 +225,34 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
                       SizedBox(
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: (_selectedGate != null && checkinReason != null) ? () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Confirm Check-In'),
-                                content: Text(
-                                  'You are about to start duty at $_selectedGate for reason:\n\n$checkinReason\n\nDo you want to proceed?',
+                          onPressed: () {
+                            if(_selectedGate != null && checkinReason != null && checkinShift!=null){
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Confirm Check-In'),
+                                  content: Text(
+                                    'You are about to start duty at $_selectedGate for reason:\n\n$checkinReason\n\nDo you want to proceed?',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        context.read<GuardDutyBloc>().add(GuardDutyCheckIn(gate: _selectedGate!, checkinReason: checkinReason!, shift: checkinShift!));
+                                      },
+                                      child: const Text('Start Duty'),
+                                    ),
+                                  ],
                                 ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      context.read<GuardDutyBloc>().add(GuardDutyCheckIn(gate: _selectedGate!, checkinReason: checkinReason!));
-                                    },
-                                    child: const Text('Start Duty'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } : null,
+                              );
+                            }else{
+                              CustomSnackbar.show(context: context, message: 'All fields are required', type: SnackbarType.error);
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             disabledBackgroundColor: Colors.indigo.withOpacity(0.3),
                             disabledForegroundColor: Colors.white70,

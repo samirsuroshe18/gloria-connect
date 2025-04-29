@@ -344,7 +344,7 @@ class _PastVisitorsScreenState extends State<PastVisitorsScreen> with AutomaticK
   }
 
   Future<void> _onRefresh() async {
-    if(data.length==10) {
+    if(_hasMore) {
       await _fetchEntries();
     }
   }

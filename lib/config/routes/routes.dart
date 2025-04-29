@@ -18,6 +18,7 @@ import 'package:gloria_connect/features/auth/screens/pdf_preview_screen.dart';
 import 'package:gloria_connect/features/auth/screens/register_screen.dart';
 import 'package:gloria_connect/features/auth/screens/splash_screen.dart';
 import 'package:gloria_connect/features/check_in/screens/apartment_selection_screen.dart';
+import 'package:gloria_connect/features/guard_duty/screens/guard_report.dart';
 import 'package:gloria_connect/features/guard_entry/screens/asking_cab_approval_screen.dart';
 import 'package:gloria_connect/features/guard_entry/screens/asking_delivery_approval_screen.dart';
 import 'package:gloria_connect/features/check_in/screens/block_selection_screen.dart';
@@ -288,10 +289,10 @@ class AppRoutes {
       case '/notice-board-screen':
         return _animatedRoute(const NoticeBoardPage(), name: '/notice-board-screen');
       case '/notice-board-details-screen':
-        if (args != null && args is NoticeBoardModel) {
+        if (args != null && args is Notice) {
           return _animatedRoute(NoticeDetailPage(data: args), name: '/notice-board-details-screen');
         }else{
-          return _animatedRoute(NoticeDetailPage(data: NoticeBoardModel(/* default values */)), name: '/notice-board-details-screen');
+          return _animatedRoute(NoticeDetailPage(data: Notice(/* default values */)), name: '/notice-board-details-screen');
         }
       case '/create-notice-board-screen':
         return _animatedRoute(const CreateNoticePage(), name: '/create-notice-board-screen');
@@ -325,6 +326,8 @@ class AppRoutes {
               name: '/error'
           );
         }
+      case '/guard-report':
+        return _animatedRoute(GuardReport(guardId: args as String), name: '/guard-report');
       default:
         return _animatedRoute(const SplashScreen(), name: '/');
     }

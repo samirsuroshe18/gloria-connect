@@ -142,6 +142,8 @@ class _AllGuardScreenState extends State<AllGuardScreen> {
                                 _deleteGuard(member.user?.id ?? "");
                               } else if(value == 'call'){
                                 _makePhoneCall(member.user?.phoneNo ?? "");
+                              } else if(value == 'guard_report'){
+                                _guardReport(member.user?.id ?? "");
                               }
                             },
                             itemBuilder: (context) => [
@@ -162,6 +164,16 @@ class _AllGuardScreenState extends State<AllGuardScreen> {
                                     Icon(Icons.call, color: Colors.blue),
                                     SizedBox(width: 8),
                                     Text('Call'),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'guard_report',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.report, color: Colors.blue),
+                                    SizedBox(width: 8),
+                                    Text('Guard Report'),
                                   ],
                                 ),
                               ),
@@ -309,5 +321,10 @@ class _AllGuardScreenState extends State<AllGuardScreen> {
         );
       },
     );
+  }
+
+  Future<void> _guardReport(String id) async {
+    if(!mounted) return;
+    Navigator.pushNamed(context, '/guard-report', arguments: id);
   }
 }

@@ -32,7 +32,7 @@ class GuardProfileBloc extends Bloc<GuardProfileEvent, GuardProfileState>{
     on<GetCheckoutHistory>((event, emit) async {
       emit(GetCheckoutHistoryLoading());
       try{
-        final List<CheckoutHistory> response = await _guardProfileRepository.getCheckoutHistory();
+        final CheckoutHistoryModel response = await _guardProfileRepository.getCheckoutHistory(queryParams: event.queryParams);
         emit(GetCheckoutHistorySuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -60,7 +60,7 @@ class GuardProfileBloc extends Bloc<GuardProfileEvent, GuardProfileState>{
     on<GetGatePass>((event, emit) async {
       emit(GetGatePassLoading());
       try{
-        final List<GatePassBanner> response = await _guardProfileRepository.getGatePass();
+        final GatePassModel response = await _guardProfileRepository.getGatePass(queryParams: event.queryParams);
         emit(GetGatePassSuccess(response: response));
       }catch(e){
         if (e is ApiError) {

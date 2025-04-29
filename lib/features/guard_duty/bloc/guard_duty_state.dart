@@ -49,3 +49,33 @@ final class GuardDutyStatusFailure extends GuardDutyState{
 
   GuardDutyStatusFailure( {required this.message, this.status});
 }
+
+///get guard logs
+final class GuardGetLogsLoading extends GuardDutyState{}
+
+final class GuardGetLogsSuccess extends GuardDutyState{
+  final GuardLogModel response;
+  GuardGetLogsSuccess({required this.response});
+}
+
+final class GuardGetLogsFailure extends GuardDutyState{
+  final String message;
+  final int? status;
+
+  GuardGetLogsFailure( {required this.message, this.status});
+}
+
+///get guard logs
+final class GetGuardInfoLoading extends GuardDutyState{}
+
+final class GetGuardInfoSuccess extends GuardDutyState{
+  final GuardInfoModel response;
+  GetGuardInfoSuccess({required this.response});
+}
+
+final class GetGuardInfoFailure extends GuardDutyState{
+  final String message;
+  final int? status;
+
+  GetGuardInfoFailure( {required this.message, this.status});
+}
