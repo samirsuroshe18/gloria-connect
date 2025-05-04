@@ -45,7 +45,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>{
     on<SettingGetComplaint>((event, emit) async {
       emit(SettingGetComplaintLoading());
       try{
-        final List<ComplaintModel> response = await _settingRepository.getComplaints();
+        final ComplaintModel response = await _settingRepository.getComplaints(queryParams: event.queryParams);
         emit(SettingGetComplaintSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -59,7 +59,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>{
     on<SettingGetComplaintDetails>((event, emit) async {
       emit(SettingGetComplaintDetailsLoading());
       try{
-        final ComplaintModel response = await _settingRepository.getComplaintDetails(id: event.id);
+        final Complaint response = await _settingRepository.getComplaintDetails(id: event.id);
         emit(SettingGetComplaintDetailsSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -73,7 +73,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>{
     on<SettingAddResponse>((event, emit) async {
       emit(SettingAddResponseLoading());
       try{
-        final ComplaintModel response = await _settingRepository.addResponse(id: event.id, message: event.message);
+        final Complaint response = await _settingRepository.addResponse(id: event.id, message: event.message);
         emit(SettingAddResponseSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -87,7 +87,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>{
     on<SettingResolve>((event, emit) async {
       emit(SettingResolveLoading());
       try{
-        final ComplaintModel response = await _settingRepository.resolve(id: event.id);
+        final Complaint response = await _settingRepository.resolve(id: event.id);
         emit(SettingResolveSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -101,7 +101,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>{
     on<SettingReopen>((event, emit) async {
       emit(SettingReopenLoading());
       try{
-        final ComplaintModel response = await _settingRepository.reopen(id: event.id);
+        final Complaint response = await _settingRepository.reopen(id: event.id);
         emit(SettingReopenSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -115,13 +115,41 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>{
     on<SettingGetResponse>((event, emit) async {
       emit(SettingGetResponseLoading());
       try{
-        final ComplaintModel response = await _settingRepository.getResponse(id: event.id);
+        final Complaint response = await _settingRepository.getResponse(id: event.id);
         emit(SettingGetResponseSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
           emit(SettingGetResponseFailure(message: e.message.toString(), status: e.statusCode));
         }else{
           emit(SettingGetResponseFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<SettingGetPendingComplaint>((event, emit) async {
+      emit(SettingGetPendingComplaintLoading());
+      try{
+        final ComplaintModel response = await _settingRepository.getPendingComplaints(queryParams: event.queryParams);
+        emit(SettingGetPendingComplaintSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(SettingGetPendingComplaintFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(SettingGetPendingComplaintFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<SettingGetResolvedComplaint>((event, emit) async {
+      emit(SettingGetResolvedComplaintLoading());
+      try{
+        final ComplaintModel response = await _settingRepository.getResolvedComplaints(queryParams: event.queryParams);
+        emit(SettingGetResolvedComplaintSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(SettingGetResolvedComplaintFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(SettingGetResolvedComplaintFailure(message: e.toString()));
         }
       }
     });

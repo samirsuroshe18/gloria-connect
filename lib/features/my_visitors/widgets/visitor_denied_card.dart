@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/guard_waiting/models/entry.dart';
+import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class VisitorDeniedCard extends StatelessWidget {
-  final VisitorEntries data;
+  final Entry data;
 
   const VisitorDeniedCard({super.key, required this.data});
 
@@ -67,7 +68,7 @@ class VisitorDeniedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),

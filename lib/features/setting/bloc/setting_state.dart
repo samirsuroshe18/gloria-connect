@@ -39,7 +39,7 @@ final class SettingSubmitComplaintFailure extends SettingState{
 final class SettingGetComplaintLoading extends SettingState{}
 
 final class SettingGetComplaintSuccess extends SettingState{
-  final List<ComplaintModel> response;
+  final ComplaintModel response;
   SettingGetComplaintSuccess({required this.response});
 }
 
@@ -50,11 +50,41 @@ final class SettingGetComplaintFailure extends SettingState{
   SettingGetComplaintFailure( {required this.message, this.status});
 }
 
+/// To Get Raising Complaint
+final class SettingGetPendingComplaintLoading extends SettingState{}
+
+final class SettingGetPendingComplaintSuccess extends SettingState{
+  final ComplaintModel response;
+  SettingGetPendingComplaintSuccess({required this.response});
+}
+
+final class SettingGetPendingComplaintFailure extends SettingState{
+  final String message;
+  final int? status;
+
+  SettingGetPendingComplaintFailure( {required this.message, this.status});
+}
+
+/// To Get Raising Complaint
+final class SettingGetResolvedComplaintLoading extends SettingState{}
+
+final class SettingGetResolvedComplaintSuccess extends SettingState{
+  final ComplaintModel response;
+  SettingGetResolvedComplaintSuccess({required this.response});
+}
+
+final class SettingGetResolvedComplaintFailure extends SettingState{
+  final String message;
+  final int? status;
+
+  SettingGetResolvedComplaintFailure( {required this.message, this.status});
+}
+
 /// To add response
 final class SettingGetComplaintDetailsLoading extends SettingState{}
 
 final class SettingGetComplaintDetailsSuccess extends SettingState{
-  final ComplaintModel response;
+  final Complaint response;
   SettingGetComplaintDetailsSuccess({required this.response});
 }
 
@@ -69,7 +99,7 @@ final class SettingGetComplaintDetailsFailure extends SettingState{
 final class SettingAddResponseLoading extends SettingState{}
 
 final class SettingAddResponseSuccess extends SettingState{
-  final ComplaintModel response;
+  final Complaint response;
   SettingAddResponseSuccess({required this.response});
 }
 
@@ -84,7 +114,7 @@ final class SettingAddResponseFailure extends SettingState{
 final class SettingResolveLoading extends SettingState{}
 
 final class SettingResolveSuccess extends SettingState{
-  final ComplaintModel response;
+  final Complaint response;
   SettingResolveSuccess({required this.response});
 }
 
@@ -99,7 +129,7 @@ final class SettingResolveFailure extends SettingState{
 final class SettingReopenLoading extends SettingState{}
 
 final class SettingReopenSuccess extends SettingState{
-  final ComplaintModel response;
+  final Complaint response;
   SettingReopenSuccess({required this.response});
 }
 
@@ -114,7 +144,7 @@ final class SettingReopenFailure extends SettingState{
 final class SettingGetResponseLoading extends SettingState{}
 
 final class SettingGetResponseSuccess extends SettingState{
-  final ComplaintModel response;
+  final Complaint response;
   SettingGetResponseSuccess({required this.response});
 }
 

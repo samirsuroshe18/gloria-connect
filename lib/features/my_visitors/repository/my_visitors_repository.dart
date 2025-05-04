@@ -72,15 +72,14 @@ class MyVisitorsRepository {
     }
   }
 
-  Future<List<VisitorEntries>> getDeniedEntries() async {
+  Future<PastDeliveryModel> getDeniedEntries({ required final Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-denied';
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/delivery-entry/get-denied', queryParams);
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -89,9 +88,7 @@ class MyVisitorsRepository {
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return (jsonBody['data'] as List)
-            .map((data) => VisitorEntries.fromJson(data))
-            .toList();
+        return PastDeliveryModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

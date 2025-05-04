@@ -35,11 +35,11 @@ final class GetCurrentEntriesFailure extends MyVisitorsState{
   GetCurrentEntriesFailure( {required this.message, this.status});
 }
 
-/// Get Current entry
+/// Get Denied entry
 final class GetDeniedEntriesLoading extends MyVisitorsState{}
 
 final class GetDeniedEntriesSuccess extends MyVisitorsState{
-  final List<VisitorEntries> response;
+  final PastDeliveryModel response;
   GetDeniedEntriesSuccess({required this.response});
 }
 

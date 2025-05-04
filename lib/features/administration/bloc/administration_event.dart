@@ -23,7 +23,11 @@ final class AdminVerifyGuard extends AdministrationEvent{
   AdminVerifyGuard({required this.requestId, required this.user, required this.guardStatus});
 }
 
-final class AdminGetSocietyMember extends AdministrationEvent{}
+final class AdminGetSocietyMember extends AdministrationEvent{
+  final Map<String, dynamic> queryParams;
+
+  AdminGetSocietyMember({required this.queryParams});
+}
 
 final class AdminGetSocietyGuard extends AdministrationEvent{}
 
@@ -53,4 +57,20 @@ final class AdminRemoveGuard extends AdministrationEvent{
   AdminRemoveGuard({required this.id});
 }
 
-final class AdminGetComplaint extends AdministrationEvent{}
+final class AdminGetComplaint extends AdministrationEvent{
+  final Map<String, dynamic> queryParams;
+
+  AdminGetComplaint({required this.queryParams});
+}
+
+final class AdminGetPendingComplaint extends AdministrationEvent{
+  final Map<String, dynamic> queryParams;
+
+  AdminGetPendingComplaint({required this.queryParams});
+}
+
+final class AdminGetResolvedComplaint extends AdministrationEvent{
+  final Map<String, dynamic> queryParams;
+
+  AdminGetResolvedComplaint({required this.queryParams});
+}

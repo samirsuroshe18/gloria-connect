@@ -86,15 +86,14 @@ class SettingRepository{
     }
   }
 
-  Future<List<ComplaintModel>> getComplaints() async {
+  Future<ComplaintModel> getComplaints({required Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/complaint/get-complaints';
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/complaint/get-complaints', queryParams);
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -102,9 +101,7 @@ class SettingRepository{
       );
       final jsonBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        return (jsonBody['data'] as List)
-            .map((data) => ComplaintModel.fromJson(data))
-            .toList();
+        return ComplaintModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -118,7 +115,65 @@ class SettingRepository{
     }
   }
 
-  Future<ComplaintModel> getComplaintDetails({required String id}) async {
+  Future<ComplaintModel> getPendingComplaints({required Map<String, dynamic> queryParams}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/complaint/get-pending-complaints', queryParams);
+      final response = await http.get(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return ComplaintModel.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<ComplaintModel> getResolvedComplaints({required Map<String, dynamic> queryParams}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/complaint/get-resolved-complaints', queryParams);
+      final response = await http.get(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return ComplaintModel.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<Complaint> getComplaintDetails({required String id}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -135,7 +190,7 @@ class SettingRepository{
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return ComplaintModel.fromJson(jsonBody['data']);
+        return Complaint.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -149,7 +204,7 @@ class SettingRepository{
     }
   }
 
-  Future<ComplaintModel> addResponse({required String id, required String message}) async {
+  Future<Complaint> addResponse({required String id, required String message}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -171,7 +226,7 @@ class SettingRepository{
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return ComplaintModel.fromJson(jsonBody['data']);
+        return Complaint.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -185,7 +240,7 @@ class SettingRepository{
     }
   }
 
-  Future<ComplaintModel> resolve({required String id}) async {
+  Future<Complaint> resolve({required String id}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -202,7 +257,7 @@ class SettingRepository{
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return ComplaintModel.fromJson(jsonBody['data']);
+        return Complaint.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -216,7 +271,7 @@ class SettingRepository{
     }
   }
 
-  Future<ComplaintModel> reopen({required String id}) async {
+  Future<Complaint> reopen({required String id}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -233,7 +288,7 @@ class SettingRepository{
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return ComplaintModel.fromJson(jsonBody['data']);
+        return Complaint.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -247,7 +302,7 @@ class SettingRepository{
     }
   }
 
-  Future<ComplaintModel> getResponse({required String id}) async {
+  Future<Complaint> getResponse({required String id}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -264,7 +319,7 @@ class SettingRepository{
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return ComplaintModel.fromJson(jsonBody['data']);
+        return Complaint.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

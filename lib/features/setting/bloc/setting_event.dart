@@ -21,7 +21,23 @@ final class SettingSubmitComplaint extends SettingEvent{
   SettingSubmitComplaint({required this.area, required this.category, required this.subCategory, required this.description, this.file});
 }
 
-final class SettingGetComplaint extends SettingEvent{}
+final class SettingGetComplaint extends SettingEvent{
+  final Map<String, dynamic> queryParams;
+
+  SettingGetComplaint({required this.queryParams});
+}
+
+final class SettingGetPendingComplaint extends SettingEvent{
+  final Map<String, dynamic> queryParams;
+
+  SettingGetPendingComplaint({required this.queryParams});
+}
+
+final class SettingGetResolvedComplaint extends SettingEvent{
+  final Map<String, dynamic> queryParams;
+
+  SettingGetResolvedComplaint({required this.queryParams});
+}
 
 final class SettingGetComplaintDetails extends SettingEvent{
   final String id;

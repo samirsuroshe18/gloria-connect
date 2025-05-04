@@ -59,7 +59,7 @@ class MyVisitorsBloc extends Bloc<MyVisitorsEvent, MyVisitorsState>{
     on<GetDeniedEntries>((event, emit) async {
       emit(GetDeniedEntriesLoading());
       try{
-        final List<VisitorEntries> response = await _myVisitorsRepository.getDeniedEntries();
+        final PastDeliveryModel response = await _myVisitorsRepository.getDeniedEntries(queryParams: event.queryParams);
         emit(GetDeniedEntriesSuccess(response: response));
       }catch(e){
         if (e is ApiError) {

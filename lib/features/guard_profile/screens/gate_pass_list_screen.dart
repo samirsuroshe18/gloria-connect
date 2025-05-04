@@ -26,10 +26,10 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
   int? statusCode;
   bool _isLazyLoading = false;
   int _page = 1;
-  final int _limit = 3;
+  final int _limit = 10;
   bool _hasMore = true;
   String _searchQuery = '';
-  String _selectedEntryType = '';
+  String _selectedStatusType = '';
   DateTime? _startDate;
   DateTime? _endDate;
   bool _hasActiveFilters = false;
@@ -50,7 +50,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      if (!_isLoading && _hasMore && data.length>=_limit) {
+      if (!_isLoading && _hasMore) {
         _isLazyLoading = true;
         _fetchEntries();
       }
@@ -67,8 +67,8 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
       queryParams['search'] = _searchQuery;
     }
 
-    if (_selectedEntryType.isNotEmpty) {
-      queryParams['entryType'] = _selectedEntryType;
+    if (_selectedStatusType.isNotEmpty) {
+      queryParams['status'] = _selectedStatusType;
     }
 
     if (_startDate != null) {
@@ -87,7 +87,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
       _page = 1;
       _hasMore = true;
       data.clear();
-      _hasActiveFilters = _selectedEntryType.isNotEmpty || _startDate != null || _endDate != null;
+      _hasActiveFilters = _selectedStatusType.isNotEmpty || _startDate != null || _endDate != null;
     });
     _fetchEntries();
   }
@@ -225,7 +225,6 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
             if (state is GetGatePassLoading) {
               _isLoading = true;
               _isError = false;
-              print('loading');
             }
             if (state is GetGatePassSuccess) {
               if (_page == 1) {
@@ -237,7 +236,6 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
               _isLoading = false;
               _isLazyLoading = false;
               _isError = false;
-              print('success : ${state.response.pagination?.toJson()}');
             }
             if (state is GetGatePassFailure) {
               data = [];
@@ -246,7 +244,6 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
               _isError = true;
               statusCode= state.status;
               _hasMore = false;
-              print('failed : ${state.message}');
             }
           },
           builder: (context, state) {
@@ -340,6 +337,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
     return ListView.builder(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         itemCount: data.length + 1,
         itemBuilder: (context, index) {
           if (index < data.length) {
@@ -394,7 +392,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
                         TextButton(
                           onPressed: () {
                             setModalState(() {
-                              _selectedEntryType = '';
+                              _selectedStatusType = '';
                               _startDate = null;
                               _endDate = null;
                             });
@@ -405,7 +403,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Entry Type',
+                      'Status',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -414,11 +412,9 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        _buildFilterChip('Delivery', 'delivery', setModalState),
-                        _buildFilterChip('Guest', 'guest', setModalState),
-                        _buildFilterChip('Cab', 'cab', setModalState),
-                        _buildFilterChip('Other', 'other', setModalState),
-                        _buildFilterChip('Service', 'service', setModalState),
+                        _buildFilterChip('All', 'all', setModalState),
+                        _buildFilterChip('Active', 'active', setModalState),
+                        _buildFilterChip('Expired', 'expired', setModalState),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -496,10 +492,10 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
   Widget _buildFilterChip(String label, String value, StateSetter setModalState) {
     return FilterChip(
       label: Text(label),
-      selected: _selectedEntryType == value,
+      selected: _selectedStatusType == value,
       onSelected: (selected) {
         setModalState(() {
-          _selectedEntryType = selected ? value : '';
+          _selectedStatusType = selected ? value : '';
         });
       },
     );

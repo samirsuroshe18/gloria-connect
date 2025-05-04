@@ -11,6 +11,7 @@ import 'package:gloria_connect/features/approval_screens/screens/delivery_approv
 import 'package:gloria_connect/features/approval_screens/screens/delivery_approval_screen.dart';
 import 'package:gloria_connect/features/approval_screens/screens/verification_pending_screen.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
+import 'package:gloria_connect/features/guard_duty/screens/checkout_entry_screen.dart';
 import 'package:gloria_connect/features/guard_duty/screens/duty_login_screen.dart';
 import 'package:gloria_connect/features/auth/screens/forgot_password_screen.dart';
 import 'package:gloria_connect/features/auth/screens/login_screen.dart';
@@ -19,6 +20,7 @@ import 'package:gloria_connect/features/auth/screens/register_screen.dart';
 import 'package:gloria_connect/features/auth/screens/splash_screen.dart';
 import 'package:gloria_connect/features/check_in/screens/apartment_selection_screen.dart';
 import 'package:gloria_connect/features/guard_duty/screens/guard_report.dart';
+import 'package:gloria_connect/features/guard_duty/screens/shift_history_screen.dart';
 import 'package:gloria_connect/features/guard_entry/screens/asking_cab_approval_screen.dart';
 import 'package:gloria_connect/features/guard_entry/screens/asking_delivery_approval_screen.dart';
 import 'package:gloria_connect/features/check_in/screens/block_selection_screen.dart';
@@ -328,6 +330,10 @@ class AppRoutes {
         }
       case '/guard-report':
         return _animatedRoute(GuardReport(guardId: args as String), name: '/guard-report');
+      case '/day-checkout-entry':
+        return _animatedRoute(CheckoutEntryScreen(checkinTime: args as DateTime), name: '/day-checkout-entry');
+      case '/shift-history-screen':
+        return _animatedRoute(ShiftHistoryScreen(guardId: args as String,), name: '/shift-history-screen');
       default:
         return _animatedRoute(const SplashScreen(), name: '/');
     }

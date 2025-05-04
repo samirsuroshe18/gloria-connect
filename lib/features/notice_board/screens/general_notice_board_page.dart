@@ -23,10 +23,10 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
   int? statusCode;
   bool _isLazyLoading = false;
   int _page = 1;
-  final int _limit = 3;
+  final int _limit = 10;
   bool _hasMore = true;
   String _searchQuery = '';
-  String _selectedEntryType = '';
+  String _selectedCategory = '';
   DateTime? _startDate;
   DateTime? _endDate;
   bool _hasActiveFilters = false;
@@ -64,8 +64,8 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
       queryParams['search'] = _searchQuery;
     }
 
-    if (_selectedEntryType.isNotEmpty) {
-      queryParams['entryType'] = _selectedEntryType;
+    if (_selectedCategory.isNotEmpty) {
+      queryParams['category'] = _selectedCategory;
     }
 
     if (_startDate != null) {
@@ -84,7 +84,7 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
       _page = 1;
       _hasMore = true;
       data.clear();
-      _hasActiveFilters = _selectedEntryType.isNotEmpty || _startDate != null || _endDate != null;
+      _hasActiveFilters = _selectedCategory.isNotEmpty || _startDate != null || _endDate != null;
     });
     _fetchEntries();
   }
@@ -118,7 +118,7 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
               controller: _searchController,
               decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  hintText: 'Search by name, mobile, etc.',
+                  hintText: 'Search by title, description, etc.',
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
@@ -230,7 +230,6 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
           if (state is NoticeBoardGetAllNoticesLoading) {
             _isLoading = true;
             _isError = false;
-            print('loading');
           }
           if (state is NoticeBoardGetAllNoticesSuccess) {
             if (_page == 1) {
@@ -242,7 +241,6 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
             _isLoading = false;
             _isLazyLoading = false;
             _isError = false;
-            print('success : ${state.response.pagination?.toJson()}');
           }
           if (state is NoticeBoardGetAllNoticesFailure) {
             data = [];
@@ -251,7 +249,6 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
             _isError = true;
             statusCode= state.status;
             _hasMore = false;
-            print('failed : ${state.message}');
           }
         },
         builder: (context, state) {
@@ -358,7 +355,7 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
 
     return Card(
       color: Colors.black.withOpacity(0.2),
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -485,121 +482,6 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      color: const Color(0xFF3498DB),
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Container(
-          height: MediaQuery.of(context).size.height - 200,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Lottie.asset(
-                'assets/animations/no_data.json',
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "No Notices Available",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "There are no announcements at this time",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF7F8C8D),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _onRefresh,
-                icon: const Icon(Icons.refresh),
-                label: const Text("Refresh"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3498DB),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      color: const Color(0xFF3498DB),
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Container(
-          height: MediaQuery.of(context).size.height - 200,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Lottie.asset(
-                'assets/animations/error.json',
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Oops! Something went wrong",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "We couldn't load the notices. Please try again.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF7F8C8D),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _onRefresh,
-                icon: const Icon(Icons.refresh),
-                label: const Text("Try Again"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3498DB),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildEntriesList() {
 
     return ListView.builder(
@@ -659,7 +541,7 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
                         TextButton(
                           onPressed: () {
                             setModalState(() {
-                              _selectedEntryType = '';
+                              _selectedCategory = '';
                               _startDate = null;
                               _endDate = null;
                             });
@@ -670,7 +552,7 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Entry Type',
+                      'Category',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -679,11 +561,9 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        _buildFilterChip('Delivery', 'delivery', setModalState),
-                        _buildFilterChip('Guest', 'guest', setModalState),
-                        _buildFilterChip('Cab', 'cab', setModalState),
-                        _buildFilterChip('Other', 'other', setModalState),
-                        _buildFilterChip('Service', 'service', setModalState),
+                        _buildFilterChip('Important', 'important', setModalState),
+                        _buildFilterChip('Event', 'event', setModalState),
+                        _buildFilterChip('Maintenance', 'maintenance', setModalState),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -761,10 +641,10 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
   Widget _buildFilterChip(String label, String value, StateSetter setModalState) {
     return FilterChip(
       label: Text(label),
-      selected: _selectedEntryType == value,
+      selected: _selectedCategory == value,
       onSelected: (selected) {
         setModalState(() {
-          _selectedEntryType = selected ? value : '';
+          _selectedCategory = selected ? value : '';
         });
       },
     );

@@ -16,12 +16,17 @@ class AllResidentScreen extends StatefulWidget {
 }
 
 class _AllResidentScreenState extends State<AllResidentScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
   List<SocietyMember> data = [];
-  List<SocietyMember> filteredResidents = [];
-  String searchQuery = '';
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;
+  bool _isLazyLoading = false;
+  int _page = 1;
+  final int _limit = 15;
+  bool _hasMore = true;
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -31,21 +36,79 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
 
   Future<void> _initialize() async {
     if(!mounted) return;
-    context.read<AdministrationBloc>().add(AdminGetSocietyMember());
+    _fetchEntries();
+    _scrollController.addListener(_scrollListener);
   }
 
-  void _filterResidents(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredResidents = data;
-      } else {
-        filteredResidents = data
-            .where((data) =>
-        data.user!.userName!.toLowerCase().contains(query.toLowerCase()) ||
-            data.user!.phoneNo!.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (!_isLoading && _hasMore && data.length>=_limit) {
+        _isLazyLoading = true;
+        _fetchEntries();
       }
-    });
+    }
+  }
+
+  Future<void> _fetchEntries()async {
+    final queryParams = {
+      'page': _page.toString(),
+      'limit': _limit.toString(),
+    };
+
+    if (_searchQuery.isNotEmpty) {
+      queryParams['search'] = _searchQuery;
+    }
+
+    context.read<AdministrationBloc>().add(AdminGetSocietyMember(queryParams: queryParams));
+  }
+
+  Widget _buildSearchFilterBar() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            hintText: 'Search by name, mobile, etc.',
+            prefixIcon: const Icon(Icons.search),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _searchController.clear();
+                setState(() {
+                  _searchQuery = '';
+                  _page = 1;
+                  data.clear();
+                });
+                _fetchEntries();
+              },
+            )
+                : null,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide.none,
+            ),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.2)
+        ),
+        onSubmitted: (value) {
+          setState(() {
+            _searchQuery = value;
+            _page = 1;
+            data.clear();
+          });
+          _fetchEntries();
+        },
+      ),
+    );
   }
 
   @override
@@ -59,22 +122,7 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
           backgroundColor: Colors.black.withOpacity(0.2),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: TextField(
-                onChanged: _filterResidents,
-                decoration: InputDecoration(
-                  hintText: 'Search by name or mobile number',
-                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.2),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildSearchFilterBar(),
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -85,16 +133,23 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
               _isError = false;
             }
             if (state is AdminGetSocietyMemberSuccess) {
+              if (_page == 1) {
+                data.clear();
+              }
+              data.addAll(state.response.societyMembers as Iterable<SocietyMember>);
+              _page++;
+              _hasMore = state.response.pagination?.hasMore ?? false;
               _isLoading = false;
+              _isLazyLoading = false;
               _isError = false;
-              data = state.response;
-              filteredResidents = data;
             }
             if (state is AdminGetSocietyMemberFailure) {
+              data = [];
               _isLoading = false;
+              _isLazyLoading = false;
               _isError = true;
-              filteredResidents = [];
-              statusCode = state.status;
+              statusCode= state.status;
+              _hasMore = false;
             }
             if (state is AdminCreateAdminSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -130,80 +185,21 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
             }
           },
           builder: (context, state){
-            if(filteredResidents.isNotEmpty && _isLoading == false) {
+            if (data.isNotEmpty && _isLoading == false) {
               return RefreshIndicator(
-                onRefresh: _refreshUserData,  // Method to refresh user data
+                onRefresh: _onRefresh,
                 child: AnimationLimiter(
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: filteredResidents.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                    itemBuilder: (context, index) {
-                      final member = filteredResidents[index];
-                      return StaggeredListAnimation(index: index, child: Card(
-                        color: Colors.black.withOpacity(0.2),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
-                                ? NetworkImage(member.user!.profile!)
-                                : const AssetImage('assets/images/profile.png') as ImageProvider,
-                          ),
-                          title: Text(
-                            member.user?.userName ?? "NA",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(member.user?.phoneNo ?? ""),
-                          trailing: PopupMenuButton<String>(
-                            onSelected: (value) {
-                              if (value == 'delete') {
-                                _deleteResident(member.user?.id ?? "");
-                              } else if (value == 'makeAdmin') {
-                                _makeAdmin(member.user?.email ?? "");
-                              }else if(value == 'call'){
-                                _makePhoneCall(member.user?.phoneNo ?? "");
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'delete',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.delete, color: Colors.red),
-                                    SizedBox(width: 8),
-                                    Text('Delete Resident'),
-                                  ],
-                                ),
-                              ),
-                              const PopupMenuItem(
-                                value: 'makeAdmin',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.person_add, color: Colors.blue),
-                                    SizedBox(width: 8),
-                                    Text('Make Admin'),
-                                  ],
-                                ),
-                              ),
-                              const PopupMenuItem(
-                                value: 'call',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.call, color: Colors.blue),
-                                    SizedBox(width: 8),
-                                    Text('Call'),
-                                  ],
-                                ),
-                              ),
-                            ],
-                            icon: const Icon(Icons.more_vert), // Three-dot icon
-                          ),
-                        ),
-                      ));
-                    },
-                  ),
+                  child: _buildEntriesList(),
                 ),
               );
-            } else if (_isLoading) {
+            } else if (_isLazyLoading) {
+              return RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: AnimationLimiter(
+                  child: _buildEntriesList(),
+                ),
+              );
+            } else if (_isLoading && _isLazyLoading==false) {
               return Center(
                 child: Lottie.asset(
                   'assets/animations/loader.json',
@@ -212,13 +208,13 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
                   fit: BoxFit.contain,
                 ),
               );
-            } else if (filteredResidents.isEmpty && _isError == true && statusCode == 401) {
+            }else if (data.isEmpty && _isError == true && statusCode == 401) {
               return RefreshIndicator(
-                onRefresh: _refreshUserData,
+                onRefresh: _onRefresh,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
-                    height: MediaQuery.of(context).size.height - (kToolbarHeight*2),
+                    height: MediaQuery.of(context).size.height - 200,
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -242,11 +238,11 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
               );
             } else {
               return RefreshIndicator(
-                onRefresh: _refreshUserData,
+                onRefresh: _onRefresh,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
-                    height: MediaQuery.of(context).size.height - (kToolbarHeight*2),
+                    height: MediaQuery.of(context).size.height - 200,
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -274,8 +270,92 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
     );
   }
 
-  Future<void> _refreshUserData() async {
-    context.read<AdministrationBloc>().add(AdminGetSocietyMember());
+  Widget _buildMembersCard(member){
+    return Card(
+      color: Colors.black.withOpacity(0.2),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
+              ? NetworkImage(member.user!.profile!)
+              : const AssetImage('assets/images/profile.png') as ImageProvider,
+        ),
+        title: Text(
+          member.user?.userName ?? "NA",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(member.user?.phoneNo ?? ""),
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'delete') {
+              _deleteResident(member.user?.id ?? "");
+            } else if (value == 'makeAdmin') {
+              _makeAdmin(member.user?.email ?? "");
+            }else if(value == 'call'){
+              _makePhoneCall(member.user?.phoneNo ?? "");
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text('Delete Resident'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'makeAdmin',
+              child: Row(
+                children: [
+                  Icon(Icons.person_add, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Text('Make Admin'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'call',
+              child: Row(
+                children: [
+                  Icon(Icons.call, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Text('Call'),
+                ],
+              ),
+            ),
+          ],
+          icon: const Icon(Icons.more_vert), // Three-dot icon
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEntriesList() {
+
+    return ListView.builder(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: data.length + 1,
+        itemBuilder: (context, index) {
+          if (index < data.length) {
+            return StaggeredListAnimation(index: index, child: _buildMembersCard(data[index]));
+          } else {
+            if (_hasMore) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              );
+            } else {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: Text("No more data to load")),
+              );
+            }
+          }
+        }
+    );
   }
 
   void _makePhoneCall(String phoneNumber) async {
@@ -367,7 +447,11 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
                   );
                 }else if (state is AdminRemoveResidentSuccess) {
                   onPressed(){
-                    context.read<AdministrationBloc>().add(AdminGetSocietyMember());
+                    _page = 1;
+                    context.read<AdministrationBloc>().add(AdminGetSocietyMember(queryParams: {
+                      'page': _page.toString(),
+                      'limit': _limit.toString(),
+                    }));
                     Navigator.of(context).pop();
                   }
                   return TextButton(
@@ -388,5 +472,11 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
         );
       },
     );
+  }
+
+  Future<void> _onRefresh() async {
+    if(_hasMore) {
+      await _fetchEntries();
+    }
   }
 }

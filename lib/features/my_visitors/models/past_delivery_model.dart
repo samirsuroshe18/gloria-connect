@@ -55,6 +55,8 @@ class Entry {
   final String? gateName;
   final GatepassAptDetails? gatepassAptDetails;
   final String? source;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Entry({
     this.id,
@@ -82,7 +84,9 @@ class Entry {
     this.apartment,
     this.gateName,
     this.gatepassAptDetails,
-    this.source
+    this.source,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Entry.fromJson(Map<String, dynamic> json) => Entry(
@@ -126,6 +130,8 @@ class Entry {
     gateName: json["gateName"],
     gatepassAptDetails: json["gatepassAptDetails"] == null ? null : GatepassAptDetails.fromJson(json["gatepassAptDetails"]),
     source: json["source"],
+    createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
+    updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -155,6 +161,8 @@ class Entry {
     "gateName": gateName,
     "gatepassAptDetails": gatepassAptDetails?.toJson(),
     "source": source,
+    "createdAt": createdAt?.toIso8601String(),
+    "updatedAt": updatedAt?.toIso8601String(),
   };
 }
 

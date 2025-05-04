@@ -9,7 +9,7 @@ final class NoticeBoardInitial extends NoticeBoardState{}
 final class NoticeBoardCreateNoticeLoading extends NoticeBoardState{}
 
 final class NoticeBoardCreateNoticeSuccess extends NoticeBoardState{
-  final NoticeBoardModel response;
+  final Notice response;
   NoticeBoardCreateNoticeSuccess({required this.response});
 }
 
