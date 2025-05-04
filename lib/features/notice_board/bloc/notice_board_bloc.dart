@@ -17,7 +17,7 @@ class NoticeBoardBloc extends Bloc<NoticeBoardEvent, NoticeBoardState>{
       emit(NoticeBoardCreateNoticeLoading());
       try{
         
-        final NoticeBoardModel response = await _noticeBoardRepository.createNotice(title: event.title, description: event.description, category: event.category, file: event.file);
+        final Notice response = await _noticeBoardRepository.createNotice(title: event.title, description: event.description, category: event.category, file: event.file);
         emit(NoticeBoardCreateNoticeSuccess(response: response));
       }catch(e){
         if (e is ApiError) {

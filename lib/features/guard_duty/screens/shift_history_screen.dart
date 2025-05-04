@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
-import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/features/guard_duty/bloc/guard_duty_bloc.dart';
 import 'package:gloria_connect/utils/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/features/guard_duty/model/guard_log_model.dart';
+import 'package:lottie/lottie.dart';
 
-class NoticeBoardPage extends StatefulWidget {
-  const NoticeBoardPage({super.key});
+class ShiftHistoryScreen extends StatefulWidget {
+  final String guardId;
+  const ShiftHistoryScreen({super.key, required this.guardId});
+
   @override
-  State<NoticeBoardPage> createState() => _NoticeBoardPageState();
+  State<ShiftHistoryScreen> createState() => _ShiftHistoryScreenState();
 }
 
-class _NoticeBoardPageState extends State<NoticeBoardPage> {
+class _ShiftHistoryScreenState extends State<ShiftHistoryScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  List<Notice> data = [];
+  List<GuardLogEntry> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;
@@ -25,8 +27,8 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
   int _page = 1;
   final int _limit = 10;
   bool _hasMore = true;
-  String _searchQuery = '';
-  String _selectedCategory = '';
+  String _selectedShift = '';
+  String _selectedGate = '';
   DateTime? _startDate;
   DateTime? _endDate;
   bool _hasActiveFilters = false;
@@ -47,7 +49,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      if (!_isLoading && _hasMore && data.length>=_limit) {
+      if (!_isLoading && _hasMore) {
         _isLazyLoading = true;
         _fetchEntries();
       }
@@ -58,14 +60,15 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
     final queryParams = {
       'page': _page.toString(),
       'limit': _limit.toString(),
+      'id': widget.guardId,
     };
 
-    if (_searchQuery.isNotEmpty) {
-      queryParams['search'] = _searchQuery;
+    if (_selectedShift.isNotEmpty) {
+      queryParams['shift'] = _selectedShift;
     }
 
-    if (_selectedCategory.isNotEmpty) {
-      queryParams['category'] = _selectedCategory;
+    if (_selectedGate.isNotEmpty) {
+      queryParams['gate'] = _selectedGate;
     }
 
     if (_startDate != null) {
@@ -76,7 +79,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
       queryParams['endDate'] = DateFormat('yyyy-MM-dd').format(_endDate!);
     }
 
-    context.read<NoticeBoardBloc>().add(NoticeBoardGetAllNotices(queryParams: queryParams));
+    context.read<GuardDutyBloc>().add(GuardGetLogs(queryParams: queryParams));
   }
 
   void _applyFilters() {
@@ -84,7 +87,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
       _page = 1;
       _hasMore = true;
       data.clear();
-      _hasActiveFilters = _selectedCategory.isNotEmpty || _startDate != null || _endDate != null;
+      _hasActiveFilters = _selectedGate.isNotEmpty || _selectedShift.isNotEmpty || _startDate != null || _endDate != null;
     });
     _fetchEntries();
   }
@@ -107,56 +110,22 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
     }
   }
 
-  Widget _buildSearchFilterBar() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          // Search field (expanded to take available width)
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  hintText: 'Search by title, description, etc.',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {
-                        _searchQuery = '';
-                        _page = 1;
-                        data.clear();
-                      });
-                      _fetchEntries();
-                    },
-                  )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.2)
-              ),
-              onSubmitted: (value) {
-                setState(() {
-                  _searchQuery = value;
-                  _page = 1;
-                  data.clear();
-                });
-                _fetchEntries();
-              },
-            ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2),
+        title: const Text(
+          'Shift History',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
-
-          // Small gap between search and filter button
-          const SizedBox(width: 8),
-
+        ),
+        actions: [
           // Filter button
           Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8.0),
@@ -167,7 +136,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                 borderRadius: BorderRadius.circular(8.0),
                 onTap: () => _showFilterBottomSheet(context),
                 child: Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -198,52 +167,24 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
           ),
         ],
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
-        title: const Text(
-          'Notice Board',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white70),
-            onPressed: _onRefresh,
-            tooltip: 'Refresh Notices',
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: _buildSearchFilterBar(),
-        ),
-      ),
-      body: BlocConsumer<NoticeBoardBloc, NoticeBoardState>(
+      body: BlocConsumer<GuardDutyBloc, GuardDutyState>(
         listener: (context, state) {
-          if (state is NoticeBoardGetAllNoticesLoading) {
+          if (state is GuardGetLogsLoading) {
             _isLoading = true;
             _isError = false;
           }
-          if (state is NoticeBoardGetAllNoticesSuccess) {
-            if (state.response.pagination?.currentPage == 1) {
+          if (state is GuardGetLogsSuccess) {
+            if (_page == 1) {
               data.clear();
-              _page=1;
             }
-            data.addAll(state.response.notices as Iterable<Notice>);
+            data.addAll(state.response.guardLogEntries as Iterable<GuardLogEntry>);
             _page++;
             _hasMore = state.response.pagination?.hasMore ?? false;
             _isLoading = false;
             _isLazyLoading = false;
             _isError = false;
           }
-          if (state is NoticeBoardGetAllNoticesFailure) {
+          if (state is GuardGetLogsFailure) {
             data = [];
             _isLoading = false;
             _isLazyLoading = false;
@@ -335,175 +276,6 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final getNotifications = context.read<NoticeBoardBloc>().add;
-          final newNotice = await Navigator.pushNamed(
-            context,
-            '/create-notice-board-screen',
-          );
-
-
-          if (newNotice is Notice) {
-            setState(() {
-              data.clear();
-              _page = 1;
-            });
-
-            getNotifications(NoticeBoardGetAllNotices(queryParams: {
-              'page': _page.toString(),
-              'limit': _limit.toString(),
-            }));
-          }
-        },
-        backgroundColor: Colors.blueAccent,
-        child: const Icon(Icons.add, color: Colors.white70),
-      ),
-    );
-  }
-
-  Widget _buildNoticeCard(Notice notice) {
-
-    // Function to get category icon
-    IconData getCategoryIcon(String category) {
-      switch (category.toLowerCase()) {
-        case 'important':
-          return Icons.priority_high;
-        case 'event':
-          return Icons.event;
-        case 'maintenance':
-          return Icons.build;
-        default:
-          return Icons.notifications;
-      }
-    }
-
-    return Card(
-      color: Colors.black.withOpacity(0.2),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(
-            context, 
-            '/notice-board-details-screen',
-            arguments: notice,
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Category label
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Icon(
-                    getCategoryIcon(notice.category ?? 'event'),
-                    color: Colors.white70,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    notice.category ?? 'Not available',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    DateFormat('MMM dd, yyyy').format(notice.createdAt ?? DateTime.now()),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Notice content
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    notice.title ?? 'No title',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white70,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    notice.description ?? 'No description',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white60,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            
-            // Footer
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        child: const Icon(
-                          Icons.person,
-                          size: 18,
-                          color: Color(0xFF7F8C8D),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        notice.publishedBy?.userName ?? "Unknown",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white60,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    'Read more',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white60,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -513,9 +285,161 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: data.length + 1,
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         itemBuilder: (context, index) {
           if (index < data.length) {
-            return StaggeredListAnimation(index: index, child: _buildNoticeCard(data[index]));
+            final guardLog = data[index];
+            return StaggeredListAnimation(index: index, child: InkWell(
+              onTap: (){
+                Navigator.pushNamed(context, '/day-checkout-entry', arguments: data[index].checkinTime);
+              },
+              child: Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                color: Colors.black.withOpacity(0.2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            guardLog.date != null
+                                ? DateFormat('MMM d, yyyy').format(guardLog.date!)
+                                : 'NA',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              guardLog.shift ?? 'NA',
+                              style: const TextStyle(
+                                color: Colors.amber,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Gate',
+                                  style: TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  guardLog.gate ?? 'NA',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white70
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Check-in',
+                                  style: TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  guardLog.checkinTime != null
+                                      ? DateFormat('h:mm a').format(guardLog.checkinTime!)
+                                      :'NA',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white70
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Check-out',
+                                  style: TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  guardLog.checkoutTime!=null
+                                      ? DateFormat('h:mm a').format(guardLog.checkoutTime!)
+                                      :'NA',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Checkin Note',
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        guardLog.checkinReason ?? 'NA',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 12,),
+                      const Text(
+                        'Checkout Note',
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        guardLog.checkoutReason ?? 'NA',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ));
           } else {
             if (_hasMore) {
               return const Padding(
@@ -566,7 +490,8 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                         TextButton(
                           onPressed: () {
                             setModalState(() {
-                              _selectedCategory = '';
+                              _selectedShift = '';
+                              _selectedGate = '';
                               _startDate = null;
                               _endDate = null;
                             });
@@ -577,7 +502,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Category',
+                      'Gate',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -586,9 +511,25 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        _buildFilterChip('Important', 'important', setModalState),
-                        _buildFilterChip('Event', 'event', setModalState),
-                        _buildFilterChip('Maintenance', 'maintenance', setModalState),
+                        _buildGateFilterChip('Ground Floor Entry', 'Ground Floor Entry', setModalState),
+                        _buildGateFilterChip('Podium Entry', 'Podium Entry', setModalState),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Shift',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        _buildShiftFilterChip('All Shifts', 'All Shifts', setModalState),
+                        _buildShiftFilterChip('Morning', 'Morning', setModalState),
+                        _buildShiftFilterChip('Evening', 'Evening', setModalState),
+                        _buildShiftFilterChip('Night', 'Night', setModalState),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -663,13 +604,25 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
     );
   }
 
-  Widget _buildFilterChip(String label, String value, StateSetter setModalState) {
+  Widget _buildGateFilterChip(String label, String value, StateSetter setModalState) {
     return FilterChip(
       label: Text(label),
-      selected: _selectedCategory == value,
+      selected: _selectedGate == value,
       onSelected: (selected) {
         setModalState(() {
-          _selectedCategory = selected ? value : '';
+          _selectedGate = selected ? value : '';
+        });
+      },
+    );
+  }
+
+  Widget _buildShiftFilterChip(String label, String value, StateSetter setModalState) {
+    return FilterChip(
+      label: Text(label),
+      selected: _selectedShift == value,
+      onSelected: (selected) {
+        setModalState(() {
+          _selectedShift = selected ? value : '';
         });
       },
     );

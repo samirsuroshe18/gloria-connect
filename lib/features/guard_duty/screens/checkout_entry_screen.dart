@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
-import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/features/guard_profile/bloc/guard_profile_bloc.dart';
+import 'package:gloria_connect/features/guard_profile/models/checkout_history.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/checkout_history_card.dart';
 import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
-// ignore: depend_on_referenced_packages
-import 'package:intl/intl.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-class NoticeBoardPage extends StatefulWidget {
-  const NoticeBoardPage({super.key});
+class CheckoutEntryScreen extends StatefulWidget {
+  final DateTime? checkinTime;
+  const CheckoutEntryScreen({super.key, required this.checkinTime});
+
   @override
-  State<NoticeBoardPage> createState() => _NoticeBoardPageState();
+  State<CheckoutEntryScreen> createState() => _CheckoutEntryScreenState();
 }
 
-class _NoticeBoardPageState extends State<NoticeBoardPage> {
+class _CheckoutEntryScreenState extends State<CheckoutEntryScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  List<Notice> data = [];
+  List<CheckoutEntry> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;
@@ -26,9 +27,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
   final int _limit = 10;
   bool _hasMore = true;
   String _searchQuery = '';
-  String _selectedCategory = '';
-  DateTime? _startDate;
-  DateTime? _endDate;
+  String _selectedEntryType = '';
   bool _hasActiveFilters = false;
 
   @override
@@ -47,7 +46,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      if (!_isLoading && _hasMore && data.length>=_limit) {
+      if (!_isLoading && _hasMore) {
         _isLazyLoading = true;
         _fetchEntries();
       }
@@ -58,25 +57,18 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
     final queryParams = {
       'page': _page.toString(),
       'limit': _limit.toString(),
+      'checkinTime': widget.checkinTime?.toIso8601String(),
     };
 
     if (_searchQuery.isNotEmpty) {
       queryParams['search'] = _searchQuery;
     }
 
-    if (_selectedCategory.isNotEmpty) {
-      queryParams['category'] = _selectedCategory;
+    if (_selectedEntryType.isNotEmpty) {
+      queryParams['entryType'] = _selectedEntryType;
     }
 
-    if (_startDate != null) {
-      queryParams['startDate'] = DateFormat('yyyy-MM-dd').format(_startDate!);
-    }
-
-    if (_endDate != null) {
-      queryParams['endDate'] = DateFormat('yyyy-MM-dd').format(_endDate!);
-    }
-
-    context.read<NoticeBoardBloc>().add(NoticeBoardGetAllNotices(queryParams: queryParams));
+    context.read<GuardProfileBloc>().add(GetCheckoutHistory(queryParams: queryParams));
   }
 
   void _applyFilters() {
@@ -84,27 +76,9 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
       _page = 1;
       _hasMore = true;
       data.clear();
-      _hasActiveFilters = _selectedCategory.isNotEmpty || _startDate != null || _endDate != null;
+      _hasActiveFilters = _selectedEntryType.isNotEmpty;
     });
     _fetchEntries();
-  }
-
-  Future<void> _selectDateRange(BuildContext context) async {
-    final DateTimeRange? picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-      initialDateRange: _startDate != null && _endDate != null
-          ? DateTimeRange(start: _startDate!, end: _endDate!)
-          : null,
-    );
-
-    if (picked != null) {
-      setState(() {
-        _startDate = picked.start;
-        _endDate = picked.end;
-      });
-    }
   }
 
   Widget _buildSearchFilterBar() {
@@ -118,7 +92,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
               controller: _searchController,
               decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  hintText: 'Search by title, description, etc.',
+                  hintText: 'Search by name, mobile, etc.',
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
@@ -207,43 +181,34 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
       appBar: AppBar(
         backgroundColor: Colors.black.withOpacity(0.2),
         title: const Text(
-          'Notice Board',
+          "Checkout History",
           style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+            color: Colors.white70,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white70),
-            onPressed: _onRefresh,
-            tooltip: 'Refresh Notices',
-          ),
-        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: _buildSearchFilterBar(),
         ),
       ),
-      body: BlocConsumer<NoticeBoardBloc, NoticeBoardState>(
+      body: BlocConsumer<GuardProfileBloc, GuardProfileState>(
         listener: (context, state) {
-          if (state is NoticeBoardGetAllNoticesLoading) {
+          if (state is GetCheckoutHistoryLoading) {
             _isLoading = true;
             _isError = false;
           }
-          if (state is NoticeBoardGetAllNoticesSuccess) {
-            if (state.response.pagination?.currentPage == 1) {
+          if (state is GetCheckoutHistorySuccess) {
+            if (_page == 1) {
               data.clear();
-              _page=1;
             }
-            data.addAll(state.response.notices as Iterable<Notice>);
+            data.addAll(state.response.checkoutEntries as Iterable<CheckoutEntry>);
             _page++;
             _hasMore = state.response.pagination?.hasMore ?? false;
             _isLoading = false;
             _isLazyLoading = false;
             _isError = false;
           }
-          if (state is NoticeBoardGetAllNoticesFailure) {
+          if (state is GetCheckoutHistoryFailure) {
             data = [];
             _isLoading = false;
             _isLazyLoading = false;
@@ -276,7 +241,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                 fit: BoxFit.contain,
               ),
             );
-          }else if (data.isEmpty && _isError == true && statusCode == 401) {
+          } else if (data.isEmpty && _isError == true && statusCode == 401) {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: SingleChildScrollView(
@@ -323,7 +288,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "There is no notice",
+                        "There is no past visitors",
                         style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
@@ -334,175 +299,6 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
             );
           }
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final getNotifications = context.read<NoticeBoardBloc>().add;
-          final newNotice = await Navigator.pushNamed(
-            context,
-            '/create-notice-board-screen',
-          );
-
-
-          if (newNotice is Notice) {
-            setState(() {
-              data.clear();
-              _page = 1;
-            });
-
-            getNotifications(NoticeBoardGetAllNotices(queryParams: {
-              'page': _page.toString(),
-              'limit': _limit.toString(),
-            }));
-          }
-        },
-        backgroundColor: Colors.blueAccent,
-        child: const Icon(Icons.add, color: Colors.white70),
-      ),
-    );
-  }
-
-  Widget _buildNoticeCard(Notice notice) {
-
-    // Function to get category icon
-    IconData getCategoryIcon(String category) {
-      switch (category.toLowerCase()) {
-        case 'important':
-          return Icons.priority_high;
-        case 'event':
-          return Icons.event;
-        case 'maintenance':
-          return Icons.build;
-        default:
-          return Icons.notifications;
-      }
-    }
-
-    return Card(
-      color: Colors.black.withOpacity(0.2),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(
-            context, 
-            '/notice-board-details-screen',
-            arguments: notice,
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Category label
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Icon(
-                    getCategoryIcon(notice.category ?? 'event'),
-                    color: Colors.white70,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    notice.category ?? 'Not available',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    DateFormat('MMM dd, yyyy').format(notice.createdAt ?? DateTime.now()),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Notice content
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    notice.title ?? 'No title',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white70,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    notice.description ?? 'No description',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white60,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            
-            // Footer
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        child: const Icon(
-                          Icons.person,
-                          size: 18,
-                          color: Color(0xFF7F8C8D),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        notice.publishedBy?.userName ?? "Unknown",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white60,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    'Read more',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white60,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -515,7 +311,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
         itemCount: data.length + 1,
         itemBuilder: (context, index) {
           if (index < data.length) {
-            return StaggeredListAnimation(index: index, child: _buildNoticeCard(data[index]));
+            return StaggeredListAnimation(index: index, child: CheckoutHistoryCard(data: data[index]));
           } else {
             if (_hasMore) {
               return const Padding(
@@ -566,9 +362,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                         TextButton(
                           onPressed: () {
                             setModalState(() {
-                              _selectedCategory = '';
-                              _startDate = null;
-                              _endDate = null;
+                              _selectedEntryType = '';
                             });
                           },
                           child: const Text('Reset'),
@@ -577,7 +371,7 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Category',
+                      'Entry Type',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -586,42 +380,12 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        _buildFilterChip('Important', 'important', setModalState),
-                        _buildFilterChip('Event', 'event', setModalState),
-                        _buildFilterChip('Maintenance', 'maintenance', setModalState),
+                        _buildFilterChip('Delivery', 'delivery', setModalState),
+                        _buildFilterChip('Guest', 'guest', setModalState),
+                        _buildFilterChip('Cab', 'cab', setModalState),
+                        _buildFilterChip('Other', 'other', setModalState),
+                        _buildFilterChip('Service', 'service', setModalState),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Date Range',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () async {
-                        await _selectDateRange(context);
-                        setModalState(() {});
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.date_range),
-                            const SizedBox(width: 8),
-                            Text(
-                              _startDate != null && _endDate != null
-                                  ? '${DateFormat('MMM d').format(_startDate!)} - ${DateFormat('MMM d').format(_endDate!)}'
-                                  : 'Select date range',
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                     const SizedBox(height: 24),
                     Row(
@@ -666,10 +430,10 @@ class _NoticeBoardPageState extends State<NoticeBoardPage> {
   Widget _buildFilterChip(String label, String value, StateSetter setModalState) {
     return FilterChip(
       label: Text(label),
-      selected: _selectedCategory == value,
+      selected: _selectedEntryType == value,
       onSelected: (selected) {
         setModalState(() {
-          _selectedCategory = selected ? value : '';
+          _selectedEntryType = selected ? value : '';
         });
       },
     );

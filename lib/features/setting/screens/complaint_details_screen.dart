@@ -658,7 +658,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   bool isResolved = false;
   final ScrollController _scrollController = ScrollController();
   List<Response>? messages = [];
-  ComplaintModel? complaintModel;
+  Complaint? complaintModel;
   late String userId;
   bool _isLoading = false;
   bool _isError = false;

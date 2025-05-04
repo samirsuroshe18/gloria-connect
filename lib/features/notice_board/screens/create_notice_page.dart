@@ -19,7 +19,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
   final _descriptionController = TextEditingController();
   String? _selectedCategory;
   File? _selectedImage;
-  NoticeBoardModel? data;
+  Notice? data;
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 

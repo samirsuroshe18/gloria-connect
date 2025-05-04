@@ -59,7 +59,7 @@ class GuardProfileRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.http('192.168.226.221:8000', '/api/v1/delivery-entry/get-checkout-history', queryParams);
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/delivery-entry/get-checkout-history', queryParams);
       final response = await http.get(
         apiUrl,
         headers: <String, String>{
@@ -138,7 +138,7 @@ class GuardProfileRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.http('192.168.226.221:8000', '/api/v1/invite-visitors/get-gate-pass', queryParams);
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/invite-visitors/get-gate-pass', queryParams);
       final response = await http.get(
         apiUrl,
         headers: <String, String>{

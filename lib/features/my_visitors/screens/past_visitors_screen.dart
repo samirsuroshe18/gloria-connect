@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/vistor_past_card.dart';
 import 'package:gloria_connect/utils/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
-
-import '../bloc/my_visitors_bloc.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
@@ -26,7 +25,7 @@ class _PastVisitorsScreenState extends State<PastVisitorsScreen> with AutomaticK
   bool _isError = false;
   int? statusCode;
   int _page = 1;
-  final int _limit = 3;
+  final int _limit = 10;
   bool _hasMore = true;
   String _searchQuery = '';
   String _selectedEntryType = '';
@@ -377,7 +376,7 @@ class _PastVisitorsScreenState extends State<PastVisitorsScreen> with AutomaticK
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Text(
                     dateKey,
                     style: TextStyle(

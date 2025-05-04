@@ -25,7 +25,7 @@ class _CheckoutHistoryScreenState extends State<CheckoutHistoryScreen> {
   int? statusCode;
   bool _isLazyLoading = false;
   int _page = 1;
-  final int _limit = 3;
+  final int _limit = 10;
   bool _hasMore = true;
   String _searchQuery = '';
   String _selectedEntryType = '';
@@ -49,7 +49,7 @@ class _CheckoutHistoryScreenState extends State<CheckoutHistoryScreen> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      if (!_isLoading && _hasMore && data.length>=_limit) {
+      if (!_isLoading && _hasMore) {
         _isLazyLoading = true;
         _fetchEntries();
       }

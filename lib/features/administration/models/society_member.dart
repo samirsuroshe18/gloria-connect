@@ -1,12 +1,64 @@
 // To parse this JSON data, do
 //
-//     final societyMember = societyMemberFromJson(jsonString);
+//     final societyMemberModel = societyMemberModelFromJson(jsonString);
 
 import 'dart:convert';
 
-List<SocietyMember> societyMemberFromJson(String str) => List<SocietyMember>.from(json.decode(str).map((x) => SocietyMember.fromJson(x)));
+SocietyMemberModel societyMemberModelFromJson(String str) => SocietyMemberModel.fromJson(json.decode(str));
 
-String societyMemberToJson(List<SocietyMember> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String societyMemberModelToJson(SocietyMemberModel data) => json.encode(data.toJson());
+
+class SocietyMemberModel {
+  final List<SocietyMember>? societyMembers;
+  final Pagination? pagination;
+
+  SocietyMemberModel({
+    this.societyMembers,
+    this.pagination,
+  });
+
+  factory SocietyMemberModel.fromJson(Map<String, dynamic> json) => SocietyMemberModel(
+    societyMembers: json["societyMembers"] == null ? [] : List<SocietyMember>.from(json["societyMembers"]!.map((x) => SocietyMember.fromJson(x))),
+    pagination: json["pagination"] == null ? null : Pagination.fromJson(json["pagination"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "societyMembers": societyMembers == null ? [] : List<dynamic>.from(societyMembers!.map((x) => x.toJson())),
+    "pagination": pagination?.toJson(),
+  };
+}
+
+class Pagination {
+  final int? totalEntries;
+  final int? entriesPerPage;
+  final int? currentPage;
+  final int? totalPages;
+  final bool? hasMore;
+
+  Pagination({
+    this.totalEntries,
+    this.entriesPerPage,
+    this.currentPage,
+    this.totalPages,
+    this.hasMore,
+  });
+
+  factory Pagination.fromJson(Map<String, dynamic> json) => Pagination(
+    totalEntries: json["totalEntries"],
+    entriesPerPage: json["entriesPerPage"],
+    currentPage: json["currentPage"],
+    totalPages: json["totalPages"],
+    hasMore: json["hasMore"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "totalEntries": totalEntries,
+    "entriesPerPage": entriesPerPage,
+    "currentPage": currentPage,
+    "totalPages": totalPages,
+    "hasMore": hasMore,
+  };
+}
 
 class SocietyMember {
   final String? id;

@@ -9,7 +9,7 @@ import '../../../utils/api_error.dart';
 
 class NoticeBoardRepository {
 
-  Future<NoticeBoardModel> createNotice({required String title, required String description, required String category, File? file}) async {
+  Future<Notice> createNotice({required String title, required String description, required String category, File? file}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
@@ -34,7 +34,7 @@ class NoticeBoardRepository {
       final jsonResponse = jsonDecode(response.body);
 
       if (response.statusCode == 201) {
-        return NoticeBoardModel.fromJson(jsonResponse['data']);
+        return Notice.fromJson(jsonResponse['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode,
@@ -94,7 +94,7 @@ class NoticeBoardRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.http('192.168.226.221:8000', '/api/v1/notice/get-notices', queryParams);
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/notice/get-notices', queryParams);
       final response = await http.get(
         apiUrl,
         headers: <String, String>{

@@ -15,6 +15,10 @@ final class GetPastEntries extends MyVisitorsEvent{
   });
 }
 
-final class GetDeniedEntries extends MyVisitorsEvent{}
+final class GetDeniedEntries extends MyVisitorsEvent{
+  final Map<String, dynamic> queryParams;
+
+  GetDeniedEntries({required this.queryParams});
+}
 
 final class GetServiceRequest extends MyVisitorsEvent{}

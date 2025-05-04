@@ -69,7 +69,7 @@ final class AdminVerifyResidentFailure extends AdministrationState{
 final class AdminGetSocietyMemberLoading extends AdministrationState{}
 
 final class AdminGetSocietyMemberSuccess extends AdministrationState{
-  final List<SocietyMember> response;
+  final SocietyMemberModel response;
   AdminGetSocietyMemberSuccess({required this.response});
 }
 
@@ -174,7 +174,7 @@ final class AdminRemoveGuardFailure extends AdministrationState{
 final class AdminGetComplaintLoading extends AdministrationState{}
 
 final class AdminGetComplaintSuccess extends AdministrationState{
-  final AdminComplaintModel response;
+  final ComplaintModel response;
   AdminGetComplaintSuccess({required this.response});
 }
 
@@ -183,5 +183,35 @@ final class AdminGetComplaintFailure extends AdministrationState{
   final int? status;
 
   AdminGetComplaintFailure( {required this.message, this.status});
+}
+
+/// To Get Pending Complaint
+final class AdminGetPendingComplaintLoading extends AdministrationState{}
+
+final class AdminGetPendingComplaintSuccess extends AdministrationState{
+  final ComplaintModel response;
+  AdminGetPendingComplaintSuccess({required this.response});
+}
+
+final class AdminGetPendingComplaintFailure extends AdministrationState{
+  final String message;
+  final int? status;
+
+  AdminGetPendingComplaintFailure( {required this.message, this.status});
+}
+
+/// To Get Pending Complaint
+final class AdminGetResolvedComplaintLoading extends AdministrationState{}
+
+final class AdminGetResolvedComplaintSuccess extends AdministrationState{
+  final ComplaintModel response;
+  AdminGetResolvedComplaintSuccess({required this.response});
+}
+
+final class AdminGetResolvedComplaintFailure extends AdministrationState{
+  final String message;
+  final int? status;
+
+  AdminGetResolvedComplaintFailure( {required this.message, this.status});
 }
 

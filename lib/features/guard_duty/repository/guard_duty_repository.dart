@@ -20,7 +20,7 @@ class GuardDutyRepository{
       };
 
       const apiUrl =
-          'http://192.168.226.221:8000/api/v1/guard-duty/check-in';
+          'https://invite.iotsense.in/api/v1/guard-duty/check-in';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -56,7 +56,7 @@ class GuardDutyRepository{
       };
 
       const apiUrl =
-          'http://192.168.226.221:8000/api/v1/guard-duty/check-out';
+          'https://invite.iotsense.in/api/v1/guard-duty/check-out';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -88,7 +88,7 @@ class GuardDutyRepository{
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrl =
-          'http://192.168.226.221:8000/api/v1/guard-duty/get-report/$id';
+          'https://invite.iotsense.in/api/v1/guard-duty/get-report/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -118,7 +118,7 @@ class GuardDutyRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.http('192.168.226.221:8000', '/api/v1/guard-duty/get-logs', queryParams);
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/guard-duty/get-logs', queryParams);
       final response = await http.get(
         apiUrl,
         headers: <String, String>{

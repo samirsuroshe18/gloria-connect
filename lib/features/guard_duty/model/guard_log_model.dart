@@ -63,13 +63,13 @@ class GuardLogEntry {
     gate: json["gate"],
     checkinReason: json["checkinReason"],
     date: json["date"] == null ? null : DateTime.parse(json["date"]),
-    checkinTime: json["checkinTime"] == null ? null : DateTime.parse(json["checkinTime"]),
+    checkinTime: json["checkinTime"] == null ? null : DateTime.parse(json["checkinTime"]).toLocal(),
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
     updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
     shift: json["shift"],
     v: json["__v"],
     checkoutReason: json["checkoutReason"],
-    checkoutTime: json["checkoutTime"] == null ? null : DateTime.parse(json["checkoutTime"]),
+    checkoutTime: json["checkoutTime"] == null ? null : DateTime.parse(json["checkoutTime"]).toLocal(),
   );
 
   Map<String, dynamic> toJson() => {

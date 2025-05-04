@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:gloria_connect/features/administration/models/admin_complaint_model.dart';
 import 'package:gloria_connect/features/administration/models/guard_requests_model.dart';
 import 'package:gloria_connect/features/administration/models/resident_requests_model.dart';
 import 'package:gloria_connect/features/administration/models/society_guard.dart';
 import 'package:gloria_connect/features/administration/models/society_member.dart';
+import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -154,15 +154,14 @@ class AdministrationRepository {
     }
   }
 
-  Future<List<SocietyMember>> getAllResidents() async {
+  Future<SocietyMemberModel> getAllResidents({required Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/admin/get-resident';
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-resident', queryParams);
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -171,9 +170,7 @@ class AdministrationRepository {
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return (jsonBody['data'] as List)
-            .map((data) => SocietyMember.fromJson(data))
-            .toList();
+        return SocietyMemberModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);
@@ -397,15 +394,15 @@ class AdministrationRepository {
     }
   }
 
-  Future<AdminComplaintModel> getComplaints() async {
+  Future<ComplaintModel> getComplaints({required Map<String, dynamic> queryParams}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl = 'https://invite.iotsense.in/api/v1/admin/get-complaints';
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-complaints', queryParams);
 
       final response = await http.get(
-        Uri.parse(apiUrl),
+        apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -414,7 +411,69 @@ class AdministrationRepository {
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return AdminComplaintModel.fromJson(jsonBody['data']);
+        return ComplaintModel.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<ComplaintModel> getPendingComplaints({required Map<String, dynamic> queryParams}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-pending-complaints', queryParams);
+
+      final response = await http.get(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return ComplaintModel.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<ComplaintModel> getResolvedComplaints({required Map<String, dynamic> queryParams}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-resolved-complaints', queryParams);
+
+      final response = await http.get(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return ComplaintModel.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

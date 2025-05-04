@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gloria_connect/features/administration/models/admin_complaint_model.dart';
 import 'package:gloria_connect/features/administration/models/guard_requests_model.dart';
 import 'package:gloria_connect/features/administration/models/resident_requests_model.dart';
 import 'package:gloria_connect/features/administration/models/society_guard.dart';
 import 'package:gloria_connect/features/administration/models/society_member.dart';
 import 'package:gloria_connect/features/administration/repository/administration_repository.dart';
+import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 
 import '../../../utils/api_error.dart';
 
@@ -75,7 +75,7 @@ class AdministrationBloc extends Bloc<AdministrationEvent, AdministrationState>{
     on<AdminGetSocietyMember>((event, emit) async {
       emit(AdminGetSocietyMemberLoading());
       try{
-        final List<SocietyMember> response = await _administrationRepository.getAllResidents();
+        final SocietyMemberModel response = await _administrationRepository.getAllResidents(queryParams: event.queryParams);
         emit(AdminGetSocietyMemberSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -173,13 +173,41 @@ class AdministrationBloc extends Bloc<AdministrationEvent, AdministrationState>{
     on<AdminGetComplaint>((event, emit) async {
       emit(AdminGetComplaintLoading());
       try{
-        final AdminComplaintModel response = await _administrationRepository.getComplaints();
+        final ComplaintModel response = await _administrationRepository.getComplaints(queryParams: event.queryParams);
         emit(AdminGetComplaintSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
           emit(AdminGetComplaintFailure(message: e.message.toString(), status: e.statusCode));
         }else{
           emit(AdminGetComplaintFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<AdminGetPendingComplaint>((event, emit) async {
+      emit(AdminGetPendingComplaintLoading());
+      try{
+        final ComplaintModel response = await _administrationRepository.getPendingComplaints(queryParams: event.queryParams);
+        emit(AdminGetPendingComplaintSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(AdminGetPendingComplaintFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(AdminGetPendingComplaintFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<AdminGetResolvedComplaint>((event, emit) async {
+      emit(AdminGetResolvedComplaintLoading());
+      try{
+        final ComplaintModel response = await _administrationRepository.getResolvedComplaints(queryParams: event.queryParams);
+        emit(AdminGetResolvedComplaintSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(AdminGetResolvedComplaintFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(AdminGetResolvedComplaintFailure(message: e.toString()));
         }
       }
     });
