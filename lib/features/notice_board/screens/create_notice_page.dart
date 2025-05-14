@@ -2,10 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+import 'package:gloria_connect/features/notice_board/widgets/build_info_card.dart';
+import 'package:gloria_connect/features/notice_board/widgets/custom_submit_button.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/utils/document_picker_utils.dart';
+import 'package:gloria_connect/utils/media_picker_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// ignore: depend_on_referenced_packages
-import 'package:intl/intl.dart';
 
 class CreateNoticePage extends StatefulWidget {
   const CreateNoticePage({super.key});
@@ -31,97 +34,17 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
   };
 
   Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
+    try {
+      final File? image = await MediaPickerHelper.pickImageFile(context: context, source: source);
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      if (image != null) {
+        setState(() {
+          _selectedImage = image;
+        });
+      }
+    } catch (e) {
+      CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
-  }
-
-  void _showImageOptions() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Select Image',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _imageOptionButton(
-                    icon: Icons.photo_library,
-                    label: 'Gallery',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickImage(ImageSource.gallery);
-                    },
-                  ),
-                  _imageOptionButton(
-                    icon: Icons.camera_alt,
-                    label: 'Camera',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickImage(ImageSource.camera);
-                    },
-                  ),
-                  if (_selectedImage != null)
-                    _imageOptionButton(
-                      icon: Icons.delete,
-                      label: 'Remove',
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          _selectedImage = null;
-                        });
-                      },
-                    ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _imageOptionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 30, color: Theme.of(context).primaryColor),
-          ),
-          const SizedBox(height: 8),
-          Text(label),
-        ],
-      ),
-    );
   }
 
   @override
@@ -143,23 +66,11 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
             data = state.response;
             setState(() => _isLoading = false);
             Navigator.of(context).pop(data);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Notice created successfully!'),
-                backgroundColor: Colors.green.shade700,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            CustomSnackBar.show(context: context, message: 'Notice created successfully!', type: SnackBarType.success);
           }
           if (state is NoticeBoardCreateNoticeFailure) {
             setState(() => _isLoading = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red.shade700,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
           }
         },
         builder: (context, state) {
@@ -171,7 +82,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInfoCard(),
+                    const BuildInfoCard(),
                     const SizedBox(height: 20),
                     _buildTitleField(),
                     const SizedBox(height: 16),
@@ -181,7 +92,11 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
                     const SizedBox(height: 20),
                     _buildImageSection(),
                     const SizedBox(height: 30),
-                    _buildSubmitButton(),
+                    CustomSubmitButton(
+                      isLoading: _isLoading,
+                      title: 'Publish Notice',
+                      onPressed: _onSubmit,
+                    ),
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -193,52 +108,21 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
     );
   }
 
-
-  Widget _buildInfoCard() {
-    return Card(
-      color: Colors.white.withOpacity(0.3),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.info_outline, color: Colors.white70,),
-                SizedBox(width: 8),
-                Text(
-                  'Create a New Notice',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white70
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Share important announcements, updates, or events with your community.',
-              style: TextStyle(fontSize: 14, color: Colors.white60),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today,
-                    size: 14, color: Colors.white60),
-                const SizedBox(width: 5),
-                Text(
-                  'Today, ${DateFormat.yMMMd().format(DateTime.now())}',
-                  style: const TextStyle(fontSize: 12, color: Colors.white70),
-                ),
-              ],
-            ),
-          ],
+  void _onSubmit() {
+    if (_formKey.currentState?.validate() ?? false) {
+      if (_selectedCategory == null) {
+        CustomSnackBar.show(context: context, message: 'Please select a category', type: SnackBarType.error);
+        return;
+      }
+      context.read<NoticeBoardBloc>().add(
+        NoticeBoardCreateNotice(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          category: _selectedCategory!,
+          file: _selectedImage,
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _buildTitleField() {
@@ -385,7 +269,12 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
         const SizedBox(height: 10),
         if (_selectedImage == null)
           InkWell(
-            onTap: _showImageOptions,
+            onTap: ()=> DocumentPickerUtils.showDocumentPickerSheet(
+              context: context,
+              onPickImage: _pickImage,
+              onPickPDF: null,
+              isOnlyImage: true,
+            ),
             child: Container(
               height: 150,
               width: double.infinity,
@@ -413,7 +302,12 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
           )
         else
           InkWell(
-            onTap: _showImageOptions,
+            onTap: ()=> ()=> DocumentPickerUtils.showDocumentPickerSheet(
+              context: context,
+              onPickImage: _pickImage,
+              onPickPDF: null,
+              isOnlyImage: true,
+            ),
             child: Container(
               height: 200,
               width: double.infinity,
@@ -444,61 +338,6 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
             ),
           ),
       ],
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        onPressed: _isLoading
-            ? null
-            : () {
-                if (_formKey.currentState?.validate() ?? false) {
-                  if (_selectedCategory == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please select a category'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                    return;
-                  }
-                  context.read<NoticeBoardBloc>().add(
-                        NoticeBoardCreateNotice(
-                          title: _titleController.text,
-                          description: _descriptionController.text,
-                          category: _selectedCategory!,
-                          file: _selectedImage,
-                        ),
-                      );
-                }
-              },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepPurple.withOpacity(0.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.0,
-                ),
-              )
-            : const Text(
-                'Publish Notice',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70
-                ),
-              ),
-      ),
     );
   }
 }

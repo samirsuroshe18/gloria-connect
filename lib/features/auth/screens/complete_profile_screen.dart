@@ -1,11 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/auth/models/society_model.dart';
+import 'package:gloria_connect/features/auth/widgets/modern_dropdown.dart';
+import 'package:gloria_connect/features/auth/widgets/modern_text_field.dart';
+import 'package:gloria_connect/features/auth/widgets/owenership_selection.dart';
+import 'package:gloria_connect/features/auth/widgets/profile_type_card.dart';
+import 'package:gloria_connect/features/auth/widgets/verification_section.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/utils/media_picker_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -15,12 +18,9 @@ import 'dart:io';
 // path :flutter_launcher_icons, flutter_native_splash, hive_generator, json_serializable
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dotted_border/dotted_border.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
-import 'package:file_picker/file_picker.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -49,13 +49,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final TextEditingController apartmentController = TextEditingController();
   final TextEditingController ownershipController = TextEditingController();
   final TextEditingController gateController = TextEditingController();
-
-  // New controllers for tenant dates
   final TextEditingController startDateController = TextEditingController();
   final TextEditingController endDateController = TextEditingController();
-
-  // Image picker instance
-  final ImagePicker _picker = ImagePicker();
   File? ownershipDocument;
   File? tenantAgreement;
 
@@ -87,7 +82,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   void dispose() {
-    // Existing disposals
     mobileController.dispose();
     profileTypeController.dispose();
     societyController.dispose();
@@ -95,8 +89,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     apartmentController.dispose();
     gateController.dispose();
     ownershipController.dispose();
-
-    // New disposals
     startDateController.dispose();
     endDateController.dispose();
     super.dispose();
@@ -137,21 +129,19 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               _isLoading = false;
             } else if (state.response.role == 'user' &&
                 state.response.profileType == 'Resident') {
-              Navigator.pushReplacementNamed(
-                  context, '/verification-pending-screen');
+              Navigator.pushReplacementNamed(context, '/verification-pending-screen');
               _isLoading = false;
             } else {
-              Navigator.pushReplacementNamed(
-                  context, '/verification-pending-screen');
+              Navigator.pushReplacementNamed(context, '/verification-pending-screen');
               _isLoading = false;
             }
           }
 
           if (state is AuthCompleteProfileFailure) {
-            CustomSnackbar.show(
+            CustomSnackBar.show(
               context: context,
               message: state.message,
-              type: SnackbarType.error,
+              type: SnackBarType.error,
             );
             _isLoading = false;
           }
@@ -161,46 +151,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             child: CustomScrollView(
               slivers: [
                 // Modern App Bar with Gradient
-                SliverAppBar(
-                  expandedHeight: 200.0,
-                  floating: false,
-                  pinned: true,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.2),
-                        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(45), bottomRight: Radius.circular(45))
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.apartment_rounded,
-                            size: 60,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Complete Your Profile',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.logout, color: Colors.red),
-                      onPressed: _logoutUser,
-                    ),
-                  ],
-                ),
+                _buildAppBar(),
 
                 // Main Content
                 SliverToBoxAdapter(
@@ -221,21 +172,24 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
+
                           Row(
                             children: [
                               Expanded(
-                                child: _buildProfileTypeCard(
-                                  'Resident',
-                                  Icons.home_rounded,
-                                  profileType == 'Resident',
+                                child: ProfileTypeCard(
+                                  onTap: _handleProfileTypeCardTap,
+                                  isSelected: profileType == 'Resident',
+                                  type: 'Resident',
+                                  icon: Icons.home_rounded,
                                 ),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
-                                child: _buildProfileTypeCard(
-                                  'Security',
-                                  Icons.security_rounded,
-                                  profileType == 'Security',
+                                child: ProfileTypeCard(
+                                  onTap: _handleProfileTypeCardTap,
+                                  type: 'Security',
+                                  icon: Icons.security_rounded,
+                                  isSelected: profileType == 'Security',
                                 ),
                               ),
                             ],
@@ -244,7 +198,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                           // Contact Information Section
                           _buildSectionHeader('Contact Information'),
-                          _buildModernTextField(
+                          ModernTextField(
                             controller: mobileController,
                             label: 'Mobile Number',
                             icon: Icons.phone_rounded,
@@ -256,7 +210,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           // Society Details Section
                           if (profileType != null) ...[
                             _buildSectionHeader('Society Details'),
-                            _buildModernDropdown(
+                            ModernDropdown(
                               value: societyName,
                               items: societyItems,
                               label: 'Select Society',
@@ -266,10 +220,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           ],
 
                           // Resident-specific fields
-                          if (profileType == 'Resident' &&
-                              societyName != null) ...[
+                          if (profileType == 'Resident' && societyName != null) ...[
                             const SizedBox(height: 24),
-                            _buildModernDropdown(
+                            ModernDropdown(
                               value: blockName,
                               items: blockItems,
                               label: 'Select Block',
@@ -278,7 +231,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                             ),
                             if (blockName != null) ...[
                               const SizedBox(height: 24),
-                              _buildModernDropdown(
+                              ModernDropdown(
                                 value: apartment,
                                 items: apartmentItems,
                                 label: 'Select Apartment',
@@ -289,10 +242,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           ],
 
                           // Security-specific fields
-                          if (profileType == 'Security' &&
-                              societyName != null) ...[
+                          if (profileType == 'Security' && societyName != null) ...[
                             const SizedBox(height: 24),
-                            _buildModernDropdown(
+                            ModernDropdown(
                               value: gateName,
                               items: gateItems,
                               label: 'Select Gate',
@@ -302,13 +254,25 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           ],
 
                           // Ownership Status Section
-                          if (profileType == 'Resident' &&
-                              apartment != null) ...[
+                          if (profileType == 'Resident' && apartment != null) ...[
                             const SizedBox(height: 32),
                             _buildSectionHeader('Ownership Details'),
-                            _buildOwnershipSelection(),
+                            OwenershipSelection(onSelected: _handleChipSelectedTap, ownershipStatus: ownershipStatus,),
                             if (ownershipStatus != null)
-                              _buildVerificationSection(),
+                              VerificationSection(
+                                ownerFileRemove: _ownerFileRemove,
+                                tenantFileRemove: _tenantFileRemove,
+                                startDateController: startDateController,
+                                selectDate: _selectDate,
+                                endDateController: endDateController,
+                                onPickImage: _pickImage,
+                                onPickPDF: _pickPDF,
+                                ownershipStatus: ownershipStatus,
+                                ownershipDocument: ownershipDocument,
+                                ownershipDocumentType: ownershipDocumentType,
+                                tenantAgreementType: tenantAgreementType,
+                                tenantAgreement: tenantAgreement,
+                              ),
                           ],
 
                           // Submit Button
@@ -350,6 +314,49 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
+  Widget _buildAppBar(){
+    return SliverAppBar(
+      expandedHeight: 200.0,
+      floating: false,
+      pinned: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.2),
+              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(45), bottomRight: Radius.circular(45))
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.apartment_rounded,
+                size: 60,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Complete Your Profile',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.logout, color: Colors.red),
+          onPressed: _logoutUser,
+        ),
+      ],
+    );
+  }
+
   Widget _buildSectionHeader(String title) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,422 +373,22 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildProfileTypeCard(String type, IconData icon, bool isSelected) {
-    return Card(
-      color: isSelected ? Colors.white.withOpacity(0.5) : Colors.white.withOpacity(0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: () => setState(() => profileType = type),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 40,
-                color: isSelected ? const Color(0xFFFFA000) : const Color(0xFFBDBDBD),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                type,
-                style: TextStyle(
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Colors.white : const Color(0xFFEEEEEE),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void _handleProfileTypeCardTap(String type){
+     setState(() => profileType = type);
   }
 
-  Widget _buildModernTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType? keyboardType,
-    int? maxLength,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        maxLength: maxLength,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(
-            color: Colors.white70
-          ),
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            // borderSide: BorderSide.none,
-          ),
-          filled: true,
-          counterText: '',
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'This field is required';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  Widget _buildModernDropdown({
-    required String? value,
-    required List<String> items,
-    required String label,
-    required Function(String?) onChanged,
-    required IconData icon,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: DropdownButtonFormField<String>(
-        value: value,
-        items: items.map((String item) {
-          return DropdownMenuItem(
-            value: item,
-            child: Text(item),
-          );
-        }).toList(),
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: Colors.white70),
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            // borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.white.withOpacity(0.2)
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOwnershipSelection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center, // Center align
-      children: ownershipItems.map((status) {
-        bool isSelected = ownershipStatus == status;
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: ChoiceChip(
-              label: Text(
-                status,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87, // Better contrast
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  fontSize: 16,
-                ),
-              ),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() => ownershipStatus = status);
-                }
-              },
-              selectedColor: Theme.of(context).primaryColor.withOpacity(0.5),
-              backgroundColor: Colors.grey.shade300, // Neutral light grey
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Comfortable touch area
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30), // Smooth pill shape
-                side: BorderSide(
-                  color: isSelected
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey.shade400,
-                  width: isSelected ? 2 : 1, // Thicker border when selected
-                ),
-              ),
-              elevation: isSelected ? 4 : 1, // Slight shadow when selected
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildVerificationSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 24),
-        if (ownershipStatus == 'Owner')
-          _buildDocumentUploadCard(
-              title: 'Upload Ownership Document',
-              subtitle:
-                  'Please provide your Index2 or Resident Smart card photo',
-              file: ownershipDocument,
-              onUpload: () => _showDocumentPickerOptions(true),
-              onRemove: () => setState(() => ownershipDocument = null),
-              isOwner: ownershipStatus == 'owner')
-        else if (ownershipStatus == 'Tenant')
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Agreement Duration'),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildDatePickerField(
-                      controller: startDateController,
-                      label: 'Start Date',
-                      onTap: () => _selectDate(context, true),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildDatePickerField(
-                      controller: endDateController,
-                      label: 'End Date',
-                      onTap: () => _selectDate(context, false),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              _buildDocumentUploadCard(
-                title: 'Upload Rental Agreement',
-                subtitle: 'Please provide your rental agreement document',
-                file: tenantAgreement,
-                onUpload: () => _showDocumentPickerOptions(false),
-                onRemove: () => setState(() => tenantAgreement = null),
-                isOwner: ownershipStatus == 'owner',
-              ),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _buildDatePickerField({
-    required TextEditingController controller,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextFormField(
-        controller: controller,
-        readOnly: true,
-        onTap: onTap,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(
-            color: Colors.white70
-          ),
-          prefixIcon: const Icon(Icons.calendar_today_rounded),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          filled: true,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDocumentUploadCard({
-    required String title,
-    required String subtitle,
-    required File? file,
-    required VoidCallback onUpload,
-    required VoidCallback onRemove,
-    required bool isOwner,
-  }) {
-    String? fileType = isOwner ? ownershipDocumentType : tenantAgreementType;
-
-    return Card(
-      color: Colors.black.withOpacity(0.2),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade300),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white70
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white60,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            if (file != null)
-              Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: _buildFilePreview(file, fileType),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red),
-                    onPressed: onRemove,
-                  ),
-                ],
-              )
-            else
-              InkWell(
-                onTap: onUpload,
-                child: SizedBox(
-                  height: 200,
-                  width: double.infinity,
-                  child: DottedBorder(
-                    color: Colors.grey.shade300,
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(12),
-                    dashPattern: const [8, 4],
-                    strokeWidth: 1,
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.upload_file_rounded,
-                            size: 48,
-                            color: Colors.white70,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Upload Document',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Tap to upload image or PDF',
-                            style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilePreview(File file, String? fileType) {
-    final String fileExtension = file.path.split('.').last.toLowerCase();
-    if (fileExtension == 'pdf') {
-      return GestureDetector(
-        onTap: () => _showPDFPreview(file),
-        child: Container(
-          height: 200,
-          width: double.infinity,
-          color: Colors.grey.shade100.withOpacity(0.2),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.picture_as_pdf,
-                size: 64,
-                color: Colors.white70,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                path.basename(file.path),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Tap to preview PDF',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    } else {
-      // For image files
-      return Image.file(
-        file,
-        height: 200,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            height: 200,
-            width: double.infinity,
-            color: Colors.grey.shade100,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: Theme.of(context).primaryColor,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Error loading image',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
+  void _handleChipSelectedTap(bool selected, String status) {
+    if (selected) {
+      setState(() => ownershipStatus = status);
     }
   }
 
-  void _showPDFPreview(File file) {
-    Navigator.pushNamed(context, '/pdf-preview-screen', arguments: file);
+  void _ownerFileRemove(){
+    setState(() => ownershipDocument = null);
+  }
+
+  void _tenantFileRemove(){
+    setState(() => tenantAgreement = null);
   }
 
   Future<void> _logoutUser() async {
@@ -842,10 +449,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     await _prefs.remove("refreshMode");
 
     if (!mounted) return;
-    CustomSnackbar.show(
+    CustomSnackBar.show(
       context: context,
       message: "Logged out successfully",
-      type: SnackbarType.info,
+      type: SnackBarType.info,
     );
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -877,12 +484,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
-  void profileOnChanged(value) {
-    setState(() {
-      profileType = value;
-    });
-  }
-
   void societyOnChanged(newValue) {
     setState(() {
       societyName = newValue;
@@ -910,12 +511,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   void apartmentOnChanged(newValue) {
     setState(() {
       apartment = newValue;
-    });
-  }
-
-  void ownershipOnChanged(newValue) {
-    setState(() {
-      ownershipStatus = newValue;
     });
   }
 
@@ -949,27 +544,27 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           apartment != null &&
           ownershipStatus != null) {
         if (ownershipStatus == 'Owner' && ownershipDocument == null) {
-          CustomSnackbar.show(
+          CustomSnackBar.show(
             context: context,
             message: "Ownership document is required",
-            type: SnackbarType.error,
+            type: SnackBarType.error,
           );
           return;
         }
         if (ownershipStatus == 'Tenant') {
           if (tenantAgreement == null || startDate == null || endDate == null) {
-            CustomSnackbar.show(
+            CustomSnackBar.show(
               context: context,
               message: "All fields are required. from tenant agreement",
-              type: SnackbarType.error,
+              type: SnackBarType.error,
             );
             return;
           } else {
             if (!checkDates(startDate!, endDate!)) {
-              CustomSnackbar.show(
+              CustomSnackBar.show(
                 context: context,
                 message: "End date must be at least 3 months greater than the start date.",
-                type: SnackbarType.error,
+                type: SnackBarType.error,
               );
               return;
             }
@@ -1001,186 +596,53 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               ),
             );
       } else {
-        CustomSnackbar.show(
+        CustomSnackBar.show(
           context: context,
           message: "All fields are required.",
-          type: SnackbarType.error,
+          type: SnackBarType.error,
         );
       }
     }
   }
 
-  void _showDocumentPickerOptions(bool isOwner) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Select Document Source',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.camera_alt_rounded,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  title: const Text('Take a Photo'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.camera, isOwner);
-                  },
-                ),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.photo_library_rounded,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  title: const Text('Choose from Gallery'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.gallery, isOwner);
-                  },
-                ),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.picture_as_pdf_rounded,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  title: const Text('Upload PDF'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickPDF(isOwner);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+  Future<void> _pickPDF() async {
+    bool isOwner = ownershipStatus == 'Owner';
+    try{
+      final File? file =  await MediaPickerHelper.pickPdfFile(context: context);
 
-  Future<void> _pickPDF(bool isOwner) async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-        allowMultiple: false,
-        withData: true, // Ensures file bytes are available
-        onFileLoading: (FilePickerStatus status) =>
-            log('FilePicker status: $status'),
-      );
-
-      if (result != null) {
-        final fileBytes = result.files.single.bytes;
-        final fileSize = result.files.single.size; // Get file size in bytes
-        final fileName = result.files.single.name;
-        final path = result.files.single.path;
-
-        // Check if file size exceeds 2MB (2097152 bytes)
-        if (fileSize > 1048576) {
-          _showErrorSnackBar('File size should not exceed 1MB');
-          return;
-        }
-
-        if (path == null) {
-          // Handle web platform or when path is not available
-          if (fileBytes != null) {
-            final tempDir = await getTemporaryDirectory();
-            final file = File('${tempDir.path}/$fileName');
-            await file.writeAsBytes(fileBytes);
-
-            setState(() {
-              if (isOwner) {
-                ownershipDocument = file;
-                ownershipDocumentType = '.pdf';
-              } else {
-                tenantAgreement = file;
-                tenantAgreementType = '.pdf';
-              }
-            });
+      if (file != null) {
+        setState(() {
+          if (isOwner) {
+            ownershipDocument = file;
+            ownershipDocumentType = '.pdf';
           } else {
-            _showErrorSnackBar('Could not access the selected file');
+            tenantAgreement = file;
+            tenantAgreementType = '.pdf';
           }
-        } else {
-          // Handle native platforms
-          final file = File(path);
-          setState(() {
-            if (isOwner) {
-              ownershipDocument = file;
-              ownershipDocumentType = '.pdf';
-            } else {
-              tenantAgreement = file;
-              tenantAgreementType = '.pdf';
-            }
-          });
-        }
+        });
       }
-    } on PlatformException catch (e) {
-      _showErrorSnackBar('Error picking PDF: ${e.message}');
-    } catch (e) {
-      _showErrorSnackBar('Error picking PDF: $e');
+    }catch(e){
+      _showErrorSnackBar('Error picking image: $e');
     }
   }
 
-  Future<void> _pickImage(ImageSource source, bool isOwner) async {
+  Future<void> _pickImage(ImageSource source) async {
+    bool isOwner = ownershipStatus == 'Owner';
     try {
-      final XFile? image = await _picker.pickImage(source: source);
+      final File? image = await MediaPickerHelper.pickImageFile(context: context, source: source);
 
       if (image != null) {
-        final int fileSize = await File(image.path).length(); // Get file size in bytes
         final String fileExtension = path.extension(image.path).toLowerCase();
 
-        // Check if file size exceeds 1MB (1048576 bytes)
-        if (fileSize > 1048576) {
-          _showErrorSnackBar('Image size should not exceed 1MB');
-          return;
-        }
-
-        if (supportedImageTypes.contains(fileExtension)) {
-          setState(() {
-            if (isOwner) {
-              ownershipDocument = File(image.path);
-              ownershipDocumentType = fileExtension;
-            } else {
-              tenantAgreement = File(image.path);
-              tenantAgreementType = fileExtension;
-            }
-          });
-        } else {
-          _showErrorSnackBar('Please select a valid image file (JPG, JPEG, or PNG)');
-        }
+        setState(() {
+          if (isOwner) {
+            ownershipDocument = image;
+            ownershipDocumentType = fileExtension;
+          } else {
+            tenantAgreement = image;
+            tenantAgreementType = fileExtension;
+          }
+        });
       }
     } catch (e) {
       _showErrorSnackBar('Error picking image: $e');
@@ -1188,10 +650,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   void _showErrorSnackBar(String message) {
-    CustomSnackbar.show(
+    CustomSnackBar.show(
       context: context,
       message: message,
-      type: SnackbarType.error,
+      type: SnackBarType.error,
     );
   }
 }

@@ -3,8 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 // import 'dart:typed_data';
 
-Future<File?> resizeImage(File? imageFile,
-    {int width = 800, int quality = 85}) async {
+Future<File?> resizeImage(File? imageFile, {int width = 800, int quality = 85}) async {
   try {
     if (imageFile != null) {
       // Read the image bytes
@@ -29,9 +28,7 @@ Future<File?> resizeImage(File? imageFile,
       return null;
     }
   } catch (e) {
-    if (kDebugMode) {
-      debugPrint("Error resizing image: $e");
-    }
+    debugPrint("Error resizing image: $e");
   }
   return null;
 }

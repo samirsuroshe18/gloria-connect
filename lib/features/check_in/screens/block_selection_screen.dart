@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
+import 'package:gloria_connect/features/check_in/widgets/block_card.dart';
+import 'package:gloria_connect/features/check_in/widgets/check_in_search_bar.dart';
 import 'package:lottie/lottie.dart';
 
 class BlockSelectionScreen extends StatefulWidget {
@@ -62,6 +67,10 @@ class _BlockSelectionScreenState extends State<BlockSelectionScreen> {
             'Select Block',
             style: TextStyle(fontSize: 20, color: Colors.white70, fontWeight: FontWeight.bold),  // Text color adjusted to white for visibility
           ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: CheckInSearchBar(searchController: searchController, hintText: 'Search block',),
+          ),
         ),
         body: BlocConsumer<CheckInBloc, CheckInState>(
           listener: (context, state){
@@ -85,25 +94,6 @@ class _BlockSelectionScreenState extends State<BlockSelectionScreen> {
             if(filteredBlocks.isNotEmpty && _isLoading == false){
               return Column(
                 children: [
-                  Container(
-                    color: Colors.black.withOpacity(0.2), // Background color for the search field's container
-                    padding: const EdgeInsets.all(8.0), // Add padding to provide spacing around the TextField
-                    child: TextField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        filled: true, // Enables the fill color
-                        fillColor: Colors.white.withOpacity(0.2), // Sets the background color of the TextField to white
-                        contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                        hintText: 'Search block',
-                        hintStyle: const TextStyle(color: Colors.white60),
-                        prefixIcon: const Icon(Icons.search, color: Colors.white70), // Set the icon color
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none, // Removes border for a cleaner look
-                        ),
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 10),
                   Expanded(
                     child: Padding(
@@ -128,70 +118,11 @@ class _BlockSelectionScreenState extends State<BlockSelectionScreen> {
                 ],
               );
             } else if (_isLoading) {
-              return Center(
-                child: Lottie.asset(
-                  'assets/animations/loader.json',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-              );
+              return const CustomLoader();
             } else if (filteredBlocks.isEmpty && _isError == true) {
-              return RefreshIndicator(
-                onRefresh: _onRefresh,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height - 200,
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Lottie.asset(
-                          'assets/animations/error.json',
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Something went wrong!",
-                          style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return BuildErrorState(onRefresh: _onRefresh);
             } else{
-              return RefreshIndicator(
-                onRefresh: _onRefresh,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height - 200,
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Lottie.asset(
-                          'assets/animations/no_data.json',
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "There are no Block",
-                          style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'There are no Block',);
             }
           },
         )
@@ -204,42 +135,5 @@ class _BlockSelectionScreenState extends State<BlockSelectionScreen> {
 
   void onBlockPressed(String blockName) {
     Navigator.pushNamed(context, '/apartment-selection-screen', arguments: {'blockName' : blockName, 'entryType' : widget.entryType, 'formData': widget.formData, 'categoryOption': widget.categoryOption});
-  }
-}
-
-class BlockCard extends StatelessWidget {
-  final void Function() onFunctionCall;
-  final String blockName;
-
-  const BlockCard({super.key, required this.blockName, required this.onFunctionCall});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.black.withOpacity(0.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      child: InkWell(
-        onTap: onFunctionCall,
-        borderRadius: BorderRadius.circular(15.0),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              const Icon(Icons.apartment, color: Colors.white70),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  blockName,
-                  style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white70),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

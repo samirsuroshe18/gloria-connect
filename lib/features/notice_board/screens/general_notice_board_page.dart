@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
+import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
+import 'package:gloria_connect/common_widgets/single_paginated_list_view.dart';
 import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/features/notice_board/widgets/notice_card.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -107,98 +112,23 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
     }
   }
 
-  Widget _buildSearchFilterBar() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          // Search field (expanded to take available width)
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  hintText: 'Search by title, description, etc.',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {
-                        _searchQuery = '';
-                        _page = 1;
-                        data.clear();
-                      });
-                      _fetchEntries();
-                    },
-                  )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.2)
-              ),
-              onSubmitted: (value) {
-                setState(() {
-                  _searchQuery = value;
-                  _page = 1;
-                  data.clear();
-                });
-                _fetchEntries();
-              },
-            ),
-          ),
+  void _onSearchSubmitted(value) {
+    setState(() {
+      _searchQuery = value;
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
+  }
 
-          // Small gap between search and filter button
-          const SizedBox(width: 8),
-
-          // Filter button
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8.0),
-                onTap: () => _showFilterBottomSheet(context),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.filter_list,
-                        color: _hasActiveFilters
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                      ),
-                      if (_hasActiveFilters)
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _onClearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchQuery = '';
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
   }
 
   @override
@@ -222,7 +152,16 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: _buildSearchFilterBar(),
+          child: SearchFilterBar(
+            searchController: _searchController,
+            hintText: 'Search by name, mobile, etc.',
+            searchQuery: _searchQuery,
+            onSearchSubmitted: _onSearchSubmitted,
+            onClearSearch: _onClearSearch,
+            isFilterButton: true,
+            hasActiveFilters: _hasActiveFilters,
+            onFilterPressed: () => _showFilterBottomSheet(context),
+          ),
         ),
       ),
       body: BlocConsumer<NoticeBoardBloc, NoticeBoardState>(
@@ -256,255 +195,44 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: AnimationLimiter(
-                child: _buildEntriesList(),
+                child: SinglePaginatedListView<Notice>(
+                  data: data,
+                  controller: _scrollController,
+                  hasMore: _hasMore,
+                  itemBuilder: _itemBuilder,
+                ),
               ),
             );
           } else if (_isLazyLoading) {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: AnimationLimiter(
-                child: _buildEntriesList(),
+                child: SinglePaginatedListView<Notice>(
+                  data: data,
+                  controller: _scrollController,
+                  hasMore: _hasMore,
+                  itemBuilder: _itemBuilder,
+                ),
               ),
             );
           } else if (_isLoading && _isLazyLoading==false) {
-            return Center(
-              child: Lottie.asset(
-                'assets/animations/loader.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-            );
+            return const CustomLoader();
           }else if (data.isEmpty && _isError == true && statusCode == 401) {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/error.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Something went wrong!",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return BuildErrorState(onRefresh: _onRefresh);
           } else {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/no_data.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "There is no notice",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no notices",);
           }
         },
       ),
     );
   }
 
-  Widget _buildNoticeCard({required Notice data}) {
-    final Notice notice = data;
-    // Function to get category icon
-    IconData getCategoryIcon(String category) {
-      switch (category.toLowerCase()) {
-        case 'important':
-          return Icons.priority_high;
-        case 'event':
-          return Icons.event;
-        case 'maintenance':
-          return Icons.build;
-        default:
-          return Icons.notifications;
-      }
-    }
-
-    return Card(
-      color: Colors.black.withOpacity(0.2),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+  Widget _itemBuilder(item, index) {
+    return StaggeredListAnimation(
+      index: index,
+      child: NoticeCard(
+        notice: item,
       ),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/notice-board-details-screen',
-            arguments: notice,
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Category label
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Icon(
-                    getCategoryIcon(notice.category ?? 'event'),
-                    color: Colors.white70,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    notice.category ?? 'Not available',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    DateFormat('MMM dd, yyyy').format(notice.createdAt ?? DateTime.now()),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Notice content
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    notice.title ?? 'No title',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white70,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    notice.description ?? 'No description',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white60,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-
-            // Footer
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        child: const Icon(
-                          Icons.person,
-                          size: 18,
-                          color: Color(0xFF7F8C8D),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        notice.publishedBy?.userName ?? "Unknown",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white60,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    'Read more',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white60,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEntriesList() {
-
-    return ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: data.length + 1,
-        itemBuilder: (context, index) {
-          if (index < data.length) {
-            return StaggeredListAnimation(index: index, child: _buildNoticeCard(data: data[index]));
-          } else {
-            if (_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: Text("No more data to load")),
-              );
-            }
-          }
-        }
     );
   }
 

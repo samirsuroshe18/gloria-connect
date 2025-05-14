@@ -1,7 +1,11 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/apartment_list_row.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/build_header.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/entry_type_tag.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/profile_image_avatar.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/read_only_pincode_field.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import '../bloc/guard_entry_bloc.dart';
 import '../widgets/ask_approval_btn.dart';
@@ -44,7 +48,7 @@ class _AskingGuestApprovalScreenState extends State<AskingGuestApprovalScreen> {
             });
           }
           if (state is AddDeliveryEntrySuccess) {
-            _showSnackBar(context, state.response['message'], Colors.green);
+            CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
             setState(() {
               _isLoading = false;
             });
@@ -52,7 +56,7 @@ class _AskingGuestApprovalScreenState extends State<AskingGuestApprovalScreen> {
             Navigator.pushNamedAndRemoveUntil(context, '/guard-home', (Route<dynamic> route) => false);
           }
           if (state is AddDeliveryEntryFailure) {
-            _showSnackBar(context, state.message, Colors.redAccent);
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
             setState(() {
               _isLoading = false;
             });
@@ -86,7 +90,7 @@ class _AskingGuestApprovalScreenState extends State<AskingGuestApprovalScreen> {
             ),
           ),
         ),
-        _buildApprovalButton(),
+        AskApprovalBtn(isLoading: _isLoading, onTap: _askForApproval),
       ],
     );
   }
@@ -100,30 +104,13 @@ class _AskingGuestApprovalScreenState extends State<AskingGuestApprovalScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileImage(),
+            ProfileImageAvatar(
+              imageSource: widget.deliveryData?['profileImg'],
+            ),
             const SizedBox(width: 16),
             _buildDeliveryInfo(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildProfileImage() {
-    final profileImg = widget.deliveryData!['profileImg'];
-    return Container(
-      width: 90,
-      height: 90,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.blue, // Border color
-          width: 2, // Border width
-        ),
-      ),
-      child: CircleAvatar(
-        backgroundImage: profileImg is File ? FileImage(profileImg) : NetworkImage(profileImg) as ImageProvider,
-        radius: 45,
       ),
     );
   }
@@ -133,47 +120,15 @@ class _AskingGuestApprovalScreenState extends State<AskingGuestApprovalScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildDeliveryHeader(),
-          _buildEntryTypeTag(),
+          BuildHeader(title: widget.deliveryData?['name'] ?? 'NA', onEditTap: () => Navigator.of(context).pop()),
+          EntryTypeTag(text: widget.deliveryData?['entryType'] ?? 'NA'),
           const SizedBox(height: 12),
           _buildAccompanyingGuest(),
           const SizedBox(height: 8),
-          _buildApartmentList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDeliveryHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            widget.deliveryData?['name'] ?? 'NA',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white70),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
+          ApartmentListRow(
+            apartments: societyApartments,
           ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.edit, size: 20, color: Colors.white70,),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEntryTypeTag() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        widget.deliveryData!['entryType'].toString().toUpperCase(),
-        style: const TextStyle(color: Colors.white70, fontSize: 16),
+        ],
       ),
     );
   }
@@ -182,22 +137,6 @@ class _AskingGuestApprovalScreenState extends State<AskingGuestApprovalScreen> {
     return Text(
       'Accomp. Guest: ${widget.deliveryData?['accompanyingGuest']} Guest',
         style: const TextStyle(fontSize: 16, color: Colors.white70)
-    );
-  }
-
-  Widget _buildApartmentList() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(padding: EdgeInsets.all(5.0), child: Icon(Icons.home, size: 20, color: Colors.white70)),
-        const SizedBox(width: 5),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: societyApartments.map((e) => Padding(padding: const EdgeInsets.only(top: 4.0), child: Text(e['apartment']!, style: const TextStyle(fontSize: 14, color: Colors.white70)))).toList(),
-          ),
-        ),
-      ],
     );
   }
 
@@ -241,55 +180,12 @@ class _AskingGuestApprovalScreenState extends State<AskingGuestApprovalScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
         ),
         const SizedBox(height: 10),
-        PinCodeTextField(
-          controller: TextEditingController(text: widget.deliveryData?['vehicleNo']),
-          appContext: context,
-          length: 4,
-          readOnly: true,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          pinTheme: PinTheme(
-            fieldOuterPadding: const EdgeInsets.symmetric(horizontal: 5),
-            fieldWidth: 50,
-            shape: PinCodeFieldShape.box,
-            borderWidth: 2,
-            activeColor: Colors.blue,
-            inactiveColor: Colors.grey.shade300,
-            selectedColor: Colors.lightBlueAccent,
-            activeFillColor: Colors.blue.shade50, // Light fill for active fields
-            inactiveFillColor: Colors.white,
-            selectedFillColor: Colors.blue.shade100, // Highlight the selected box
-            borderRadius: BorderRadius.circular(12), // Rounded corners for a modern look
-          ),
-          boxShadows: [
-            BoxShadow(
-              offset: const Offset(0, 4),
-              blurRadius: 8,
-              color: Colors.black.withOpacity(0.1),
-            ),
-          ],
-          animationType: AnimationType.fade,
-          animationDuration: const Duration(milliseconds: 300),
-          enablePinAutofill: true, // Allow autofill
-          backgroundColor: Colors.transparent,
-          textStyle: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white70,
-          ),
-        )
+        ReadOnlyPinCodeField(
+          initialValue: widget.deliveryData?['vehicleNo'] ?? '',
+          context: context,
+        ),
       ],
     );
-  }
-
-  Widget _buildApprovalButton() {
-    return AskApprovalBtn(isLoading: _isLoading, onTap: _askForApproval);
-  }
-
-  void _showSnackBar(BuildContext context, String message, Color? color){
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: color ?? const Color(0xFF323232),
-    ));
   }
 
   void _mapSelectedFlatsToApartmentList(List<String> selectedFlats) {

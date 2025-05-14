@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
@@ -94,33 +96,13 @@ class VerificationRequestCard extends StatelessWidget {
                     children: [
                       Hero(
                         tag: 'profile_$userName',
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.blue.shade100,
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: ClipOval(
-                            child: profileImageUrl.isNotEmpty
-                                ? Image.network(
-                              profileImageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Image.asset('assets/images/profile.png'),
-                            )
-                                : Image.asset('assets/images/profile.png'),
-                          ),
+                        child: CustomCachedNetworkImage(
+                          imageUrl: profileImageUrl,
+                          size: 60,
+                          isCircular: true,
+                          borderWidth: 3,
+                          errorImage: Icons.person,
+                          onTap: ()=> CustomFullScreenImageViewer.show(context, profileImageUrl),
                         ),
                       ),
                       const SizedBox(width: 16),

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
-import 'package:lottie/lottie.dart';
+import 'package:gloria_connect/features/resident_profile/widgets/build_action_button.dart';
+import 'package:gloria_connect/features/resident_profile/widgets/build_resident_info_tile.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../auth/models/get_user_model.dart';
@@ -33,7 +39,17 @@ class _ResidentProfileScreenState extends State<ResidentProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2),
+        centerTitle: true,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
+      ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthGetUserLoading) {
@@ -50,237 +66,162 @@ class _ResidentProfileScreenState extends State<ResidentProfileScreen> {
         builder: (context, state) {
           if(data != null && _isLoading == false) {
             return RefreshIndicator(
-              onRefresh: _refreshUserData,  // Method to refresh user data
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+              onRefresh: _refreshUserData,
+              child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                              radius: 50.0,
-                              backgroundImage: data?.profile == null
-                                  ? const AssetImage('assets/images/profile.png')
-                                  : NetworkImage(data!.profile!),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Profile Header Section
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            const SizedBox(height: 14),
-                            Text(
-                              data?.userName ?? "NA",
-                              style: const TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  overflow: TextOverflow.ellipsis
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              data?.email ?? "NA",
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/edit-profile-screen', arguments: data);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(45),
+                            child: Column(
+                              children: [
+                                CustomCachedNetworkImage(
+                                  imageUrl: data?.profile,
+                                  isCircular: true,
+                                  size: 100,
+                                  errorImage: Icons.person,
+                                  onTap: () => CustomFullScreenImageViewer.show(context, data?.profile),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  data?.userName ?? "NA",
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18)
-                              ),
-                              child: const Text(
-                                'Edit profile',
-                                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400),
-                              ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  data?.email ?? "NA",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/admin-edit-profile-screen',
+                                      arguments: data,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white.withOpacity(0.2),
+                                    foregroundColor: Colors.white70,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.edit, size: 18),
+                                  label: const Text('Edit Profile'),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD1F0FF),
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            color: const Color(0xFFE1E1E1), // Border color
-                            width: 2, // Border width
                           ),
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: ListTile(
-                                leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white
-                                    ),
-                                    child: const Icon(
-                                      Icons.door_sliding_outlined,
-                                      color: Color(0xFF5B5B5B),
-                                    )),
-                                title: Text(
-                                  'Block ${data?.societyBlock?.toUpperCase() ?? "NA"}, Apartment ${data?.apartment ?? "NA"}',
-                                  style: const TextStyle(color: Color(0xFF272727), fontWeight: FontWeight.w500),
-                                ),
-                              ),
+                          const SizedBox(height: 24),
+
+                          // Resident Details Card
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: const Divider(height: 2),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: ListTile(
-                                leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white
-                                    ),
-                                    child: const Icon(
-                                      Icons.lock,
-                                      color: Color(0xFF5B5B5B),
-                                    )),
-                                title: Text(
-                                  'Passcode : ${data?.checkInCode ?? "NA"}',
-                                  style: const TextStyle(color: Color(0xFF272727), fontWeight: FontWeight.w500),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: const Divider(height: 2),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: ListTile(
-                                leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white
-                                    ),
-                                    child: const Icon(
-                                      Icons.group,
-                                      color: Color(0xFF5B5B5B),
-                                    )),
-                                title: const Text(
-                                  'Apartment Members',
-                                  style: TextStyle(color: Color(0xFF272727), fontWeight: FontWeight.w500),
-                                ),
-                                trailing: const Icon(Icons.arrow_forward_ios,
-                                  size: 16,
-                                  color: Color(0xFF5B5B5B),),
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/apartment-member-screen');
-                                },
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: const Divider(height: 2),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: ListTile(
-                                leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    child: const Icon(
-                                      Icons.settings,
-                                      color: Color(0xFF5B5B5B),
-                                    )),
-                                title: const Text(
-                                  'Settings',
-                                  style: TextStyle(color: Color(0xFF272727), fontWeight: FontWeight.w500),
-                                ),
-                                trailing: const Icon(Icons.arrow_forward_ios,
-                                  size: 16,
-                                  color: Color(0xFF5B5B5B),),
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/setting-screen', arguments: data);
-                                },
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: const Divider(height: 2),
-                            ),
-                            ListTile(
-                              leading: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                      color: const Color(0x2FB74343),
-                                      borderRadius: BorderRadius.circular(10)
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Residence Details',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  child: const Icon(
-                                    Icons.logout,
-                                    color: Color(0xFFAD3232),
-                                  )),
-                              title: const Text(
-                                'Logout',
-                                style: TextStyle(color: Color(0xFFB74343), fontWeight: FontWeight.w500),
-                              ),
-                              onTap: _logoutUser,
+                                ),
+                                const SizedBox(height: 16),
+                                BuildResidentInfoTile(
+                                  icon: Icons.apartment,
+                                  label: 'Block & Apartment',
+                                  value: 'Block ${data?.societyBlock?.toUpperCase() ?? "NA"}, Apartment ${data?.apartment ?? "NA"}',
+                                ),
+                                const Divider(height: 24),
+                                BuildResidentInfoTile(
+                                  icon: Icons.password,
+                                  label: 'Passcode',
+                                  value: data?.checkInCode ?? "NA",
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Actions Grid
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Quick Actions',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                BuildActionButton(
+                                  title: 'Apartment Members',
+                                  icon: Icons.group_outlined,
+                                  color: const Color(0xFF4A90E2),
+                                  onTap: () => Navigator.pushNamed(context, '/apartment-member-screen'),
+                                ),
+                                const SizedBox(height: 12),
+                                BuildActionButton(
+                                  title: 'Settings',
+                                  icon: Icons.settings_outlined,
+                                  color: Colors.white60,
+                                  onTap: () => Navigator.pushNamed(context, '/setting-screen', arguments: data),
+                                ),
+                                const SizedBox(height: 12),
+                                BuildActionButton(
+                                  title: 'Logout',
+                                  icon: Icons.logout,
+                                  color: const Color(0xFFE63946),
+                                  onTap: _logoutUser,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
                       ),
-                    ]
-                ),
+                    ),
+                  ),
+                ],
               ),
             );
           } else if (_isLoading) {
-            return Center(
-              child: Lottie.asset(
-                'assets/animations/loader.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-            );
-          }else {
-            return RefreshIndicator(
-              onRefresh: _refreshUserData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/error.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Something went wrong!",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return const CustomLoader();
+          } else {
+            return BuildErrorState(onRefresh: _refreshUserData);
           }
         },
       ),
@@ -293,7 +234,6 @@ class _ResidentProfileScreenState extends State<ResidentProfileScreen> {
 
   Future<void> _logoutUser() async {
     if(!mounted) return;
-
     showDialog(context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -349,9 +289,7 @@ class _ResidentProfileScreenState extends State<ResidentProfileScreen> {
     await _prefs.remove("refreshMode");
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Logged out')),
-    );
+    CustomSnackBar.show(context: context, message: 'Logged out', type: SnackBarType.success);
     Navigator.pushNamedAndRemoveUntil(context, '/login', (Route<dynamic> route) => false);
   }
 }

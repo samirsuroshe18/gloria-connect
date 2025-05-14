@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:gloria_connect/utils/gradient_color.dart';
+import 'package:gloria_connect/common_widgets/gradient_color.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
 import 'package:lottie/lottie.dart';
 
@@ -90,16 +91,16 @@ class _LoginScreenState extends State<LoginScreen> {
             if (state.status == 310) {
               emailController.clear();
               passwordController.clear();
-              CustomSnackbar.show(
+              CustomSnackBar.show(
                 context: context,
                 message: state.message,
-                type: SnackbarType.error,
+                type: SnackBarType.error,
               );
             } else {
-              CustomSnackbar.show(
+              CustomSnackBar.show(
                 context: context,
                 message: state.message,
-                type: SnackbarType.error,
+                type: SnackBarType.error,
               );
             }
             _isLoading = false;
@@ -149,11 +150,11 @@ class _LoginScreenState extends State<LoginScreen> {
           }
 
           if (state is AuthGoogleLinkedSuccess){
-            CustomSnackbar.show(context: context, message: state.response['message'], type: SnackbarType.success);
+            CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
           }
 
           if (state is AuthGoogleLinkedFailure){
-            CustomSnackbar.show(context: context, message: state.message, type: SnackbarType.error);
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
           }
         },
         builder: (context, state) {
@@ -183,14 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                           if (_isGoogleLoading)
-                            Center(
-                              child: Lottie.asset(
-                                'assets/animations/loader.json',
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.contain,
-                              ),
-                            )
+                            const CustomLoader(),
                         ],
                       ),
                     ),

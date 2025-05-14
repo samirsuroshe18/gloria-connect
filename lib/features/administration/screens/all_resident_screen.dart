@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
+import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
+import 'package:gloria_connect/common_widgets/single_paginated_list_view.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/administration/models/society_member.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import 'package:gloria_connect/features/administration/widgets/member_card.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
 
 class AllResidentScreen extends StatefulWidget {
   const AllResidentScreen({super.key,});
@@ -49,7 +53,7 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      if (!_isLoading && _hasMore && data.length>=_limit) {
+      if (!_isLoading && _hasMore) {
         _isLazyLoading = true;
         _fetchEntries();
       }
@@ -69,51 +73,29 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
     context.read<AdministrationBloc>().add(AdminGetSocietyMember(queryParams: queryParams));
   }
 
-  Widget _buildSearchFilterBar() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            hintText: 'Search by name, mobile, etc.',
-            prefixIcon: const Icon(Icons.search),
-            suffixIcon: _searchQuery.isNotEmpty
-                ? IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () {
-                _searchController.clear();
-                setState(() {
-                  _searchQuery = '';
-                  _page = 1;
-                  data.clear();
-                });
-                _fetchEntries();
-              },
-            )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.2)
-        ),
-        onSubmitted: (value) {
-          setState(() {
-            _searchQuery = value;
-            _page = 1;
-            data.clear();
-          });
-          _fetchEntries();
-        },
-      ),
-    );
+  void _onClearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchQuery = '';
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
+  }
+
+  void _onSearchSubmitted(value) {
+    setState(() {
+      _searchQuery = value;
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: const Text(
             'Society Members',
@@ -122,10 +104,16 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
           backgroundColor: Colors.black.withOpacity(0.2),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: _buildSearchFilterBar(),
+            child: SearchFilterBar(
+              searchController: _searchController,
+              hintText: 'Search by name, mobile, etc.',
+              searchQuery: _searchQuery,
+              onSearchSubmitted: _onSearchSubmitted,
+              onClearSearch: _onClearSearch,
+              isFilterButton: false,
+            ),
           ),
         ),
-        backgroundColor: Colors.transparent,
         body: BlocConsumer<AdministrationBloc, AdministrationState>(
           listener: (context, state){
             if (state is AdminGetSocietyMemberLoading) {
@@ -152,36 +140,16 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
               _hasMore = false;
             }
             if (state is AdminCreateAdminSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.response['message']!),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
             }
             if (state is AdminCreateAdminFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.redAccent,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
             }
             if (state is AdminRemoveResidentSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.response['message']!),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
             }
             if (state is AdminRemoveResidentFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.redAccent,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
             }
           },
           builder: (context, state){
@@ -189,182 +157,47 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
               return RefreshIndicator(
                 onRefresh: _onRefresh,
                 child: AnimationLimiter(
-                  child: _buildEntriesList(),
+                  child: SinglePaginatedListView<SocietyMember>(
+                    data: data,
+                    controller: _scrollController,
+                    hasMore: _hasMore,
+                    itemBuilder: _itemBuilder,
+                  ),
                 ),
               );
             } else if (_isLazyLoading) {
               return RefreshIndicator(
                 onRefresh: _onRefresh,
                 child: AnimationLimiter(
-                  child: _buildEntriesList(),
+                  child: SinglePaginatedListView<SocietyMember>(
+                    data: data,
+                    controller: _scrollController,
+                    hasMore: _hasMore,
+                    itemBuilder: _itemBuilder,
+                  ),
                 ),
               );
             } else if (_isLoading && _isLazyLoading==false) {
-              return Center(
-                child: Lottie.asset(
-                  'assets/animations/loader.json',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-              );
+              return const CustomLoader();
             }else if (data.isEmpty && _isError == true && statusCode == 401) {
-              return RefreshIndicator(
-                onRefresh: _onRefresh,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height - 200,
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Lottie.asset(
-                          'assets/animations/error.json',
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Something went wrong!",
-                          style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return BuildErrorState(onRefresh: _onRefresh);
             } else {
-              return RefreshIndicator(
-                onRefresh: _onRefresh,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height - 200,
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Lottie.asset(
-                          'assets/animations/no_data.json',
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "There are no residents.",
-                          style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no residents.",);
             }
           },
         )
     );
   }
 
-  Widget _buildMembersCard(member){
-    return Card(
-      color: Colors.black.withOpacity(0.2),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
-              ? NetworkImage(member.user!.profile!)
-              : const AssetImage('assets/images/profile.png') as ImageProvider,
-        ),
-        title: Text(
-          member.user?.userName ?? "NA",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(member.user?.phoneNo ?? ""),
-        trailing: PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'delete') {
-              _deleteResident(member.user?.id ?? "");
-            } else if (value == 'makeAdmin') {
-              _makeAdmin(member.user?.email ?? "");
-            }else if(value == 'call'){
-              _makePhoneCall(member.user?.phoneNo ?? "");
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete Resident'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'makeAdmin',
-              child: Row(
-                children: [
-                  Icon(Icons.person_add, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Text('Make Admin'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'call',
-              child: Row(
-                children: [
-                  Icon(Icons.call, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Text('Call'),
-                ],
-              ),
-            ),
-          ],
-          icon: const Icon(Icons.more_vert), // Three-dot icon
-        ),
+  Widget _itemBuilder(item, index) {
+    return StaggeredListAnimation(
+      index: index,
+      child: MemberCard(
+        data: item,
+        deleteResident: _deleteResident,
+        makeAdmin: _makeAdmin,
       ),
     );
-  }
-
-  Widget _buildEntriesList() {
-
-    return ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: data.length + 1,
-        itemBuilder: (context, index) {
-          if (index < data.length) {
-            return StaggeredListAnimation(index: index, child: _buildMembersCard(data[index]));
-          } else {
-            if (_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: Text("No more data to load")),
-              );
-            }
-          }
-        }
-    );
-  }
-
-  void _makePhoneCall(String phoneNumber) async {
-    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 
   Future<void> _makeAdmin(String email) async {

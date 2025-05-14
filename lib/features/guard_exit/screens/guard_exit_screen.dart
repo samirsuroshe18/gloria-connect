@@ -5,24 +5,29 @@ import 'package:gloria_connect/features/guard_exit/screens/delivery_tab.dart';
 import 'package:gloria_connect/features/guard_exit/screens/guest_tab.dart';
 import 'package:gloria_connect/features/guard_exit/screens/service_tab.dart';
 
-class GuardExitScreen extends StatefulWidget {
+class GuardExitScreen extends StatelessWidget {
   const GuardExitScreen({super.key});
 
-  @override
-  State<GuardExitScreen> createState() => _GuardExitScreenState();
-}
+  // Define tab data once to avoid repetition
+  static const _tabData = [
+    {'title': 'All', 'widget': AllTab()},
+    {'title': 'Guest', 'widget': GuestTab()},
+    {'title': 'Cab', 'widget': CabTab()},
+    {'title': 'Delivery', 'widget': DeliveryTab()},
+    {'title': 'Service', 'widget': ServiceTab()},
+  ];
 
-class _GuardExitScreenState extends State<GuardExitScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
+  // Shared text style for tab labels
+  static const _tabTextStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 15,
+  );
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
+      length: _tabData.length,
       initialIndex: 0,
-      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
@@ -30,46 +35,14 @@ class _GuardExitScreenState extends State<GuardExitScreen> {
             style: TextStyle(color: Colors.white70),
           ),
           backgroundColor: Colors.black.withOpacity(0.2),
+          bottom: TabBar(
+            tabAlignment: TabAlignment.center,
+            tabs: _tabData.map((tab) => Tab(child: Text(tab['title'] as String, style: _tabTextStyle))
+            ).toList(),
+          ),
         ),
-        body: const Column(
-          children: [
-            TabBar(
-              tabAlignment: TabAlignment.center,
-              tabs: [
-                Tab(
-                    child: Text('All',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-                Tab(
-                    child: Text('Guest',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-                Tab(
-                    child: Text('Cab',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-                Tab(
-                    child: Text('Delivery',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-                Tab(
-                    child: Text('Service',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  AllTab(),
-                  GuestTab(),
-                  CabTab(),
-                  DeliveryTab(),
-                  ServiceTab(),
-                ],
-              ),
-            ),
-          ],
+        body: TabBarView(
+          children: _tabData.map((tab) => tab['widget'] as Widget).toList(),
         ),
       ),
     );

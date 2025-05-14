@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/administration/models/society_guard.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:gloria_connect/features/administration/widgets/guard_card.dart';
+import 'package:gloria_connect/features/administration/widgets/search_bar.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
 
 
 class AllGuardScreen extends StatefulWidget {
@@ -59,22 +63,7 @@ class _AllGuardScreenState extends State<AllGuardScreen> {
           backgroundColor: Colors.black.withOpacity(0.2),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: TextField(
-                onChanged: _filterGuards,
-                decoration: InputDecoration(
-                  hintText: 'Search by name or mobile number',
-                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.2),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
+            child: CustomSearchBar(filter: _filterGuards),
           ),
         ),
         body: BlocConsumer<AdministrationBloc, AdministrationState>(
@@ -96,178 +85,49 @@ class _AllGuardScreenState extends State<AllGuardScreen> {
               statusCode = state.status;
             }
             if (state is AdminRemoveGuardSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.response['message']!),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
             }
             if (state is AdminRemoveGuardFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.redAccent,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
             }
           },
           builder: (context, state){
             if(data.isNotEmpty && _isLoading == false) {
               return RefreshIndicator(
-                onRefresh: _refreshUserData,  // Method to refresh user data
+                onRefresh: _onRefresh,  // Method to refresh user data
                 child: AnimationLimiter(
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: filteredGuards.length,
                     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                     itemBuilder: (context, index) {
-                      final member = filteredGuards[index];
-                      return StaggeredListAnimation(index: index, child: Card(
-                        color: Colors.black.withOpacity(0.2),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: (member.user?.profile != null && member.user!.profile!.isNotEmpty)
-                                ? NetworkImage(member.user!.profile!)
-                                : const AssetImage('assets/images/profile.png') as ImageProvider,
-                          ),
-                          title: Text(
-                            member.user?.userName ?? "NA",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(member.user?.phoneNo ?? ""),
-                          trailing: PopupMenuButton<String>(
-                            onSelected: (value) {
-                              if (value == 'delete') {
-                                _deleteGuard(member.user?.id ?? "");
-                              } else if(value == 'call'){
-                                _makePhoneCall(member.user?.phoneNo ?? "");
-                              } else if(value == 'guard_report'){
-                                _guardReport(member.user?.id ?? "");
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'delete',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.delete, color: Colors.red),
-                                    SizedBox(width: 8),
-                                    Text('Delete Guard'),
-                                  ],
-                                ),
-                              ),
-                              const PopupMenuItem(
-                                value: 'call',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.call, color: Colors.blue),
-                                    SizedBox(width: 8),
-                                    Text('Call'),
-                                  ],
-                                ),
-                              ),
-                              const PopupMenuItem(
-                                value: 'guard_report',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.report, color: Colors.blue),
-                                    SizedBox(width: 8),
-                                    Text('Guard Report'),
-                                  ],
-                                ),
-                              ),
-                            ],
-                            icon: const Icon(Icons.more_vert), // Three-dot icon
-                          ),
+                      final data = filteredGuards[index];
+                      return StaggeredListAnimation(
+                        index: index,
+                        child: GuardCard(
+                          data: data,
+                          deleteGuard: _deleteGuard,
+                          guardReport: _guardReport,
                         ),
-                      ));
+                      );
                     },
                   ),
                 ),
               );
             } else if (_isLoading) {
-              return Center(
-                child: Lottie.asset(
-                  'assets/animations/loader.json',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-              );
+              return const CustomLoader();
             } else if (filteredGuards.isEmpty && _isError == true && statusCode == 401) {
-              return RefreshIndicator(
-                onRefresh: _refreshUserData,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height - (kToolbarHeight*2),
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Lottie.asset(
-                          'assets/animations/error.json',
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Something went wrong!",
-                          style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return BuildErrorState(onRefresh: _onRefresh);
             } else {
-              return RefreshIndicator(
-                onRefresh: _refreshUserData,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height - (kToolbarHeight*2),
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Lottie.asset(
-                          'assets/animations/no_data.json',
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "There are no guards",
-                          style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no guard.",);
             }
           },
         )
     );
   }
 
-  Future<void> _refreshUserData() async {
+  Future<void> _onRefresh() async {
     context.read<AdministrationBloc>().add(AdminGetSocietyGuard());
-  }
-
-  void _makePhoneCall(String phoneNumber) async {
-    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 
   Future<void> _deleteGuard(String id) async {

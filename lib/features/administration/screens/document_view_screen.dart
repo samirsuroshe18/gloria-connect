@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 // import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -55,9 +56,7 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
       }
     } catch (e) {
       if(!mounted)return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading document: $e')),
-      );
+      CustomSnackBar.show(context: context, message: 'Error loading document: $e', type: SnackBarType.error);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -88,15 +87,11 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
 
       // Show success message
       if(!mounted)return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Document downloaded to ${file.path}')),
-      );
+      CustomSnackBar.show(context: context, message: 'Document downloaded to ${file.path}', type: SnackBarType.success);
     } catch (e) {
       // Handle download errors
       if(!mounted)return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Download failed: $e')),
-      );
+      CustomSnackBar.show(context: context, message: 'Download Failed: $e', type: SnackBarType.error);
     } finally {
       setState(() => _isDownloading = false);
     }
@@ -117,9 +112,7 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
       await Share.share(widget.documentUrl!, subject: widget.title);
     } catch (e) {
       if(!mounted)return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sharing failed: $e')),
-      );
+      CustomSnackBar.show(context: context, message: 'Sharing failed: $e', type: SnackBarType.error);
     }
   }
 
@@ -179,7 +172,7 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
         children: [
           if (widget.isTenantAgreement! && widget.startDate != null && widget.endDate != null)
             Container(
-              color: Colors.white,
+              color: Colors.black.withOpacity(0.2),
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -225,7 +218,8 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
             const SizedBox(height: 4),
             Text(
               date,
-              style: const TextStyle(
+              style: TextStyle(
+                color: Colors.blue.shade700,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),

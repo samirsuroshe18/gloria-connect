@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
+import 'package:gloria_connect/utils/phone_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../auth/bloc/auth_bloc.dart';
 
 class VerificationPendingScreen extends StatefulWidget {
@@ -113,14 +116,13 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                           Stack(
                             alignment: Alignment.center,
                             children: [
-                              CircleAvatar(
-                                radius: 50,
-                                backgroundColor: Colors.grey[200],
-                                backgroundImage: profileImg != null
-                                    ? NetworkImage(profileImg!)
-                                    : const AssetImage(
-                                    'assets/images/profile.png')
-                                as ImageProvider,
+                              CustomCachedNetworkImage(
+                                imageUrl: profileImg,
+                                size: 100,
+                                isCircular: true,
+                                borderWidth: 3,
+                                errorImage: Icons.person,
+                                onTap: ()=> CustomFullScreenImageViewer.show(context, profileImg),
                               ),
                               Container(
                                 width: 110,
@@ -192,7 +194,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     const SizedBox(height: 32),
                     // Support Section
                     OutlinedButton(
-                      onPressed: _contactSupport,
+                      onPressed: ()=> PhoneUtils.sendEmail(context: context, email: contactEmail ?? ''),
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.black.withOpacity(0.2),
                         shape: RoundedRectangleBorder(
@@ -401,35 +403,13 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     await _prefs.remove("refreshMode");
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Logged out successfully'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    CustomSnackBar.show(context: context, message: 'Logged out successfully', type: SnackBarType.success);
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/login',
           (Route<dynamic> route) => false,
     );
   }
-
-  void _contactSupport() async {
-  final Uri emailUri = Uri(
-    scheme: 'mailto',
-    path: contactEmail ?? 'support@example.com', // Replace with your support email
-    queryParameters: {
-      'subject': 'Support Request',
-      'body': 'Hello, I need help with...',
-    },
-  );
-
-  if (await canLaunchUrl(emailUri)) {
-    await launchUrl(emailUri);
-  } else {
-    debugPrint('Could not launch email app');
-  }
-}
 }
 
 

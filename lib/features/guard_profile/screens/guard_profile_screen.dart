@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
+import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/build_action_list.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/build_info_card.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../auth/bloc/auth_bloc.dart';
-import '../../check_in/bloc/check_in_bloc.dart';
 
 class GuardProfileScreen extends StatefulWidget {
   const GuardProfileScreen({super.key});
@@ -59,23 +64,11 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Hero(
-                                tag: DateTime.now().toIso8601String(),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white70,
-                                      width: 4,
-                                    ),
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage: data?.profile == null
-                                        ? const AssetImage('assets/images/profile.png')
-                                        : NetworkImage(data!.profile!) as ImageProvider,
-                                  ),
-                                ),
+                              CustomCachedNetworkImage(
+                                imageUrl: data!.profile!,
+                                isCircular: true,
+                                size: 100,
+                                errorImage: Icons.person,
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -130,7 +123,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                       child: Column(
                         children: [
                           // Gate Assignment Card
-                          _buildInfoCard(
+                          BuildInfoCard(
                             title: 'Gate Assignment',
                             content: data?.gateAssign?.toUpperCase() ?? "NA",
                             icon: Icons.door_sliding_outlined,
@@ -138,7 +131,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                           ),
                           const SizedBox(height: 16),
                           // Passcode Card
-                          _buildInfoCard(
+                          BuildInfoCard(
                             title: 'Guard Passcode',
                             content: data?.checkInCode ?? "NA",
                             icon: Icons.lock,
@@ -146,7 +139,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                           ),
                           const SizedBox(height: 16),
                           // Quick Actions
-                          _buildActionsList(),
+                          BuildActionList(logoutUser: _logoutUser, data: data, onAddGatePass: _addGatePass,)
                         ],
                       ),
                     ),
@@ -155,184 +148,11 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
               ),
             );
           } else if (_isLoading) {
-            return Center(
-              child: Lottie.asset(
-                'assets/animations/loader.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-            );
+            return const CustomLoader();
           } else {
-            return _buildErrorState();
+            return BuildErrorState(onRefresh: _refreshData);
           }
         },
-      ),
-    );
-  }
-
-  Widget _buildInfoCard({
-    required String title,
-    required String content,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  content,
-                  style: const TextStyle(
-                    color: Colors.white60,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionsList() {
-    final List<Map<String, dynamic>> actions = [
-      {
-        'title': 'View Checkout History',
-        'icon': Icons.history,
-        'color': Colors.white70,
-        'route': '/checkout-history-screen',
-      },
-      {
-        'title': 'View Gate Pass',
-        'icon': Icons.visibility,
-        'color': Colors.white70,
-        'route': '/gate-pass-list-screen',
-      },
-      {
-        'title': 'Add Gate Pass',
-        'icon': Icons.add_circle,
-        'color': Colors.white70,
-        'onTap': () {
-          context.read<CheckInBloc>().add(ClearFlat());
-          Navigator.pushNamed(context, '/add-service-screen');
-        },
-      },
-      {
-        'title': 'Settings',
-        'icon': Icons.settings,
-        'color': Colors.white70,
-        'route': '/setting-screen',
-        'arguments': data,
-      },
-      {
-        'title': 'Logout',
-        'icon': Icons.logout,
-        'color': Colors.redAccent,
-        'onTap': _logoutUser,
-      },
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: ListView.separated(
-        padding: const EdgeInsets.only(top: 0),
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: actions.length,
-        separatorBuilder: (context, index) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final action = actions[index];
-          return ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: action['color'].withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                action['icon'],
-                color: action['color'],
-              ),
-            ),
-            title: Text(
-              action['title'],
-              style: TextStyle(
-                color: action['title'] == 'Logout' ? Colors.redAccent : Colors.white70,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            trailing: const Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: Colors.grey,
-            ),
-            onTap: action['onTap'] ??
-                    () => Navigator.pushNamed(context, action['route'], arguments: action['arguments']),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return RefreshIndicator(
-      onRefresh: _refreshData,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Container(
-          height: MediaQuery.of(context).size.height - 100,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Lottie.asset(
-                'assets/animations/error.json',
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Something went wrong!",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -388,14 +208,17 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
     );
   }
 
+  void _addGatePass() {
+    context.read<CheckInBloc>().add(ClearFlat());
+    Navigator.pushNamed(context, '/add-service-screen');
+  }
+
   Future<void> removeAccessToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove("accessToken");
     await prefs.remove("refreshMode");
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Logged out successfully')),
-      );
+      CustomSnackBar.show(context: context, message: 'Logged out successfully', type: SnackBarType.success);
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/login',

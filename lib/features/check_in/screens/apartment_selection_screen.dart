@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
+import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
+import 'package:gloria_connect/features/administration/widgets/search_bar.dart';
+import 'package:gloria_connect/features/check_in/widgets/apartment_card.dart';
+import 'package:gloria_connect/features/check_in/widgets/check_in_search_bar.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:lottie/lottie.dart';
 
 import '../bloc/check_in_bloc.dart';
@@ -37,8 +45,7 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
   void filterFlats() {
     final query = searchController.text.toLowerCase();
     setState(() {
-      filteredFlats =
-          allFlats.where((flat) => flat.toLowerCase().contains(query)).toList();
+      filteredFlats = allFlats.where((flat) => flat.toLowerCase().contains(query)).toList();
     });
   }
 
@@ -66,8 +73,12 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
           style: TextStyle(
               fontSize: 20,
               color: Colors.white70,
-              fontWeight: FontWeight
-                  .bold), // Text color adjusted to white for visibility
+              fontWeight: FontWeight.bold,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: CheckInSearchBar(searchController: searchController, hintText: 'Search Apartment',),
         ),
       ),
       body: BlocConsumer<CheckInBloc, CheckInState>(
@@ -95,26 +106,6 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
           if (allFlats.isNotEmpty && _isLoading == false) {
             return Column(
               children: [
-                // Search Bar and Block Info
-                Container(
-                  color: Colors.black.withOpacity(0.2),
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      filled: true, // Enables the fill color
-                      fillColor: Colors.white.withOpacity(0.2),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                      hintText: 'Search apartment',
-                      hintStyle: const TextStyle(color: Colors.white60),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -123,11 +114,13 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                       Text(
                         'Block : $blockName',
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white60),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white60,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
-                          // Navigate to previous page (block selection)
                           Navigator.of(context).pop();
                         },
                         child: const Text("Select Another Block", style: TextStyle(color: Colors.white60),),
@@ -149,7 +142,6 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                             backgroundColor: Colors.black.withOpacity(0.2),
                             label: Text(selectedFlats[index], style: const TextStyle(color: Colors.white70),),
                             onDeleted: () {
-                              // context.read().add(RemoveFlat(blockName: blockName!, flatName: selectedFlats[index]));
                               toggleFlatSelection(selectedFlats[index]);
                             },
                           ),
@@ -165,8 +157,7 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                       onRefresh: _onRefresh,
                       child: GridView.builder(
                         itemCount: filteredFlats.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           crossAxisSpacing: 6,
                           mainAxisSpacing: 6,
@@ -176,42 +167,7 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                           final flat = filteredFlats[index];
                           final selected = '$blockName ${filteredFlats[index]}';
                           final isSelected = selectedFlats.contains(selected);
-                          return Card(
-                            color: Colors.black.withOpacity(0.2),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                toggleFlatSelection(selected);
-                              },
-                              borderRadius: BorderRadius.circular(15.0),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.home,
-                                        color: Colors.white70),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        flat,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500, color: Colors.white70),
-                                        overflow: TextOverflow.visible,
-                                      ),
-                                    ),
-                                    Checkbox(
-                                      value: isSelected,
-                                      onChanged: (value) {
-                                        toggleFlatSelection(selected);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
+                          return ApartmentCard(toggleFlatSelection: toggleFlatSelection, selected: selected, flat: flat, isSelected: isSelected);
                         },
                       ),
                     ),
@@ -226,80 +182,29 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(22.0)),
+                          borderRadius: BorderRadius.circular(22.0),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
-                    child: Text(widget.formData?['isAddService'] == true ? "Submit" : 'Continue',
-                        style: const TextStyle(color: Colors.white, fontSize: 18)),
+                    child: Text(
+                      widget.formData?['isAddService'] == true
+                      ? "Submit"
+                      : 'Continue',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                      ),
+                    ),
                   ),
                 ),
               ],
             );
           } else if (_isLoading) {
-            return Center(
-              child: Lottie.asset(
-                'assets/animations/loader.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-            );
+            return const CustomLoader();
           } else if (allFlats.isEmpty && _isError == true) {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/error.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Something went wrong!",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return BuildErrorState(onRefresh: _onRefresh);
           } else {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/no_data.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "There are no apartments",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'There are no apartments',);
           }
         },
       ),
@@ -312,39 +217,12 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
 
   void _onContinuePress() {
     if (widget.formData?['isAddService'] == true) {
-
-// Navigate to the desired screen after clearing above routes
-//       Navigator.pushReplacementNamed(
-//         context,
-//         '/add-service-screen',
-//         arguments: widget.formData,
-//       );
-
-    // Navigator.pop(context, widget.formData);
-    //   Navigator.pushNamedAndRemoveUntil(
-    //     context,
-    //     '/add-service-screen', // The target screen to push
-    //         (route) {
-    //       // Keep pages with specific route names
-    //       return route.settings.name == '/guard-home';
-    //     },
-    //     arguments: widget.formData,
-    //   );
-
       Navigator.popUntil(context, (route) => route.settings.name == '/guard-home');
-// Re-add the necessary screens
       Navigator.pushNamed(context, '/add-service-screen', arguments: widget.formData);
-
-
-
     }else if (selectedFlats.isNotEmpty) {
-      Navigator.pushNamed(context, '/mobile-no-screen',
-          arguments: {'entryType': widget.entryType, 'categoryOption': widget.categoryOption});
+      Navigator.pushNamed(context, '/mobile-no-screen', arguments: {'entryType': widget.entryType, 'categoryOption': widget.categoryOption});
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please select apartment'),
-        backgroundColor: Colors.redAccent,
-      ));
+      CustomSnackBar.show(context: context, message: 'Please select apartment', type: SnackBarType.error);
     }
   }
 }

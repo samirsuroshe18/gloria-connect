@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
+import 'package:gloria_connect/utils/phone_utils.dart';
 
 import '../models/entry.dart';
 
@@ -7,33 +9,6 @@ class FlatRow extends StatelessWidget {
   final SocietyApartment? data;
 
   const FlatRow({super.key, this.data});
-
-  void _makePhoneCall(String? phoneNo) async {
-    // Check if the phone number is valid
-    if (phoneNo == null || phoneNo.isEmpty) {
-      // Optionally show an error message to the user
-      debugPrint('Invalid phone number');
-      return;
-    }
-
-    // Create the URI using Uri.parse
-    final Uri url = Uri.parse('tel:$phoneNo');
-
-    // Check if the device supports launching the URL
-    if (await canLaunchUrl(url)) {
-      try {
-        await launchUrl(url);
-      } catch (e) {
-        // Handle any errors during launch
-        debugPrint('Error launching URL: $e');
-        // Optionally show an error message
-      }
-    } else {
-      // Inform the user the action isn't supported
-      debugPrint('Could not launch $url');
-      // Optionally show a dialog or snackbar
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +28,13 @@ class FlatRow extends StatelessWidget {
                 const Icon(Icons.home, color: Colors.grey, size: 28), // Home icon
                 const SizedBox(width: 12),
                 // Reduced font size for flat number
-                Text(data!.apartment ?? 'NA',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  data!.apartment ?? 'NA',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                  ),
+                ),
               ],
             ),
             Row(
@@ -103,17 +82,22 @@ class FlatRow extends StatelessWidget {
               itemBuilder: (context, index) {
                 final contact = data?.members?[index];
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(contact?.profile ??
-                        'https://www.gravatar.com/avatar/?d=identicon'), // Default profile
+                  leading: CustomCachedNetworkImage(
+                    imageUrl: contact?.profile,
+                    size: 45,
+                    isCircular: true,
+                    borderWidth: 2,
+                    errorImage: Icons.person,
+                    onTap: ()=> CustomFullScreenImageViewer.show(context, contact?.profile
+                    ),
                   ),
                   title: Text(
-                      contact?.userName ?? 'Default User'), // Default user name
+                    contact?.userName ?? 'Default User',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ), // Default user name
                   subtitle: Text(contact?.phoneNo ?? 'n'),
-                  onTap: () {
-                    // Handle the click event for the selected contact
-                    _makePhoneCall(contact?.phoneNo);
-                  },
+                  onTap: ()=> PhoneUtils.makePhoneCall(context, contact?.phoneNo ?? ''),
                 );
               },
             ),

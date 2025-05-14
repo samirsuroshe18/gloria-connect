@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:gloria_connect/features/home/widgets/quick_action_button.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
@@ -331,11 +332,12 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: quickActions.map((action) {
-                              return _buildQuickActionButton(
-                                  title: action['title'],
-                                  icon: action['icon'],
-                                  color: action['color'],
-                                  route: action['route']
+                              return QuickActionButton(
+                                title: action['title'],
+                                icon: action['icon'],
+                                color: action['color'],
+                                route: action['route'],
+                                context: context, // pass context explicitly if you're inside a method
                               );
                             }).toList(),
                           ),
@@ -511,49 +513,6 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildQuickActionButton({
-    required String title,
-    required IconData icon,
-    required Color color,
-    required String route,
-  }) {
-    return InkWell(
-      onTap: (){
-        Navigator.pushNamed(context, route);
-      },
-      child: SizedBox(
-        width: 72,
-        child: Column(
-          children: [
-            Container(
-              height: 56,
-              width: 56,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.white60,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }

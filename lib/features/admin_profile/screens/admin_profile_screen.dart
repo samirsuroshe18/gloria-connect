@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/features/admin_profile/widgets/build_action_button.dart';
+import 'package:gloria_connect/features/admin_profile/widgets/build_resident_info_tile.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
-import 'package:lottie/lottie.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../auth/models/get_user_model.dart';
 
@@ -65,8 +71,9 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // Profile Header Section
                           Container(
@@ -77,63 +84,12 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                             ),
                             child: Column(
                               children: [
-                                Stack(
-                                  children: [
-                                    // Profile Image
-                                    Center(
-                                      child: Hero(
-                                        tag: 'profile-image',
-                                        child: Container(
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.white.withOpacity(0.5),
-                                              width: 3,
-                                            ),
-                                            image: DecorationImage(
-                                              image: data?.profile == null
-                                                  ? const AssetImage('assets/images/profile.png')
-                                                  : NetworkImage(data!.profile!) as ImageProvider,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    // Edit Profile Button
-                                    Positioned(
-                                      right: 0,
-                                      top: 0,
-                                      child: InkWell(
-                                        onTap: () => Navigator.pushNamed(
-                                            context,
-                                            '/edit-profile-screen',
-                                            arguments: data
-                                        ),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.1),
-                                                blurRadius: 5,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          child: const Icon(
-                                            Icons.edit_outlined,
-                                            color: Color(0xFF4A90E2),
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                CustomCachedNetworkImage(
+                                  imageUrl: data?.profile,
+                                  isCircular: true,
+                                  size: 100,
+                                  errorImage: Icons.person,
+                                  onTap: () => CustomFullScreenImageViewer.show(context, data?.profile),
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
@@ -149,6 +105,29 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                   style: const TextStyle(
                                     fontSize: 16,
                                   ),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/admin-edit-profile-screen',
+                                      arguments: data,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white.withOpacity(0.2),
+                                    foregroundColor: Colors.white70,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.edit, size: 18),
+                                  label: const Text('Edit Profile'),
                                 ),
                               ],
                             ),
@@ -173,16 +152,16 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                _buildInfoTile(
-                                  Icons.apartment,
-                                  'Block & Apartment',
-                                  'Block ${data?.societyBlock?.toUpperCase() ?? "NA"}, Apartment ${data?.apartment ?? "NA"}',
+                                BuildResidentInfoTile(
+                                  icon: Icons.apartment,
+                                  label: 'Block & Apartment',
+                                  value: 'Block ${data?.societyBlock?.toUpperCase() ?? "NA"}, Apartment ${data?.apartment ?? "NA"}',
                                 ),
                                 const Divider(height: 24),
-                                _buildInfoTile(
-                                  Icons.password,
-                                  'Passcode',
-                                  data?.checkInCode ?? "NA",
+                                BuildResidentInfoTile(
+                                  icon: Icons.password,
+                                  label: 'Passcode',
+                                  value: data?.checkInCode ?? "NA",
                                 ),
                               ],
                             ),
@@ -207,25 +186,25 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                _buildActionButton(
-                                  'Apartment Members',
-                                  Icons.group_outlined,
-                                  const Color(0xFF4A90E2),
-                                      () => Navigator.pushNamed(context, '/apartment-member-screen'),
+                                BuildActionButton(
+                                  title: 'Apartment Members',
+                                  icon: Icons.group_outlined,
+                                  color: const Color(0xFF4A90E2),
+                                  onTap: () => Navigator.pushNamed(context, '/admin-member-screen'),
                                 ),
                                 const SizedBox(height: 12),
-                                _buildActionButton(
-                                  'Settings',
-                                  Icons.settings_outlined,
-                                  Colors.white60,
-                                      () => Navigator.pushNamed(context, '/setting-screen', arguments: data),
+                                BuildActionButton(
+                                  title: 'Settings',
+                                  icon: Icons.settings_outlined,
+                                  color: Colors.white60,
+                                  onTap: () => Navigator.pushNamed(context, '/setting-screen', arguments: data),
                                 ),
                                 const SizedBox(height: 12),
-                                _buildActionButton(
-                                  'Logout',
-                                  Icons.logout,
-                                  const Color(0xFFE63946),
-                                  _logoutUser,
+                                BuildActionButton(
+                                  title: 'Logout',
+                                  icon: Icons.logout,
+                                  color: const Color(0xFFE63946),
+                                  onTap: _logoutUser,
                                 ),
                               ],
                             ),
@@ -239,127 +218,14 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
               ),
             );
           } else if (_isLoading) {
-            return Center(
-              child: Lottie.asset(
-                'assets/animations/loader.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-            );
+            return const CustomLoader();
           } else {
             return RefreshIndicator(
               onRefresh: _refreshUserData,
-              child: _buildErrorState(),
+              child: BuildErrorState(onRefresh: _refreshUserData),
             );
           }
         },
-      ),
-    );
-  }
-
-  Widget _buildInfoTile(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F7FA),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: const Color(0xFF4A90E2), size: 24),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white70
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButton(String title, IconData icon, Color color, VoidCallback onTap) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          decoration: BoxDecoration(
-            border: Border.all(color: color.withOpacity(0.2)),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: color),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: color,
-                ),
-              ),
-              const Spacer(),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: color.withOpacity(0.5),
-                size: 16,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: Container(
-        height: MediaQuery.of(context).size.height - 200,
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Lottie.asset(
-              'assets/animations/error.json',
-              width: 200,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Something went wrong!",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3142),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -435,17 +301,12 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     await _prefs.remove("refreshMode");
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Logged out'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Color(0xFF4A90E2),
-      ),
-    );
+    CustomSnackBar.show(context: context, message: 'Logged out successfully', type: SnackBarType.success);
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/login',
           (Route<dynamic> route) => false,
     );
   }
+
 }

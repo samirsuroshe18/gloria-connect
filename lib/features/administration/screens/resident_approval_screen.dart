@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/utils/phone_utils.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:gloria_connect/features/administration/widgets/verification_request_card.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../bloc/administration_bloc.dart';
 import '../models/resident_requests_model.dart';
@@ -79,24 +82,14 @@ class _ResidentApprovalScreenState extends State<ResidentApprovalScreen> {
             }
 
             if (state is AdminVerifyResidentSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.response['message']!),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
               setState(() {
                 isLoadingList[cardIndex!][button!] = false;
                 context.read<AdministrationBloc>().add(AdminGetPendingResidentReq());
               });
             }
             if (state is AdminVerifyResidentFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.redAccent,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
               setState(() {
                 isLoadingList[cardIndex!][button!] = false;
               });
@@ -106,7 +99,7 @@ class _ResidentApprovalScreenState extends State<ResidentApprovalScreen> {
         builder: (context, state) {
           if (data.isNotEmpty && _isLoading == false) {
             return RefreshIndicator(
-              onRefresh: _refreshUserData,
+              onRefresh: _onRefresh,
               child: AnimationLimiter(
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -126,7 +119,7 @@ class _ResidentApprovalScreenState extends State<ResidentApprovalScreen> {
                       time: timeago.format(data[index].createdAt!),
                       onApprove: () => onApprove(data[index], index),
                       onReject: () => onReject(data[index], index),
-                      onCall: () => onCall(data[index]),
+                      onCall: () => PhoneUtils.makePhoneCall(context, data[index].user?.phoneNo ?? ''),
                       profileType: data[index].profileType,
                       ownership: data[index].ownership,
                       tenantAgreement: data[index].tenantAgreement,
@@ -139,90 +132,19 @@ class _ResidentApprovalScreenState extends State<ResidentApprovalScreen> {
               ),
             );
           } else if (_isLoading) {
-            return Center(
-              child: Lottie.asset(
-                'assets/animations/loader.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-            );
+            return const CustomLoader();
           } else if (data.isEmpty && _isError == true && statusCode == 401) {
-            return RefreshIndicator(
-              onRefresh: _refreshUserData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/error.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Something went wrong!",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return BuildErrorState(onRefresh: _onRefresh);
           } else {
-            return RefreshIndicator(
-              onRefresh: _refreshUserData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/no_data.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "There are no resident request",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'There are no resident request',);
           }
         },
       ),
     );
   }
 
-  Future<void> _refreshUserData() async {
+  Future<void> _onRefresh() async {
     context.read<AdministrationBloc>().add(AdminGetPendingResidentReq());
-  }
-
-  Future<void> onCall(ResidentRequestsModel data) async {
-    final Uri url = Uri(
-      scheme: 'tel',
-      path: data.user?.phoneNo,
-    );
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Could not connect $url';
-    }
   }
 
   void onApprove(ResidentRequestsModel data, int index) {

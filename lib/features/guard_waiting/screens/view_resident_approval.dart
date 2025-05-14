@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
 import 'package:gloria_connect/features/guard_waiting/bloc/guard_waiting_bloc.dart';
+import 'package:gloria_connect/features/guard_waiting/widgets/apartment_list.dart';
+import 'package:gloria_connect/features/guard_waiting/widgets/company_row.dart';
+import 'package:gloria_connect/features/guard_waiting/widgets/delivery_header.dart';
+import 'package:gloria_connect/features/guard_waiting/widgets/entry_action_button.dart';
+import 'package:gloria_connect/features/guard_waiting/widgets/entry_type_tag.dart';
 import 'package:gloria_connect/features/guard_waiting/widgets/flat_row.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 
 import '../models/entry.dart';
 
@@ -37,20 +45,13 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
             if (state is WaitingAllowEntrySuccess) {
               _isLoadingAllow = false;
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.response['message']),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
                 context.read<GuardWaitingBloc>().add(WaitingGetEntries());
                 Navigator.pop(context);
               }
             }
             if (state is WaitingAllowEntryFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.redAccent));
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
               _isLoadingAllow = false;
             }
             if (state is WaitingDenyEntryLoading) {
@@ -59,20 +60,13 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
             if (state is WaitingDenyEntrySuccess) {
               _isLoadingDeny = false;
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.response['message']),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
                 context.read<GuardWaitingBloc>().add(WaitingGetEntries());
                 Navigator.pop(context);
               }
             }
             if (state is WaitingDenyEntryFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.redAccent));
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
               _isLoadingDeny = false;
             }
           },
@@ -89,14 +83,13 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
                     child: AnimationLimiter(
                       child: ListView.builder(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: widget.data?.societyDetails?.societyApartments
-                                ?.length ??
-                            0,
+                        itemCount: widget.data?.societyDetails?.societyApartments?.length ?? 0,
                         itemBuilder: (context, index) {
-                          return StaggeredListAnimation(index: index, child: FlatRow(
-                            data: widget
-                                .data?.societyDetails!.societyApartments![index],
-                          ));
+                          return StaggeredListAnimation(
+                              index: index, child: FlatRow(
+                              data: widget.data?.societyDetails!.societyApartments![index],
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -107,52 +100,18 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _denyEntryPressed,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor:
-                                  Colors.red, // Deny Entry button color
-                            ),
-                            child: Center(
-                              child: _isLoadingDeny
-                                  ? CircularProgressIndicator(
-                                      valueColor:
-                                          const AlwaysStoppedAnimation<Color>(
-                                              Colors.blueAccent),
-                                      backgroundColor: Colors.grey[200],
-                                      strokeWidth: 5.0,
-                                    )
-                                  : const Text('DENY ENTRY',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16)),
-                            ),
-                          ),
+                        EntryActionButton(
+                          onPressed: _denyEntryPressed,
+                          isLoading: _isLoadingDeny,
+                          label: 'DENY ENTRY',
+                          backgroundColor: Colors.red,
                         ),
                         const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _allowEntryPressed,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor:
-                                  Colors.green, // Allow Entry button color
-                            ),
-                            child: Center(
-                              child: _isLoadingAllow
-                                  ? CircularProgressIndicator(
-                                      valueColor:
-                                          const AlwaysStoppedAnimation<Color>(
-                                              Colors.blueAccent),
-                                      backgroundColor: Colors.grey[200],
-                                      strokeWidth: 5.0,
-                                    )
-                                  : const Text('ALLOW ENTRY',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16)),
-                            ),
-                          ),
+                        EntryActionButton(
+                          onPressed: _allowEntryPressed,
+                          isLoading: _isLoadingAllow,
+                          label: 'ALLOW ENTRY',
+                          backgroundColor: Colors.green,
                         ),
                       ],
                     ),
@@ -161,19 +120,16 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
               ),
             );
           },
-        ));
+        ),
+    );
   }
 
   void _allowEntryPressed() {
-    context
-        .read<GuardWaitingBloc>()
-        .add(WaitingAllowEntry(id: widget.data!.id!));
+    context.read<GuardWaitingBloc>().add(WaitingAllowEntry(id: widget.data!.id!));
   }
 
   void _denyEntryPressed() {
-    context
-        .read<GuardWaitingBloc>()
-        .add(WaitingDenyEntry(id: widget.data!.id!));
+    context.read<GuardWaitingBloc>().add(WaitingDenyEntry(id: widget.data!.id!));
   }
 
   Widget _buildDeliveryCard() {
@@ -185,37 +141,20 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileImage(),
+            CustomCachedNetworkImage(
+              imageUrl: widget.data?.profileImg,
+              size: 90,
+              isCircular: true,
+              borderWidth: 2,
+              errorImage: Icons.person,
+              onTap: ()=> CustomFullScreenImageViewer.show(
+                context,
+                widget.data?.profileImg
+              ),
+            ),
             const SizedBox(width: 16),
             _buildDeliveryInfo(),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileImage() {
-    return Container(
-      width: 90,
-      height: 90,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white70, // Border color
-          width: 2, // Border width
-        ),
-      ),
-      child: CircleAvatar(
-        backgroundImage: widget.data?.profileImg != null &&
-                !widget.data!.profileImg!.contains('assets')
-            ? NetworkImage(widget.data!.profileImg!)
-            : AssetImage(widget.data!.profileImg!),
-        radius: 45,
-        child: GestureDetector(
-          onTap: () {
-            _showImageDialog(
-                widget.data?.profileImg, context); // Open dialog on tap
-          },
         ),
       ),
     );
@@ -226,170 +165,28 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildDeliveryHeader(),
-          _buildEntryTypeTag(),
+          DeliveryHeader(
+            title: widget.data?.name ?? 'NA',
+            onClose: () => Navigator.of(context).pop(),
+          ),
+          EntryTypeTag(entryType: widget.data!.entryType ?? ''),
           const SizedBox(height: 12),
-          if (widget.data!.entryType != 'guest') _buildCompanyRow(),
+          if (widget.data!.entryType != 'guest')
+            CompanyRow(
+              entryType: widget.data!.entryType ?? '',
+              serviceLogo: widget.data?.serviceLogo,
+              companyLogo: widget.data?.companyLogo,
+              serviceName: widget.data?.serviceName,
+              companyName: widget.data?.companyName,
+            ),
           const SizedBox(height: 8),
-          _buildApartmentList(),
+          ApartmentList(
+            apartments: widget.data!.societyDetails?.societyApartments
+                ?.map((e) => e.apartment!)
+                .toList() ?? [],
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildDeliveryHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            widget.data?.name ?? 'NA',
-            style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white70),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.cancel,
-            size: 20,
-            color: Colors.white70,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEntryTypeTag() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-      decoration: BoxDecoration(
-        gradient:
-            const LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        widget.data!.entryType.toString().toUpperCase(),
-        style: const TextStyle(color: Colors.white70, fontSize: 16),
-      ),
-    );
-  }
-
-  Widget _buildCompanyRow() {
-    return Row(
-      children: [
-        CircleAvatar(
-            radius: 13,
-            backgroundImage: AssetImage(widget.data!.entryType == 'other'
-                ? widget.data?.serviceLogo ?? 'assets/images/profile.png'
-                : widget.data!.companyLogo!)),
-        const SizedBox(width: 5),
-        Text(
-            widget.data!.entryType == 'other'
-                ? widget.data?.serviceName ?? "NA"
-                : widget.data!.companyName!,
-            style: const TextStyle(fontSize: 16, color: Colors.white70)),
-      ],
-    );
-  }
-
-  Widget _buildApartmentList() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Icon(Icons.home, size: 20, color: Colors.white70)),
-        const SizedBox(width: 5),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: widget.data!.societyDetails!.societyApartments!
-                .map((e) => Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(e.apartment!,
-                        style: const TextStyle(
-                            fontSize: 14, color: Colors.white70))))
-                .toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showImageDialog(String? imageUrl, BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true, // Allows dismissing by tapping outside
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          backgroundColor: Colors.transparent, // Transparent background
-          child: Stack(
-            alignment: Alignment.topRight,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  color:
-                      Colors.white, // White background for the image container
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min, // Fit to image size
-                    children: [
-                      imageUrl!.contains("assets")
-                          ? Image.asset(
-                              imageUrl,
-                              height: MediaQuery.of(context).size.height *
-                                  0.5, // Constrain the height
-                              width: double
-                                  .infinity, // Expand to the width of the dialog
-                              fit: BoxFit
-                                  .contain, // Contain image within the space, maintaining aspect ratio
-                            )
-                          : Image.network(
-                              imageUrl,
-                              height: MediaQuery.of(context).size.height *
-                                  0.5, // Constrain the height
-                              width: double
-                                  .infinity, // Expand to the width of the dialog
-                              fit: BoxFit
-                                  .contain, // Contain image within the space, maintaining aspect ratio
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.error, size: 100);
-                              },
-                            ),
-                    ],
-                  ),
-                ),
-              ),
-              // Close button
-              Positioned(
-                top: 10,
-                right: 10,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black.withOpacity(0.6),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

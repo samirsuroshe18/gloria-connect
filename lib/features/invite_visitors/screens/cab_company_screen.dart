@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/custom_pre_approve_card.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/custom_search_field.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/custom_service_dialog.dart';
 
 class CabCompanyScreen extends StatefulWidget {
   const CabCompanyScreen({super.key});
@@ -55,124 +58,48 @@ class _CabCompanyScreenState extends State<CabCompanyScreen> {
       appBar: AppBar(
         title: const Text('Select Cab', style: TextStyle(color: Colors.white, fontSize: 20)),
         backgroundColor: Colors.black.withOpacity(0.2),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: CustomSearchField(
+            controller: searchController,
+            hintText: 'Search Cab...',
+          ),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Search bar with more padding and enhanced UI
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: TextField(
-                controller: searchController,
-                style: const TextStyle(fontSize: 16),
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: Colors.white70),
-                  hintText: 'Search Cab...',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(15),
-                  fillColor: Colors.transparent
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Expanded list of companies
-            Expanded(
-              child: AnimationLimiter(
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: filteredCab.length,
-                  itemBuilder: (context, index) {
-                    final cab = filteredCab[index];
-                    final image = cab['image'];
-                    final name = cab['name'] ?? '';
-                    return StaggeredListAnimation(index: index, child: Card(
-                      color: Colors.black.withOpacity(0.2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: AssetImage(image!),
-                            radius: 25,
-                          ),
-                          title: Text(
-                            name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          trailing: const Icon(Icons.chevron_right, color: Colors.white70),
-                          onTap: () {
-                            if (cab['name'] == 'Other') {
-                              _showOtherCabDialog(context, image);  // Use modal bottom sheet approach
-                              // _navigateToOtherCompanyScreen(context);  // Use navigation approach
-                            } else {
-                              // Handle tap for predefined companies
-                              Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'cab', 'image': image, 'companyName': name});
-                            }
-                          },
-                        ),
-                      ),
-                    ));
-                  },
-                ),
-              ),
-            ),
-          ],
+      body: AnimationLimiter(
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: filteredCab.length,
+          itemBuilder: (context, index) {
+            final cab = filteredCab[index];
+            final image = cab['image'];
+            final name = cab['name'] ?? '';
+            return StaggeredListAnimation(index: index, child: CustomPreApproveCard(name: name, image: image!, onTap: ()=>_onCardTap(cab, image, name)),);
+          },
         ),
       ),
     );
+  }
+
+  void _onCardTap(Map<String, String> cab, String image, String name) {
+    if (cab['name'] == 'Other') {
+      _showOtherCabDialog(context, image);
+    } else {
+      Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'cab', 'image': image, 'companyName': name});
+    }
   }
 
   void _showOtherCabDialog(BuildContext context, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.deepPurple,
-          insetPadding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    image,
-                    height: 100, // adjust as needed
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: name,
-                    decoration: InputDecoration(
-                      labelText: 'Enter cab service name',
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Colors.white70),
-                      fillColor: Colors.white.withOpacity(0.2)
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'cab', 'image': image, 'companyName': name.text});
-                    },
-                    child: const Text('Next', style: TextStyle(color: Colors.white),),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        return CustomServiceDialog(
+          labelText: 'Enter cab service name',
+          image: image,
+          nameController: name,
+          onNext: () {
+            Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'cab', 'image': image, 'companyName': name.text});
+          },
         );
       },
     );

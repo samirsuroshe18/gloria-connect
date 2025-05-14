@@ -2,6 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
+import 'package:gloria_connect/features/setting/widgets/build_area_selector.dart';
+import 'package:gloria_connect/features/setting/widgets/build_category.dart';
+import 'package:gloria_connect/features/setting/widgets/build_description.dart';
+import 'package:gloria_connect/features/setting/widgets/build_image_uploader.dart';
+import 'package:gloria_connect/features/setting/widgets/build_selection_tile.dart';
+import 'package:gloria_connect/features/setting/widgets/build_sub_category.dart';
+import 'package:gloria_connect/features/setting/widgets/build_submit_button.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/utils/media_picker_helper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ComplaintFormScreen extends StatefulWidget {
@@ -14,7 +23,6 @@ class ComplaintFormScreen extends StatefulWidget {
 class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
   File? file;
 
   String? selectedArea;
@@ -67,6 +75,12 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
   }
 
   @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -85,21 +99,11 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
             setState(() => isLoading = true);
           } else if (state is SettingSubmitComplaintSuccess) {
             setState(() => isLoading = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Complaint submitted successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
+            CustomSnackBar.show(context: context, message: 'Complaint submitted successfully', type: SnackBarType.success);
             Navigator.pop(context, state.response);
           } else if (state is SettingSubmitComplaintFailure) {
             setState(() => isLoading = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
           }
         },
         builder: (context, state) {
@@ -113,21 +117,43 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionTitle('Location Details'),
-                        _buildAreaSelector(),
+                        const BuildSelectionTile(title: 'Location Details'),
+                        BuildAreaSelector(
+                          selectedArea: selectedArea,
+                          areas: areas,
+                          onChange: (String? newValue) {
+                            setState(() => selectedArea = newValue);
+                          },
+                        ),
                         const SizedBox(height: 24),
-                        _buildSectionTitle('Complaint Category'),
-                        _buildCategorySelector(),
+                        const BuildSelectionTile(title: 'Complaint Category'),
+                        BuildCategory(
+                          selectedCategory: selectedCategory,
+                          onChange: (String? newValue) {
+                            setState(() {
+                              selectedCategory = newValue;
+                              selectedSubCategory = null;
+                            });
+                          },
+                          categories: categories,
+                        ),
                         if (selectedCategory != null)
-                          _buildSubCategorySelector(),
+                          BuildSubCategory(
+                            selectedCategory: selectedCategory,
+                            selectedSubCategory: selectedSubCategory,
+                            categories: categories,
+                            onChange: (String? newValue) {
+                              setState(() => selectedSubCategory = newValue);
+                            },
+                          ),
                         const SizedBox(height: 24),
-                        _buildSectionTitle('Complaint Details'),
-                        _buildDescriptionField(),
+                        const BuildSelectionTile(title: 'Complaint Details'),
+                        BuildDescription(descriptionController: _descriptionController),
                         const SizedBox(height: 24),
-                        _buildSectionTitle('Supporting Evidence'),
-                        _buildImageUploader(),
+                        const BuildSelectionTile(title: 'Supporting Evidence'),
+                        BuildImageUploader(file: file, onCancel: () => setState(() => file = null), pickImage: _pickImage),
                         const SizedBox(height: 32),
-                        _buildSubmitButton(),
+                        BuildSubmitButton(isLoading: isLoading, onPressed: _submitForm),
                       ],
                     ),
                   ),
@@ -140,425 +166,17 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: Colors.white70,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAreaSelector() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: DropdownButtonFormField<String>(
-        value: selectedArea,
-        decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.white.withOpacity(0.2),
-          hintText: 'Select Area',
-          hintStyle: const TextStyle(color: Colors.white70),
-          prefixIcon:
-              const Icon(Icons.location_on_outlined, color: Colors.white70),
-        ),
-        items: areas.map((String area) {
-          return DropdownMenuItem<String>(
-            value: area,
-            child: Text(area),
-          );
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => selectedArea = newValue);
-        },
-        validator: (value) => value == null ? 'Please select an area' : null,
-      ),
-    );
-  }
-
-  Widget _buildCategorySelector() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: DropdownButtonFormField<String>(
-        value: selectedCategory,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          hintText: 'Select Category',
-          hintStyle: const TextStyle(color: Colors.white70),
-          prefixIcon: const Icon(Icons.category_outlined, color: Colors.white70),
-        ),
-        items: categories.keys.map((String category) {
-          return DropdownMenuItem<String>(
-            value: category,
-            child: Text(category),
-          );
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() {
-            selectedCategory = newValue;
-            selectedSubCategory = null;
-          });
-        },
-        validator: (value) => value == null ? 'Please select a category' : null,
-      ),
-    );
-  }
-
-  Widget _buildSubCategorySelector() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: DropdownButtonFormField(
-          isExpanded: true,  // Forces the dropdown to take the full width
-          value: selectedSubCategory,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            filled: true,
-            fillColor: Colors.transparent,
-            hintText: 'Select Sub-Category',
-            hintStyle: const TextStyle(color: Colors.white70),
-            prefixIcon: const Icon(Icons.subdirectory_arrow_right,
-                color: Colors.white70),
-          ),
-          items: categories[selectedCategory]!.map((String subCategory) {
-            return DropdownMenuItem(
-              value: subCategory,
-              child: Text(subCategory, overflow: TextOverflow.ellipsis), // Avoids text overflow
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            setState(() => selectedSubCategory = newValue);
-          },
-          validator: (value) => value == null ? 'Please select a sub-category' : null,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDescriptionField() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextFormField(
-        controller: _descriptionController,
-        maxLines: 4,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.all(20),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          hintText: 'Describe your complaint in detail...',
-          hintStyle: const TextStyle(color: Colors.white70),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 15, right: 15, bottom: 80),
-            child: Icon(Icons.description_outlined, color: Colors.white70),
-          ),
-        ),
-        validator: (value) =>
-            value?.isEmpty == true ? 'Please enter a description' : null,
-      ),
-    );
-  }
-
-  Widget _buildImageUploader() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (file != null)
-              Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      file!,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.close,
-                            color: Colors.red, size: 20),
-                        onPressed: () => setState(() => file = null),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            else
-              InkWell(
-                onTap: _showImagePickerOptions,
-                child: Container(
-                  height: 200,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    border:
-                        Border.all(color: const Color(0xFF3498DB), width: 1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add_photo_alternate,
-                          size: 50, color: Color(0xFF3498DB)),
-                      SizedBox(height: 8),
-                      Text(
-                        'Upload Supporting Image',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        '(Optional)',
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : _submitForm,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepPurple.withOpacity(0.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : const Text(
-                'Submit Complaint',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white70,
-                ),
-              ),
-      ),
-    );
-  }
-
-  void _showImagePickerOptions() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.photo_camera,
-                        color: Color(0xFF3498DB)),
-                  ),
-                  title: const Text('Take a photo'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.camera);
-                  },
-                ),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.photo_library,
-                        color: Color(0xFF3498DB)),
-                  ),
-                  title: const Text('Choose from gallery'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.gallery);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? image = await _picker.pickImage(
-        source: source,
-        imageQuality: 80,
-        maxWidth: 1200,
-      );
+      final File? image = await MediaPickerHelper.pickImageFile(context: context, source: source);
+
       if (image != null) {
         setState(() {
-          file = File(image.path);
+          file = image;
         });
       }
     } catch (e) {
-      if(mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error picking image: $e'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-      }
+      CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
-  }
-
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    super.dispose();
-  }
-}
-
-// Helper class for form validation and error messages
-class FormValidator {
-  static String? validateRequired(String? value, String fieldName) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter $fieldName';
-    }
-    return null;
-  }
-
-  static String? validateDescription(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter a description';
-    }
-    if (value.trim().length < 10) {
-      return 'Description must be at least 10 characters long';
-    }
-    return null;
-  }
-}
-
-// Custom theme constants
-class ComplaintFormTheme {
-  static const Color primaryColor = Color(0xFF3498DB);
-  static const Color backgroundColor = Color(0xFFF8F9FA);
-  static const Color textColor = Color(0xFF2C3E50);
-  static const Color errorColor = Color(0xFFE74C3C);
-
-  static const double borderRadius = 12.0;
-  static const double spacing = 16.0;
-  static const double fontSize = 16.0;
-
-  static BoxDecoration containerDecoration = BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(borderRadius),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.grey.withOpacity(0.1),
-        spreadRadius: 1,
-        blurRadius: 4,
-        offset: const Offset(0, 2),
-      ),
-    ],
-  );
-
-  static InputDecoration inputDecoration(String hint, IconData icon) {
-    return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-        borderSide: BorderSide.none,
-      ),
-      filled: true,
-      fillColor: Colors.white,
-      hintText: hint,
-      prefixIcon: Icon(icon, color: primaryColor),
-    );
   }
 }
