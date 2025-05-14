@@ -33,17 +33,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         if (state is AuthForgotPassSuccess) {
           emailController.clear();
           _isLoading = false;
-          CustomSnackbar.show(
+          CustomSnackBar.show(
             context: context,
             message: state.response['message'],
-            type: SnackbarType.success,
+            type: SnackBarType.success,
           );
         }
         if (state is AuthForgotPassFailure) {
-          CustomSnackbar.show(
+          CustomSnackBar.show(
             context: context,
             message: state.message,
-            type: SnackbarType.error,
+            type: SnackBarType.error,
           );
           _isLoading = false;
         }

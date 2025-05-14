@@ -4,10 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/custom_continue_button.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/custom_pin_code_field.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/custom_text_form_field.dart';
+import 'package:gloria_connect/features/guard_entry/widgets/profile_image_picker.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/utils/document_picker_utils.dart';
+import 'package:gloria_connect/utils/media_picker_helper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
 
-import '../../../utils/resize_image.dart';
 import '../widgets/company_tile.dart';
 import '../widgets/more_option_tile.dart';
 import '../widgets/vehicle_option.dart';
@@ -25,8 +30,7 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController otherPhoneController = TextEditingController();
   TextEditingController otherNameController = TextEditingController();
-  final TextEditingController otherVehicleNumberController =
-      TextEditingController();
+  final TextEditingController otherVehicleNumberController = TextEditingController();
   String? otherServiceLogo;
   String? otherServiceName;
   String? serviceName;
@@ -82,18 +86,20 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
     setState(() {
       otherVehicleNumberController.clear();
       selectedVehicle = vehicle;
-      vehicleNo = null;
     });
   }
 
-  Future<void> _openCamera() async {
-    final ImagePicker picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final File? image = await MediaPickerHelper.pickImageFile(context: context, source: source);
 
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      if (image != null) {
+        setState(() {
+          _image = image;
+        });
+      }
+    } catch (e) {
+      CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }
 
@@ -146,20 +152,9 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
                     ),
                   ),
                 ),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12.0),
-                  child: ElevatedButton(
-                    onPressed: _onContinuePress,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(22.0)),
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    ),
-                    child: const Text('Continue',
-                        style: TextStyle(color: Colors.white, fontSize: 18)),
-                  ),
+                CustomContinueButton(
+                  onPressed: _onContinuePress,
+                  label: 'Continue',
                 ),
               ],
             ),
@@ -172,95 +167,48 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
   Widget _profileDetails() {
     return Row(
       children: [
-        Stack(
-          alignment: Alignment.bottomRight,
-          children: [
-            Container(
-              width: 120, // Diameter = 2 * radius
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white70, // Border color
-                  width: 2.5, // Border width
-                ),
-              ),
-              child: CircleAvatar(
-                radius: 60,
-                backgroundColor: Colors.grey[300],
-                backgroundImage: _image != null
-                    ? FileImage(_image!)
-                    : profileData['profileImg'] != null &&
-                            profileData.isNotEmpty
-                        ? NetworkImage(profileData['profileImg'])
-                        : const AssetImage('assets/images/profile.png')
-                            as ImageProvider,
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.blue,
-                child: IconButton(
-                  icon: const Icon(Icons.camera_alt,
-                      color: Colors.white, size: 25),
-                  onPressed: _openCamera,
-                ),
-              ),
-            ),
-          ],
+        ProfileImagePicker(
+          localImage: _image,
+          networkImageUrl: profileData['profileImg'].runtimeType == String ? profileData['profileImg']: null,
+          onPickImage: () {
+            DocumentPickerUtils.showDocumentPickerSheet(
+              context: context,
+              onPickImage: _pickImage,
+              onPickPDF: null,
+              isOnlyImage: true,
+            );
+          },
         ),
         const SizedBox(width: 15),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (mounted)
-                TextFormField(
-                  controller: otherPhoneController,
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [LengthLimitingTextInputFormatter(10)],
-                  // maxLength: 10,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    prefixIcon: const Icon(Icons.phone, color: Colors.white70),
-                    hintText: 'Enter Phone Number',
-                    hintStyle: const TextStyle(color: Colors.white60),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty || value.length < 10) {
-                      return 'Please enter valid number';
-                    } else {
-                      return null;
-                    }
-                  },
-                ),
+              CustomTextFormField(
+                controller: otherPhoneController,
+                hintText: 'Enter Phone Number',
+                prefixIcon: Icons.phone,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [LengthLimitingTextInputFormatter(10)],
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.length < 10) {
+                    return 'Please enter valid number';
+                  }
+                  return null;
+                },
+              ),
               const SizedBox(height: 15),
-              if (mounted)
-                TextFormField(
-                  controller: otherNameController,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    prefixIcon: const Icon(Icons.person, color: Colors.white70),
-                    hintText: 'Enter Name',
-                    hintStyle: const TextStyle(color: Colors.white60),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter name';
-                    } else {
-                      return null;
-                    }
-                  },
-                ),
+              CustomTextFormField(
+                controller: otherNameController,
+                hintText: 'Enter Name',
+                prefixIcon: Icons.person,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter name';
+                  }
+                  return null;
+                },
+              ),
             ],
           ),
         ),
@@ -381,52 +329,16 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
                     fontWeight: FontWeight.bold, color: Colors.white70),
               ),
               const SizedBox(height: 10),
-              PinCodeTextField(
+              CustomPinCodeField(
                 appContext: context,
                 length: 4,
-                keyboardType: TextInputType.number,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                onChanged: (String verificationCode) {
-                  vehicleNo = verificationCode;
+                onChanged: (code) {
+                  vehicleNo = code;
                 },
-                onCompleted: (String verificationCode) {
-                  vehicleNo = verificationCode;
+                onCompleted: (code) {
+                  vehicleNo = code;
                 },
-                pinTheme: PinTheme(
-                  fieldOuterPadding: const EdgeInsets.symmetric(horizontal: 5),
-                  fieldWidth: 50,
-                  shape: PinCodeFieldShape.box,
-                  borderWidth: 2,
-                  activeColor: Colors.blue,
-                  inactiveColor: Colors.grey.shade300,
-                  selectedColor: Colors.lightBlueAccent,
-                  activeFillColor:
-                      Colors.blue.shade50, // Light fill for active fields
-                  inactiveFillColor: Colors.white,
-                  selectedFillColor:
-                      Colors.blue.shade100, // Highlight the selected box
-                  borderRadius: BorderRadius.circular(
-                      12), // Rounded corners for a modern look
-                ),
-                boxShadows: [
-                  BoxShadow(
-                    offset: const Offset(0, 4), // Subtle shadow effect
-                    blurRadius: 8,
-                    color: Colors.black.withOpacity(0.1), // Light shadow
-                  ),
-                ],
-                cursorColor: Colors.blue, // Blue cursor for consistency
-                animationType: AnimationType.fade, // Smooth animation effect
-                animationDuration:
-                    const Duration(milliseconds: 300), // Adjust animation speed
-                enablePinAutofill: true, // Allow autofill
-                backgroundColor: Colors.transparent, // Transparent background
-                textStyle: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70, // Black text for visibility
-                ),
-              )
+              ),
             ],
           ),
       ],
@@ -448,57 +360,35 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
   }
 
   Future<void> _onContinuePress() async {
-    setState(() {
-      isLoading = true;
-    });
-    File? resizedImage = await resizeImage(_image, width: 800, quality: 85);
-    setState(() {
-      isLoading = false;
-    });
+
     if (_formKey.currentState!.validate()) {
       profileData['name'] = otherNameController.text;
       profileData['mobNumber'] = otherPhoneController.text;
-      profileData['profileImg'] = resizedImage ?? profileData['profileImg'];
+      profileData['profileImg'] = _image ?? profileData['profileImg'];
       profileData['serviceName'] = serviceName ?? otherServiceName;
       profileData['serviceLogo'] = serviceLogo ?? otherServiceLogo;
       profileData['entryType'] = 'other';
       profileData['vehicleType'] = selectedVehicle;
       profileData['vehicleNo'] = vehicleNo;
-      if (selectedVehicle != 'No Vehicle' &&
-          (vehicleNo == null || vehicleNo!.length < 4)) {
+
+      if (selectedVehicle != 'No Vehicle' && (vehicleNo == null || vehicleNo!.length < 4)) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Enter vehicle number'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          CustomSnackBar.show(context: context, message: 'Enter vehicle number', type: SnackBarType.error);
         }
         return;
       } else if (_image == null && profileData['profileImg'] == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please take image'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          CustomSnackBar.show(context: context, message: 'Please take image', type: SnackBarType.error);
         }
         return;
       } else if (profileData['serviceName'] == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please select the service'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          CustomSnackBar.show(context: context, message: 'Please select the service', type: SnackBarType.error);
         }
         return;
       }
       if (mounted) {
-        Navigator.pushNamed(context, '/ask-other-approval',
-            arguments: profileData);
+        Navigator.pushNamed(context, '/ask-other-approval', arguments: profileData);
       }
     }
   }

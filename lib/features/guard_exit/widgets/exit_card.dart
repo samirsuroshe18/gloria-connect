@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
 import 'package:gloria_connect/features/guard_exit/bloc/guard_exit_bloc.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import '../../guard_waiting/models/entry.dart';
@@ -14,31 +17,22 @@ class ExitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _showDetailsSheet(context),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 16),
-                  _buildMainContent(),
-                  const SizedBox(height: 16),
-                  _buildFooter(context),
-                ],
-              ),
-            ),
-          ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 16),
+            _buildMainContent(),
+            const SizedBox(height: 16),
+            _buildFooter(context),
+          ],
         ),
       ),
     );
@@ -47,26 +41,13 @@ class ExitCard extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Row(
       children: [
-        Hero(
-          tag: 'profile_${data.id}',
-          child: GestureDetector(
-            onTap: () => _showImageDialog(data.profileImg, context),
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: _getStatusColor(),
-                  width: 2,
-                ),
-                image: DecorationImage(
-                  image: _getProfileImage(),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
+        CustomCachedNetworkImage(
+          isCircular: true,
+          size: 64,
+          imageUrl: data.profileImg,
+          errorImage: Icons.person,
+          borderWidth: 3,
+          onTap: ()=> CustomFullScreenImageViewer.show(context, data.profileImg),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -125,14 +106,6 @@ class ExitCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // TextButton.icon(
-        //   icon: const Icon(Icons.info_outline, size: 20),
-        //   label: const Text('Details'),
-        //   onPressed: () => _showDetailsSheet(context),
-        //   style: TextButton.styleFrom(
-        //     foregroundColor: Colors.grey[700],
-        //   ),
-        // ),
         ElevatedButton.icon(
           icon: const Icon(Icons.exit_to_app, size: 20),
           label: const Text('CHECK OUT'),
@@ -240,19 +213,6 @@ class ExitCard extends StatelessWidget {
     }
   }
 
-  // Keeping existing helper methods with slight modifications
-  ImageProvider _getProfileImage() {
-    if (data.profileImg != null && data.allowedBy == null) {
-      return NetworkImage(data.profileImg!);
-    } else if (data.entryType == 'service') {
-      return NetworkImage(data.profileImg!);
-    } else if (data.profileType != null && data.profileImg != null) {
-      return NetworkImage(data.profileImg!);
-    } else {
-      return AssetImage(data.profileImg!);
-    }
-  }
-
   String _getApartmentDetails() {
     if (data.profileType != null && data.apartment == null) {
       return data.societyName!;
@@ -263,34 +223,6 @@ class ExitCard extends StatelessWidget {
     } else {
       return data.societyDetails!.societyApartments!.map((item) => item.apartment as String).toList().join(', ');
     }
-  }
-
-  void _showDetailsSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (_, controller) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: SingleChildScrollView(
-            controller: controller,
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Add detailed information widgets here
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   void _showOutConfirmationDialog(BuildContext context, VisitorEntries data, String type) {
@@ -311,19 +243,14 @@ class ExitCard extends StatelessWidget {
                 isLoading = true;
               }
               if (state is ExitEntrySuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(state.response['message']),
-                  backgroundColor: Colors.green,
-                ));
+                CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
                 Navigator.of(context).pop();
                 isLoading = false;
                 _refresh(context);
               }
               if (state is ExitEntryFailure) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ));
+                CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.success);
+                CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
                 isLoading = false;
               }
             },
@@ -358,9 +285,13 @@ class ExitCard extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            backgroundImage: _getProfileImage(),
-                            radius: 40,
+                          CustomCachedNetworkImage(
+                            isCircular: true,
+                            size: 80,
+                            imageUrl: data.profileImg,
+                            errorImage: Icons.person,
+                            borderWidth: 2,
+                            onTap: ()=> CustomFullScreenImageViewer.show(context, data.profileImg),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -475,69 +406,5 @@ class ExitCard extends StatelessWidget {
       default:
         return;
     }
-  }
-
-  void _showImageDialog(String? imageUrl, BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true, // Allows dismissing by tapping outside
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          backgroundColor: Colors.transparent, // Transparent background
-          child: Stack(
-            alignment: Alignment.topRight,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  color: Colors.white, // White background for the image container
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min, // Fit to image size
-                    children: [
-                      imageUrl!.contains("assets")
-                          ? Image.asset(imageUrl,
-                        height: MediaQuery.of(context).size.height * 0.5, // Constrain the height
-                        width: double.infinity, // Expand to the width of the dialog
-                        fit: BoxFit.contain, // Contain image within the space, maintaining aspect ratio
-                      )
-                          : Image.network(
-                        imageUrl,
-                        height: MediaQuery.of(context).size.height * 0.5, // Constrain the height
-                        width: double.infinity, // Expand to the width of the dialog
-                        fit: BoxFit.contain, // Contain image within the space, maintaining aspect ratio
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.error, size: 100);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Close button
-              Positioned(
-                top: 10,
-                right: 10,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black.withOpacity(0.6),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 }

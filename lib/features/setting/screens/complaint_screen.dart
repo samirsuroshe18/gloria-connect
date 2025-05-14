@@ -48,7 +48,6 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
         )
       ),
       body: TabBarView(
-        physics: const AlwaysScrollableScrollPhysics(),
         controller: _tabController,
         children: [
           PendingComplaintScreen(isAdmin: widget.isAdmin),

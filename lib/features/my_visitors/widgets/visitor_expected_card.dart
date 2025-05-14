@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
+import 'package:gloria_connect/utils/phone_utils.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../invite_visitors/models/pre_approved_banner.dart';
 
 class VisitorExpectedCard extends StatelessWidget {
   final PreApprovedBanner data;
@@ -30,18 +29,6 @@ class VisitorExpectedCard extends StatelessWidget {
     required this.data,
     super.key,
   });
-
-  void _makePhoneCall() async {
-    final Uri url = Uri(
-      scheme: 'tel',
-      path: data.mobNumber,
-    );
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Could not connect $url';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -196,22 +183,24 @@ class VisitorExpectedCard extends StatelessWidget {
                         child: _ActionButton(
                           icon: Icons.share,
                           label: 'Share Code',
-                          onPressed: () {
+                          isCall: false,
+                          primary: true,
+                          onShare: (){
                             Navigator.pushNamed(
                               context,
                               '/otp-banner',
                               arguments: data,
                             );
                           },
-                          primary: true,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _ActionButton(
+                          mobNumber: data.mobNumber,
                           icon: Icons.phone,
                           label: 'Call Visitor',
-                          onPressed: _makePhoneCall,
+                          isCall: true,
                         ),
                       ),
                     ],
@@ -302,22 +291,33 @@ class VisitorExpectedCard extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
+  final String? mobNumber;
   final IconData icon;
   final String label;
-  final VoidCallback onPressed;
   final bool primary;
+  final bool isCall;
+  final VoidCallback? onShare;
 
   const _ActionButton({
     required this.icon,
     required this.label,
-    required this.onPressed,
     this.primary = false,
+    this.mobNumber,
+    required this.isCall,
+    this.onShare,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: () {
+        if(isCall && onShare==null){
+          PhoneUtils.makePhoneCall(context, mobNumber?? '');
+        }else{
+          onShare!();
+        }
+
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: primary ? Theme.of(context).primaryColor : Colors.grey[200],
         foregroundColor: primary ? Colors.white : Colors.grey[800],

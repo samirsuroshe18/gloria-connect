@@ -1,65 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
+import 'package:gloria_connect/features/guard_profile/models/checkout_history.dart';
+import 'package:gloria_connect/utils/phone_utils.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../models/checkout_history.dart';
 
 class CheckoutHistoryCard extends StatelessWidget {
   final CheckoutEntry data;
 
   const CheckoutHistoryCard({super.key, required this.data});
 
-  Future<void> _makePhoneCall() async {
-    final Uri url = Uri(scheme: 'tel', path: data.mobNumber);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Could not connect $url';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Card(
       color: Colors.black.withOpacity(0.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header section with profile and basic info
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile Image
-                GestureDetector(
-                  onTap: () => _showImageDialog(data.profileImg, context),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: theme.primaryColor.withOpacity(0.2),
-                        width: 2,
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      radius: 32,
-                      backgroundColor: theme.primaryColor.withOpacity(0.1),
-                      backgroundImage: _getProfileImage(),
-                      onBackgroundImageError: (_, __) => const Icon(Icons.person),
-                    ),
-                  ),
+                // Profile Image Section
+                CustomCachedNetworkImage(
+                  isCircular: true,
+                  size: 64,
+                  imageUrl: data.profileImg,
+                  errorImage: Icons.person,
+                  borderWidth: 3,
+                  onTap: ()=> CustomFullScreenImageViewer.show(context, data.profileImg),
                 ),
                 const SizedBox(width: 16),
 
-                // Name and Details
+                // Visitor Details Section
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,274 +46,197 @@ class CheckoutHistoryCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              data.name ?? 'Visitor',
+                              data.name ?? 'Unknown Visitor',
                               style: const TextStyle(
+                                color: Colors.white70,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white70
                               ),
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          _buildStatusChip(data.entryType ?? data.profileType ?? 'Visitor'),
+                          _buildTypeTag(),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      _buildInfoRow(
-                        Icons.calendar_today,
-                        DateFormat('dd MMM, yyyy').format(data.entryTime ?? DateTime.now()),
+                      _buildInfoTile(
+                        icon: Icons.calendar_today_rounded,
+                        title: 'Date',
+                        value: data.exitTime != null ? DateFormat('dd MMM, yyyy').format(data.exitTime!) :'NA',
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-
-          // Time information section
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: theme.primaryColor.withOpacity(0.05),
-              border: Border(
-                top: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
-                bottom: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildTimeInfo(
-                  'Entry Time',
-                  DateFormat('hh:mm a').format(data.entryTime ?? DateTime.now()),
-                  Icons.login,
-                ),
-                Container(
-                  height: 30,
-                  width: 1,
-                  color: theme.dividerColor.withOpacity(0.2),
-                ),
-                _buildTimeInfo(
-                  'Exit Time',
-                  DateFormat('hh:mm a').format(data.exitTime ?? DateTime.now()),
-                  Icons.logout,
-                ),
-              ],
-            ),
-          ),
-
-          // Approval information
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildApprovalInfo(
-                  'Approved by',
-                  data.approvedBy?.user?.userName ??
-                      data.societyDetails?.societyApartments?[0].entryStatus?.approvedBy?.userName ??
-                      'No one',
-                  Icons.verified_user,
-                ),
-                const SizedBox(height: 8),
-                _buildApprovalInfo(
-                  'Allowed by Guard',
-                  data.allowedBy?.user?.userName ?? data.guardStatus?.guard?.userName ?? 'Unknown',
-                  Icons.security,
-                ),
-              ],
-            ),
-          ),
-
-          // Call button
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _makePhoneCall,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: const Icon(Icons.phone),
-                label: const Text('Call'),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  ImageProvider _getProfileImage() {
-    if (data.allowedBy != null && data.approvedBy?.user != null) {
-      return AssetImage(data.profileImg!);
-    } else if (data.profileImg != null) {
-      return NetworkImage(data.profileImg!);
-    }
-    return const AssetImage('assets/images/profile.png');
-  }
-
-  Widget _buildStatusChip(String status) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        status,
-        style: const TextStyle(
-          color: Colors.white70,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: Colors.white70),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTimeInfo(String label, String time, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, size: 20, color: Colors.white70),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.white70,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          time,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildApprovalInfo(String label, String name, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: Colors.white70),
-        const SizedBox(width: 8),
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              style: const TextStyle(fontSize: 14),
-              children: [
-                TextSpan(
-                  text: '$label: ',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                  ),
-                ),
-                TextSpan(
-                  text: name,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showImageDialog(String? imageUrl, BuildContext context) {
-    if (imageUrl == null) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        insetPadding: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.topRight,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.7,
-                  maxWidth: MediaQuery.of(context).size.width * 0.9,
-                ),
-                child: imageUrl.contains("assets")
-                    ? Image.asset(
-                  imageUrl,
-                  fit: BoxFit.contain,
-                )
-                    : Image.network(
-                  imageUrl,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.error, size: 100, color: Colors.white70,);
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              top: -16,
-              right: -16,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => Navigator.pop(context),
-                  borderRadius: BorderRadius.circular(24),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white70,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            const Divider(height: 24),
+            _buildTimingInfo(),
+            const SizedBox(height: 16,),
+            _buildApprovalInfo(),
+            const SizedBox(height: 16),
+            _buildActionButtons(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTypeTag() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 6,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        data.entryType ?? data.profileType ?? 'Visitor',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimingInfo() {
+    return Row(
+      children: [
+        if(data.entryTime != null)
+          Expanded(
+            child: _buildInfoTile(
+              icon: Icons.login,
+              title: 'Entry Time',
+              value: data.entryTime != null
+                  ? DateFormat('hh:mm a').format(data.entryTime!)
+                  :'NA',
+            ),
+          ),
+        if(data.exitTime != null)
+          Expanded(
+            child: _buildInfoTile(
+              icon: Icons.logout,
+              title: 'Exit Time',
+              value: data.exitTime != null
+                  ? DateFormat('hh:mm a').format(data.exitTime!)
+                  :'NA',
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildInfoTile({required IconData icon, required String title, required String value,}) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 20, color: Colors.white60),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white60,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white60,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildApprovalInfo() {
+
+    final approvedBy = data.approvedBy?.user?.userName ??
+        (data.societyDetails?.societyApartments?.isEmpty ?? true
+            ? 'No one'
+            : data.societyDetails?.societyApartments?[0].entryStatus?.approvedBy
+            ?.userName);
+
+    final allowedBy = data.allowedBy?.user?.userName ??
+        data.guardStatus?.guard?.userName ??
+        'Unknown Guard';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildInfoRow(
+          Icons.check_circle_outline,
+          'Approved by $approvedBy',
+          Colors.green,
+        ),
+        const SizedBox(height: 8),
+        _buildInfoRow(
+          Icons.security,
+          'Allowed by Guard ($allowedBy)',
+          Colors.blue,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text, Color color) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              // color: Colors.grey.shade700,
+              fontSize: 13,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: ()=> PhoneUtils.makePhoneCall(context, data.mobNumber ?? ''),
+            icon: const Icon(Icons.phone),
+            label: const Text('Call Visitor'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

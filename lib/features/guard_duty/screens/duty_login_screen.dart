@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/features/guard_duty/bloc/guard_duty_bloc.dart';
+import 'package:gloria_connect/features/guard_duty/widgets/custom_dropdown_field.dart';
+import 'package:gloria_connect/features/guard_duty/widgets/info_text.dart';
+import 'package:gloria_connect/features/guard_duty/widgets/start_duty_button.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:lottie/lottie.dart';
 
 class DutyLoginScreen extends StatefulWidget {
   const DutyLoginScreen({super.key});
@@ -40,6 +43,7 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2),
         title: const Text(
           'Start Duty',
           style: TextStyle(
@@ -47,8 +51,6 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
           ),
         ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: BlocConsumer<GuardDutyBloc, GuardDutyState>(
         listener: (context, state){
@@ -61,7 +63,7 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
           }
           if(state is GuardDutyCheckInFailure){
             _isLoading = false;
-            CustomSnackbar.show(context: context, message: state.message, type: SnackbarType.error);
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
           }
         },
         builder: (context, state){
@@ -77,32 +79,12 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
                       const SizedBox(height: 40),
 
                       // Gate Selection Dropdown
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Select Gate',
-                          labelStyle: TextStyle(
-                            color: Colors.white60,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          hintText: 'Choose your assigned gate',
-                          prefixIcon: Icon(Icons.location_on_outlined, color: Colors.white70),
-                          border: OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white70, width: 1.5),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white, width: 2),
-                          ),
-                        ),
+                      CustomDropdownFormField(
                         value: _selectedGate,
-                        isExpanded: true,
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
-                        items: _gates.map<DropdownMenuItem<String>>((String gate) {
-                          return DropdownMenuItem<String>(
-                            value: gate,
-                            child: Text(gate),
-                          );
-                        }).toList(),
+                        items: _gates,
+                        labelText: 'Select Gate',
+                        hintText: 'Choose your assigned gate',
+                        prefixIcon: Icons.location_on_outlined,
                         onChanged: (String? newValue) {
                           setState(() {
                             _selectedGate = newValue;
@@ -111,47 +93,19 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
                       ),
 
                       // Info text
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0, left: 8.0),
-                        child: Text(
-                          'Please select your assigned gate before starting.',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
-                        ),
+                      const InfoText(
+                        message: 'Please select your assigned gate before starting.',
                       ),
-
                       const SizedBox(height: 10,),
 
-                      // Gate Selection Dropdown
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Select Reason',
-                          labelStyle: TextStyle(
-                            color: Colors.white60,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          hintText: 'Choose your check-in reasons',
-                          prefixIcon: Icon(Icons.location_on_outlined, color: Colors.white70),
-                          border: OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white70, width: 1.5),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white, width: 2),
-                          ),
-                        ),
+                      // Reason Selection Dropdown
+                      CustomDropdownFormField(
                         value: checkinReason,
-                        isExpanded: true,
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
-                        items: _checkinReasons.map<DropdownMenuItem<String>>((String gate) {
-                          return DropdownMenuItem<String>(
-                            value: gate,
-                            child: Text(gate),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
+                        items: _checkinReasons,
+                        labelText: 'Select Reason',
+                        hintText: 'Choose your check-in reasons',
+                        prefixIcon: Icons.location_on_outlined,
+                        onChanged: (newValue) {
                           setState(() {
                             checkinReason = newValue;
                           });
@@ -159,46 +113,18 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
                       ),
 
                       // Info text
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0, left: 8.0),
-                        child: Text(
-                          'Please select your reason before check-in.',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
-                        ),
+                      const InfoText(
+                        message: 'Please select your reason before check-in.',
                       ),
-
                       const SizedBox(height: 10,),
 
-                      // Gate Selection Dropdown
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Select Shift',
-                          labelStyle: TextStyle(
-                            color: Colors.white60,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          hintText: 'Choose your Shift',
-                          prefixIcon: Icon(Icons.access_time, color: Colors.white70),
-                          border: OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white70, width: 1.5),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white, width: 2),
-                          ),
-                        ),
+                      // Shift Selection Dropdown
+                      CustomDropdownFormField(
                         value: checkinShift,
-                        isExpanded: true,
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
-                        items: _shifts.map<DropdownMenuItem<String>>((String gate) {
-                          return DropdownMenuItem<String>(
-                            value: gate,
-                            child: Text(gate),
-                          );
-                        }).toList(),
+                        items: _shifts,
+                        labelText: 'Select Shift',
+                        hintText: 'Choose your Shift',
+                        prefixIcon: Icons.access_time,
                         onChanged: (String? newValue) {
                           setState(() {
                             checkinShift = newValue;
@@ -207,63 +133,18 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
                       ),
 
                       // Info text
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0, left: 8.0),
-                        child: Text(
-                          'Please select your shift before check-in.',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
-                        ),
+                      const InfoText(
+                        message: 'Please select your shift before check-in.',
                       ),
 
                       // Spacer
                       const Spacer(),
 
                       // Start Duty Button
-                      SizedBox(
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if(_selectedGate != null && checkinReason != null && checkinShift!=null){
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Confirm Check-In'),
-                                  content: Text(
-                                    'You are about to start duty at $_selectedGate for reason:\n\n$checkinReason\n\nDo you want to proceed?',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        context.read<GuardDutyBloc>().add(GuardDutyCheckIn(gate: _selectedGate!, checkinReason: checkinReason!, shift: checkinShift!));
-                                      },
-                                      child: const Text('Start Duty'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }else{
-                              CustomSnackbar.show(context: context, message: 'All fields are required', type: SnackbarType.error);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            disabledBackgroundColor: Colors.indigo.withOpacity(0.3),
-                            disabledForegroundColor: Colors.white70,
-                            textStyle: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            elevation: 3,
-                          ),
-                          child: const Text('START DUTY'),
-                        ),
+                      StartDutyButton(
+                        checkinReason: checkinReason,
+                        checkinShift: checkinShift,
+                        selectedGate: _selectedGate,
                       ),
 
                       // Bottom spacing
@@ -273,14 +154,7 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
                 ),
               ),
               if (_isLoading)
-                Center(
-                  child: Lottie.asset(
-                    'assets/animations/loader.json',
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.contain,
-                  ),
-                )
+                const CustomLoader()
             ],
           );
         },

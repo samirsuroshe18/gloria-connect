@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/grouped_paginated_list_view.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/vistor_past_card.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
 import 'package:lottie/lottie.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -260,14 +261,28 @@ class _PastVisitorsScreenState extends State<PastVisitorsScreen> with AutomaticK
                   return RefreshIndicator(
                     onRefresh: _onRefresh,
                     child: AnimationLimiter(
-                      child: _buildGroupedEntriesList(),
+                      child: GroupedPaginatedListView<Entry>(
+                        groupedData: _getGroupedData(),
+                        controller: _scrollController,
+                        hasMore: _hasMore,
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        groupHeaderBuilder: _groupHeaderBuilder,
+                        itemBuilder: _itemBuilder,
+                      ),
                     ),
                   );
                 } else if (_isLazyLoading) {
                   return RefreshIndicator(
                     onRefresh: _onRefresh,
                     child: AnimationLimiter(
-                      child: _buildGroupedEntriesList(),
+                      child: GroupedPaginatedListView<Entry>(
+                        groupedData: _getGroupedData(),
+                        controller: _scrollController,
+                        hasMore: _hasMore,
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        groupHeaderBuilder: _groupHeaderBuilder,
+                        itemBuilder: _itemBuilder,
+                      ),
                     ),
                   );
                 } else if (_isLoading && _isLazyLoading==false) {
@@ -348,7 +363,7 @@ class _PastVisitorsScreenState extends State<PastVisitorsScreen> with AutomaticK
     }
   }
 
-  Widget _buildGroupedEntriesList() {
+  Map<String, List<Entry>> _getGroupedData(){
     // Group entries by date
     final Map<String, List<Entry>> groupedEntries = {};
 
@@ -361,55 +376,29 @@ class _PastVisitorsScreenState extends State<PastVisitorsScreen> with AutomaticK
 
       groupedEntries[dateKey]!.add(entry);
     }
+    return groupedEntries;
+  }
 
-    return ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: groupedEntries.keys.length + 1,
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        itemBuilder: (context, index) {
-          if (index < groupedEntries.keys.length) {
-            final dateKey = groupedEntries.keys.elementAt(index);
-            final entriesInGroup = groupedEntries[dateKey]!;
+  Widget _groupHeaderBuilder(date) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        date,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black87,
+        ),
+      ),
+    );
+  }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    dateKey,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black87,
-                    ),
-                  ),
-                ),
-                ...entriesInGroup.map((entry) {
-                  return StaggeredListAnimation(
-                    index: index,
-                    child: VisitorPastCard(data: entry),
-                  );
-                }),
-              ],
-            );
-          } else {
-            if (_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: Text("No more data to load")),
-              );
-            }
-          }
-        }
+  Widget _itemBuilder(entry, index) {
+    return StaggeredListAnimation(
+      index: index,
+      child: VisitorPastCard(data: entry),
     );
   }
 

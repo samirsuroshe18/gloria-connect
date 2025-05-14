@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/custom_pre_approve_card.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/custom_search_field.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/custom_service_dialog.dart';
 
 class OtherPreapproveScreen extends StatefulWidget {
   const OtherPreapproveScreen({super.key});
@@ -12,8 +15,8 @@ class OtherPreapproveScreen extends StatefulWidget {
 class _OtherPreapproveScreenState extends State<OtherPreapproveScreen> {
   TextEditingController searchController = TextEditingController();
   final TextEditingController name = TextEditingController();
-  List<Map<String, dynamic>> filteredServices = [];
-  final List<Map<String, dynamic>> services = [
+  List<Map<String, String>> filteredServices = [];
+  final List<Map<String, String>> services = [
     {'name': 'Maid', 'image': 'assets/images/other/cleaning.png'},
     {'name': 'Cook', 'image': 'assets/images/other/cook.png'},
     {'name': 'Driver', 'image': 'assets/images/other/driver.png'},
@@ -77,124 +80,48 @@ class _OtherPreapproveScreenState extends State<OtherPreapproveScreen> {
       appBar: AppBar(
         title: const Text('Select services', style: TextStyle(color: Colors.white, fontSize: 20)),
         backgroundColor: Colors.black.withOpacity(0.2),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: CustomSearchField(
+            controller: searchController,
+            hintText: 'Search other services...',
+          ),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Search bar with more padding and enhanced UI
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: TextField(
-                controller: searchController,
-                style: const TextStyle(fontSize: 16),
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: Colors.white70),
-                  hintText: 'Search other services...',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(15),
-                  fillColor: Colors.transparent
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Expanded list of companies
-            Expanded(
-              child: AnimationLimiter(
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: filteredServices.length,
-                  itemBuilder: (context, index) {
-                    final service = filteredServices[index];
-                    final image = service['image'];
-                    final name = service['name'] ?? '';
-                    return StaggeredListAnimation(index: index, child: Card(
-                      color: Colors.black.withOpacity(0.2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: AssetImage(image!),
-                            radius: 25,
-                          ),
-                          title: Text(
-                            name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          trailing: const Icon(Icons.chevron_right, color: Colors.white70),
-                          onTap: () {
-                            if (service['name'] == 'Other') {
-                              _showOtherServiceDialog(context, image);  // Use modal bottom sheet approach
-                              // _navigateToOtherCompanyScreen(context);  // Use navigation approach
-                            } else {
-                              // Handle tap for predefined companies
-                              Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'other', 'image': image, 'companyName': name});
-                            }
-                          },
-                        ),
-                      ),
-                    ));
-                  },
-                ),
-              ),
-            ),
-          ],
+      body: AnimationLimiter(
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: filteredServices.length,
+          itemBuilder: (context, index) {
+            final service = filteredServices[index];
+            final image = service['image'];
+            final name = service['name'] ?? '';
+            return StaggeredListAnimation(index: index, child: CustomPreApproveCard(name: name, image: image!, onTap: ()=>_onCardTap(service, image, name)));
+          },
         ),
       ),
     );
+  }
+
+  void _onCardTap(Map<String, dynamic> service, String image, String name) {
+    if (service['name'] == 'Other') {
+      _showOtherServiceDialog(context, image);
+    } else {
+      Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'other', 'image': image, 'companyName': name});
+    }
   }
 
   void _showOtherServiceDialog(BuildContext context, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.deepPurple,
-          insetPadding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    image,
-                    height: 100, // adjust as needed
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: name,
-                    decoration: InputDecoration(
-                      labelText: 'Enter other service name',
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Colors.white70),
-                      fillColor: Colors.white.withOpacity(0.2)
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'other', 'image': image, 'companyName': name.text});
-                    },
-                    child: const Text('Next', style: TextStyle(color: Colors.white),),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        return CustomServiceDialog(
+          labelText: 'Enter other service name.',
+          image: image,
+          nameController: name,
+          onNext: () {
+            Navigator.pushNamed(context, '/contact-screen', arguments: {'profileType': 'other', 'image': image, 'companyName': name.text});
+          },
         );
       },
     );

@@ -27,33 +27,27 @@ class _InviteGuestScreenState extends State<InviteGuestScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Guest', style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.black.withOpacity(0.2),
-      ),
-      body: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          body: Column(
-            children: [
-              const TabBar(
-                labelColor: Colors.blue,
-                tabs: [
-                  Tab(text: 'Once'),
-                  Tab(text: 'Frequently'),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    OnceTab(data: widget.data,),
-                    FrequentlyTab(data: widget.data,),
-                  ],
-                ),
-              ),
+    return DefaultTabController(
+      length: 2,
+      initialIndex: 0,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Add Guest', style: TextStyle(color: Colors.white),),
+          backgroundColor: Colors.black.withOpacity(0.2),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Once'),
+              Tab(text: 'Frequently'),
             ],
           ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            OnceTab(data: widget.data,),
+            FrequentlyTab(data: widget.data,),
+          ],
         ),
       ),
     );

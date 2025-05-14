@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import 'package:gloria_connect/features/guard_profile/bloc/guard_profile_bloc.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/add_flat_section.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/build_text_field.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/custom_structure_card.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/document_upload_card.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/geneder_option_tile.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/image_picker_option.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/profile_avatar_picker.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/service_type_slector_tile.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
+import 'package:gloria_connect/utils/document_picker_utils.dart';
+import 'package:gloria_connect/utils/media_picker_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -15,10 +25,8 @@ class AddNewServiceScreen extends StatefulWidget {
 }
 
 class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
-  // Existing controllers and variables remain the same
   File? _image;
   File? proofImage;
-  final ImagePicker _picker = ImagePicker();
   TextEditingController name = TextEditingController();
   TextEditingController mobileNo = TextEditingController();
   TextEditingController address = TextEditingController();
@@ -44,7 +52,6 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize existing data if available
     _initializeData();
   }
 
@@ -67,467 +74,32 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
     }
   }
 
-  Widget _buildProfileSection() {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      color: Colors.black.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Profile Photo',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white70
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Stack(
-                children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.2),
-                      border: Border.all(
-                        color: Theme.of(context).primaryColor.withOpacity(0.2),
-                        width: 2,
-                      ),
-                    ),
-                    child: _image != null
-                        ? ClipOval(
-                      child: Image.file(
-                        _image!,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                        : Icon(
-                      Icons.person,
-                      size: 60,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () => _showImageSourceDialog(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFormSection() {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Personal Details',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white70
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildTextField(
-              controller: name,
-              label: 'Full Name',
-              hint: 'Enter your full name',
-              icon: Icons.person_outline,
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: mobileNo,
-              label: 'Mobile Number',
-              hint: '+91',
-              icon: Icons.phone_android,
-              keyboardType: TextInputType.phone,
-              maxLength: 10,
-            ),
-            const SizedBox(height: 8),
-            _buildTextField(
-              controller: address,
-              label: 'Address',
-              hint: 'Enter your address',
-              icon: Icons.location_on_outlined,
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    'Upload Identity Document',
-                    style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                  ),
-                ),
-                Card(
-                  color: Colors.white.withOpacity(0.2),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (proofImage != null)
-                          Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Image.file(
-                                proofImage!,
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close, color: Colors.red),
-                                onPressed: () =>
-                                    setState(() => proofImage = null),
-                              ),
-                            ],
-                          )
-                        else
-                          Container(
-                            height: 200,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: InkWell(
-                              onTap: () => _showImagePickerOptions(true),
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.add_photo_alternate, size: 50, color: Colors.white70,),
-                                  Text('Upload Ownership Document', style: TextStyle(color: Colors.white70),),
-                                ],
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showImagePickerOptions(bool isOwner) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Take a photo'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Choose from gallery'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _pickProofImage(ImageSource source) async {
     try {
-      final XFile? image = await _picker.pickImage(source: source);
+      final File? image = await MediaPickerHelper.pickImageFile(context: context, source: source);
+
       if (image != null) {
         setState(() {
-            proofImage = File(image.path);
+          proofImage = image;
         });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking image: $e')),
-      );
-      }
+      CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType? keyboardType,
-    int? maxLength,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white70,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLength: maxLength,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: Colors.white60),
-            prefixIcon: Icon(icon, color: Colors.white70,),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor),
-            ),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.2),
-          ),
-        ),
-      ],
-    );
-  }
+  Future<void> _pickProfileImage(ImageSource source) async {
+    try {
+      final File? image = await MediaPickerHelper.pickImageFile(context: context, source: source);
 
-  Widget _buildServiceSection() {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Service Information',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white70
-              ),
-            ),
-            const SizedBox(height: 24),
-            InkWell(
-              onTap: _navigateToServiceTypeSelection,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      serviceLogo ?? 'assets/images/other/more_options.png', // Replace with your asset image path
-                      width: 24, // Adjust the width as needed
-                      height: 24, // Adjust the height as needed
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Service Type',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            serviceName ?? 'Select service type',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.arrow_forward_ios,
-                        size: 16, color: Colors.white70),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Gender',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.white70
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildGenderOption(
-                    'male',
-                    'Male',
-                    Icons.male,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildGenderOption(
-                    'female',
-                    'Female',
-                    Icons.female,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Add Flats',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white70
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: _addFlats,
-                      icon: const Icon(Icons.add, color: Colors.white70),
-                      label: const Text(
-                        'Add',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                if (selectedFlats.isNotEmpty)
-                  SizedBox(
-                    height: 60,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: selectedFlats.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          color: Colors.white.withOpacity(0.2),
-                          margin: const EdgeInsets.only(right: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Theme.of(context).primaryColor),
-                          ),
-                          child: Padding(
-                            padding:
-                            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: Row(
-                              children: [
-                                Text(selectedFlats[index], style: const TextStyle(color: Colors.white70),),
-                                const SizedBox(width: 8),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      context.read<CheckInBloc>().add(
-                                          RemoveFlat(flatName: selectedFlats[index]));
-                                      selectedFlats.removeAt(index);
-                                      // List<String> parts = selectedFlats[index].split(' ');
-                                      // context.read<CheckInBloc>().add(RemoveFlat(flatName: selectedFlats[index]));
-                                    });
-                                  },
-                                  child: const Icon(Icons.close,
-                                      size: 20, color: Colors.white70),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+      if (image != null) {
+        setState(() {
+          _image = image;
+        });
+      }
+    } catch (e) {
+      CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
+    }
   }
 
   Future<void> _addFlats() async {
@@ -547,46 +119,349 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
       'serviceName': serviceName,
       'isAddService': true
     };
-    Navigator.pushNamed(context, '/block-selection-screen',
-        arguments: formData);
+    Navigator.pushNamed(context, '/block-selection-screen', arguments: formData);
   }
 
-  Widget _buildGenderOption(String value, String label, IconData icon) {
-    final isSelected = selectedGender == value;
-    return InkWell(
-      onTap: () => setState(() => selectedGender = value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected
-                ? Theme.of(context).primaryColor
-                : Colors.grey[300]!,
-          ),
-          borderRadius: BorderRadius.circular(12),
-          color: isSelected
-              ? Colors.white.withOpacity(0.2)
-              : Colors.transparent,
+  bool _validateForm() {
+    if (_image == null ||
+        name.text.isEmpty ||
+        proofImage == null ||
+        mobileNo.text.isEmpty ||
+        address.text.isEmpty ||
+        serviceName == null ||
+        serviceLogo == null ||
+        selectedGender.isEmpty ||
+        selectedFlats.isEmpty ||
+        startDate == null ||
+        endDate == null ||
+        startTime == null ||
+        endTime == null) {
+
+      String errorMessage = 'Please fill in all required fields:';
+      if (_image == null) errorMessage += '\n- Profile photo';
+      if (name.text.isEmpty) errorMessage += '\n- Name';
+      if (proofImage == null) errorMessage += '\n- Identity Document';
+      if (mobileNo.text.isEmpty) errorMessage += '\n- Mobile Number';
+      if (address.text.isEmpty) errorMessage += '\n- Address';
+      if (serviceName == null) errorMessage += '\n- Service Type';
+      if (selectedFlats.isEmpty) errorMessage += '\n- Flats';
+      if (startDate == null || endDate == null) errorMessage += '\n- Service Duration';
+      if (startTime == null || endTime == null) errorMessage += '\n- Service Time';
+
+      CustomSnackBar.show(context: context, message: errorMessage, type: SnackBarType.error);
+      return false;
+    }
+    return true;
+  }
+
+  void _submitForm() {
+    // Validate and submit form logic (existing implementation)
+    if (!_validateForm()) return;
+
+    List<Map<String, String>> result = parseApartments(selectedFlats);
+
+    context.read<GuardProfileBloc>().add(AddGatePass(
+      name: name.text,
+      profile: proofImage,
+      mobNumber: mobileNo.text,
+      address: address.text,
+      serviceName: serviceName,
+      serviceLogo: serviceLogo,
+      addressProof: proofImage,
+      gender: selectedGender,
+      gatepassAptDetails: result,
+      checkInCodeStartDate: DateTime(startDate!.year, startDate!.month, startDate!.day, 00, 00, 00).toIso8601String(),
+      checkInCodeExpiryDate: DateTime(endDate!.year, endDate!.month, endDate!.day, 23, 59, 59).toIso8601String(),
+      checkInCodeStart: DateTime(startDate!.year, startDate!.month, startDate!.day, startTime!.hour, startTime!.minute).toIso8601String(),
+      checkInCodeExpiry: DateTime(endDate!.year, endDate!.month, endDate!.day, endTime!.hour, endTime!.minute).toIso8601String(),
+    ));
+  }
+
+  List<Map<String, String>> parseApartments(List<String> apartments) {
+    return apartments.map((apartment) {
+      List<String> parts = apartment.split(' ');
+      return {
+        'societyBlock': parts[0],
+        'apartment': parts[1]
+      };
+    }).toList();
+  }
+
+  int _getMinutesDifference(TimeOfDay start, TimeOfDay end) {
+    return (end.hour * 60 + end.minute) - (start.hour * 60 + start.minute);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.2), // Change AppBar color here
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.read<CheckInBloc>().add(ClearFlat());
+            Navigator.pop(context);
+          },
+          color: Colors.white70,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? Theme.of(context).primaryColor
-                  : Colors.white70,
+        title: const Text(
+          'Add new gate pass',
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.white70,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: BlocConsumer<CheckInBloc, CheckInState>(
+        listener: (context, state) {
+          if (state is FlatState) {
+            setState(() => selectedFlats = state.selectedFlats);
+          }
+        },
+        builder: (context, checkInState) {
+          return BlocConsumer<GuardProfileBloc, GuardProfileState>(
+            listener: (context, state) {
+              if (state is AddGatePassLoading) {
+                setState(() => _isLoading = true);
+              } else if (state is AddGatePassSuccess) {
+                setState(() => _isLoading = false);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/gate-pass-banner-screen',
+                  arguments: state.response,
+                      (route) => route.isFirst,
+                );
+              } else if (state is AddGatePassFailure) {
+                setState(() => _isLoading = false);
+                CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
+              }
+            },
+            builder: (context, state) {
+              return CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverToBoxAdapter(child: _buildProfileSection()),
+                  SliverToBoxAdapter(child: _buildFormSection()),
+                  SliverToBoxAdapter(child: _buildServiceSection()),
+                  SliverToBoxAdapter(child: _buildDurationSection()),
+                  SliverToBoxAdapter(child: _buildSubmitButton()),
+                  const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileSection() {
+    return CustomStructureCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.account_circle,
+                color: Colors.white,
+                size: 24,
+              ),
+              SizedBox(width: 12),
+              Text(
+                'Profile Photo',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ProfileAvatarPicker(
+            imageFile: _image,
+            onTap: () => DocumentPickerUtils.showDocumentPickerSheet(
+              context: context,
+              onPickImage: _pickProfileImage,
+              onPickPDF: null,
+              isOnlyImage: true,
             ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.white70,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1,
               ),
             ),
-          ],
-        ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ImagePickerOption(
+                  icon: Icons.photo_library,
+                  label: 'Gallery',
+                  onTap: () => _pickProfileImage(ImageSource.gallery),
+                ),
+                ImagePickerOption(
+                  icon: Icons.camera,
+                  label: 'Camera',
+                  onTap: () => _pickProfileImage(ImageSource.camera),
+                ),
+                ImagePickerOption(
+                  icon: Icons.delete_outline,
+                  label: 'Remove',
+                  onTap: () => setState(() => _image = null),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormSection() {
+    return CustomStructureCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Personal Details',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white
+            ),
+          ),
+          const SizedBox(height: 24),
+          BuildTextField(
+            controller: name,
+            label: 'Full Name',
+            hint: 'Enter your full name',
+            icon: Icons.person_outline,
+          ),
+          const SizedBox(height: 16),
+          BuildTextField(
+            controller: mobileNo,
+            label: 'Mobile Number',
+            hint: '+91',
+            icon: Icons.phone_android,
+            keyboardType: TextInputType.phone,
+            maxLength: 10,
+          ),
+          const SizedBox(height: 8),
+          BuildTextField(
+            controller: address,
+            label: 'Address',
+            hint: 'Enter your address',
+            icon: Icons.location_on_outlined,
+            maxLines: 3,
+          ),
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'Upload Identity Document',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              DocumentUploadCard(
+                file: proofImage,
+                onRemove: () => setState(() => proofImage = null),
+                onUploadTap: () => DocumentPickerUtils.showDocumentPickerSheet(
+                  context: context,
+                  onPickImage: _pickProofImage,
+                  onPickPDF: null,
+                  isOnlyImage: true,
+                ),
+                label: 'Upload Ownership Document',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceSection() {
+    return CustomStructureCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Service Information',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white70
+            ),
+          ),
+          const SizedBox(height: 24),
+          ServiceTypeSelectorTile(
+            logoPath: serviceLogo,
+            title: 'Service Type',
+            subtitle: serviceName ?? 'Select service type',
+            onTap: _navigateToServiceTypeSelection,
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Gender',
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white70
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: GenderOptionTile(
+                  value: 'male',
+                  groupValue: selectedGender,
+                  label: 'Male',
+                  icon: Icons.male,
+                  onTap: () => setState(() => selectedGender = 'male'),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: GenderOptionTile(
+                  value: 'female',
+                  groupValue: selectedGender,
+                  label: 'Female',
+                  icon: Icons.female,
+                  onTap: () => setState(() => selectedGender = 'female'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          AddFlatsSection(
+            selectedFlats: selectedFlats,
+            onAddFlat: _addFlats,
+            onRemoveFlat: (index) {
+              context.read<CheckInBloc>().add(RemoveFlat(flatName: selectedFlats[index]));
+              setState(() {
+                selectedFlats.removeAt(index);
+              });
+            },
+          ),
+        ],
       ),
     );
   }
@@ -621,107 +496,37 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
     );
   }
 
-  void _submitForm() {
-    // Validate and submit form logic (existing implementation)
-    if (!_validateForm()) return;
-
-    List<Map<String, String>> result = parseApartments(selectedFlats);
-
-    context.read<GuardProfileBloc>().add(AddGatePass(
-      name: name.text,
-      profile: proofImage,
-      mobNumber: mobileNo.text,
-      address: address.text,
-      serviceName: serviceName,
-      serviceLogo: serviceLogo,
-      addressProof: proofImage,
-      gender: selectedGender,
-      gatepassAptDetails: result,
-      checkInCodeStartDate: DateTime(startDate!.year, startDate!.month, startDate!.day, 00, 00, 00).toIso8601String(),
-      checkInCodeExpiryDate: DateTime(endDate!.year, endDate!.month, endDate!.day, 23, 59, 59).toIso8601String(),
-      checkInCodeStart: DateTime(startDate!.year, startDate!.month, startDate!.day, startTime!.hour, startTime!.minute).toIso8601String(),
-      checkInCodeExpiry: DateTime(endDate!.year, endDate!.month, endDate!.day, endTime!.hour, endTime!.minute).toIso8601String(),
-    ));
-  }
-
-  // ... (continuing from previous code)
-
-  bool _validateForm() {
-    if (_image == null ||
-        name.text.isEmpty ||
-        proofImage == null ||
-        mobileNo.text.isEmpty ||
-        address.text.isEmpty ||
-        serviceName == null ||
-        serviceLogo == null ||
-        selectedGender.isEmpty ||
-        selectedFlats.isEmpty ||
-        startDate == null ||
-        endDate == null ||
-        startTime == null ||
-        endTime == null) {
-
-      String errorMessage = 'Please fill in all required fields:';
-      if (_image == null) errorMessage += '\n- Profile photo';
-      if (name.text.isEmpty) errorMessage += '\n- Name';
-      if (proofImage == null) errorMessage += '\n- Identity Document';
-      if (mobileNo.text.isEmpty) errorMessage += '\n- Mobile Number';
-      if (address.text.isEmpty) errorMessage += '\n- Address';
-      if (serviceName == null) errorMessage += '\n- Service Type';
-      if (selectedFlats.isEmpty) errorMessage += '\n- Flats';
-      if (startDate == null || endDate == null) errorMessage += '\n- Service Duration';
-      if (startTime == null || endTime == null) errorMessage += '\n- Service Time';
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return false;
-    }
-    return true;
-  }
-
   Widget _buildDurationSection() {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Service Duration',
-              style: TextStyle(
+    return CustomStructureCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Service Duration',
+            style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white70
-              ),
             ),
-            const SizedBox(height: 16),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  ...durationOptions.map((option) => Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: _buildDurationOption(option),
-                  )),
-                  _buildCustomDurationOption(),
-                ],
-              ),
+          ),
+          const SizedBox(height: 16),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                ...durationOptions.map((option) => Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: _buildDurationOption(option),
+                )),
+                _buildCustomDurationOption(),
+              ],
             ),
-            if (selectedDurationType != null) ...[
-              const SizedBox(height: 24),
-              _buildDateTimeSelectors(),
-            ],
+          ),
+          if (selectedDurationType != null) ...[
+            const SizedBox(height: 24),
+            _buildDateTimeSelectors(),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -796,8 +601,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
             Expanded(
               child: _buildDateSelector(
                 'Start Date',
-                startDate,
-                    (date) => setState(() => startDate = date),
+                startDate, (date) => setState(() => startDate = date),
                 true,
               ),
             ),
@@ -805,8 +609,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
             Expanded(
               child: _buildDateSelector(
                 'End Date',
-                endDate,
-                    (date) => setState(() => endDate = date),
+                endDate, (date) => setState(() => endDate = date),
                 false,
               ),
             ),
@@ -838,12 +641,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
     );
   }
 
-  Widget _buildDateSelector(
-      String label,
-      DateTime? selectedDate,
-      Function(DateTime) onDateSelected,
-      bool isStartDate,
-      ) {
+  Widget _buildDateSelector(String label, DateTime? selectedDate, Function(DateTime) onDateSelected, bool isStartDate,) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -885,12 +683,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
     );
   }
 
-  Widget _buildTimeSelector(
-      String label,
-      TimeOfDay? selectedTime,
-      Function(TimeOfDay) onTimeSelected,
-      bool isStartTime,
-      ) {
+  Widget _buildTimeSelector(String label, TimeOfDay? selectedTime, Function(TimeOfDay) onTimeSelected, bool isStartTime,) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -932,181 +725,6 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2), // Change AppBar color here
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            context.read<CheckInBloc>().add(ClearFlat());
-            Navigator.pop(context);
-          },
-          color: Colors.white70,
-        ),
-        title: const Text(
-          'Add new gate pass',
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white70,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: BlocConsumer<CheckInBloc, CheckInState>(
-        listener: (context, state) {
-          if (state is FlatState) {
-            setState(() => selectedFlats = state.selectedFlats);
-          }
-        },
-        builder: (context, checkInState) {
-          return BlocConsumer<GuardProfileBloc, GuardProfileState>(
-            listener: (context, state) {
-              if (state is AddGatePassLoading) {
-                setState(() => _isLoading = true);
-              } else if (state is AddGatePassSuccess) {
-                setState(() => _isLoading = false);
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/gate-pass-banner-screen',
-                  arguments: state.response,
-                      (route) => route.isFirst,
-                );
-              } else if (state is AddGatePassFailure) {
-                setState(() => _isLoading = false);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            builder: (context, state) {
-              return CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverToBoxAdapter(child: _buildProfileSection()),
-                  SliverToBoxAdapter(child: _buildFormSection()),
-                  SliverToBoxAdapter(child: _buildServiceSection()),
-                  SliverToBoxAdapter(child: _buildDurationSection()),
-                  SliverToBoxAdapter(child: _buildSubmitButton()),
-                  const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
-                ],
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  List<Map<String, String>> parseApartments(List<String> apartments) {
-    return apartments.map((apartment) {
-      List<String> parts = apartment.split(' ');
-      return {
-        'societyBlock': parts[0],
-        'apartment': parts[1]
-      };
-    }).toList();
-  }
-
-  Future<void> _showImageSourceDialog({bool isProof = false}) async {
-    await showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Text(
-                'Select Image Source',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildImageSourceOption(
-                    icon: Icons.camera_alt,
-                    title: 'Camera',
-                    onTap: () {
-                      isProof
-                          ? _getProofImage(ImageSource.camera)
-                          : _getImage(ImageSource.camera);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _buildImageSourceOption(
-                    icon: Icons.photo_library,
-                    title: 'Gallery',
-                    onTap: () {
-                      isProof
-                          ? _getProofImage(ImageSource.gallery)
-                          : _getImage(ImageSource.gallery);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildImageSourceOption({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 32, color: Colors.green),
-          ),
-          const SizedBox(height: 12),
-          Text(title),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _getProofImage(ImageSource source) async {
-    final XFile? pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        proofImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _getImage(ImageSource source) async {
-    final XFile? pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
-  }
-
   Future<void> _selectTime(BuildContext context, bool isStartTime) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -1132,22 +750,12 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
             if (difference >= 30) {
               endTime = picked;
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                      'End time must be at least 30 minutes after start time'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              CustomSnackBar.show(context: context, message: 'End time must be at least 30 minutes after start time', type: SnackBarType.error);
             }
           }
         }
       });
     }
-  }
-
-  int _getMinutesDifference(TimeOfDay start, TimeOfDay end) {
-    return (end.hour * 60 + end.minute) - (start.hour * 60 + start.minute);
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {

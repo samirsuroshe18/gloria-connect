@@ -42,10 +42,10 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
               });
             },
             onError: (error) {
-              CustomSnackbar.show(
+              CustomSnackBar.show(
                 context: context,
                 message: error,
-                type: SnackbarType.error,
+                type: SnackBarType.error,
               );
             },
           ),

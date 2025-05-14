@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:gloria_connect/utils/gradient_color.dart';
+import 'package:gloria_connect/common_widgets/gradient_color.dart';
 import 'package:lottie/lottie.dart';
 
 import '../bloc/auth_bloc.dart';
@@ -48,11 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
 
           if(state is AuthRegisterSuccess){
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.response['message']),
-                backgroundColor: Colors.green,
-              ),
-            );
+            CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
             userNameController.clear();
             emailController.clear();
             passwordController.clear();
@@ -61,11 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
 
           if(state is AuthRegisterFailure){
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message),
-                backgroundColor: Colors.redAccent,
-              )
-            );
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
             _isLoading = false;
           }
 
@@ -103,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
 
           if (state is AuthGoogleLinkedSuccess) {
-            CustomSnackbar.show(context: context, message: state.response['message'], type: SnackbarType.success);
+            CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
           }
 
         },
@@ -267,11 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _onSignUpPressed() {
     if (passwordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Password do not match.'),
-        duration: Duration(seconds: 3),
-        backgroundColor: Colors.redAccent,
-      ));
+      CustomSnackBar.show(context: context, message: 'Password do not match.', type: SnackBarType.error);
       return;
     }
     if (_formKey.currentState!.validate()) {

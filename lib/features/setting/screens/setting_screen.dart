@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
-
+import 'package:gloria_connect/features/setting/widgets/setting_option_tile.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 
 class SettingScreen extends StatelessWidget {
   final GetUserModel? data;
@@ -18,167 +19,34 @@ class SettingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15)
-              ),
-              child: ListTile(
-                leading: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.report, size: 30,),
-                ),
-                title: const Text('Raise Complaint',),
-                trailing: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey,),
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, '/complaint-screen', arguments: data);
-                },
-              ),
+            SettingOptionTile(
+              title: 'Raise Complaint',
+              onTap: ()=> Navigator.pushNamed(context, '/complaint-screen', arguments: data),
+              icon: Icons.report,
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(15)
-              ),
-              child: ListTile(
-                leading: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.password, size: 30,),
-                ),
-                title: const Text('Change Password',),
-                trailing: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey,),
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, '/change-password');
-                },
-              ),
+            SettingOptionTile(
+              title: 'Change Password',
+              onTap: ()=> Navigator.pushNamed(context, '/change-password'),
+              icon: Icons.password,
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(15)
-              ),
-              child: ListTile(
-                leading: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.lock_open, size: 30,),
-                ),
-                title: const Text('Forgot Password',),
-                trailing: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey,),
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, '/forgot-password');
-                },
-              ),
+            SettingOptionTile(
+              title: 'Forgot Password',
+              onTap: ()=> Navigator.pushNamed(context, '/forgot-password'),
+              icon: Icons.lock_open,
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(15)
-              ),
-              child: ListTile(
-                leading: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.lock, size: 30,),
-                ),
-                title: const Text('Privacy Setting',),
-                trailing: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey,),
-                ),
-                onTap: () {
-                  const snackBar = SnackBar(
-                    content: Text('Privacy settings coming soon.'),
-                    duration: Duration(seconds: 3),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                },
-              ),
+            SettingOptionTile(
+              title: 'Privacy Policy',
+              onTap: ()=> CustomSnackBar.show(context: context, message: 'Privacy settings coming soon.', type: SnackBarType.info,),
+              icon: Icons.lock,
             ),
             const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(15)
-              ),
-              child: ListTile(
-                leading: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.info, size: 30,),
-                ),
-                title: const Text('About',),
-                trailing: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey,),
-                ),
-                onTap: () {
-                  const snackBar = SnackBar(
-                    content: Text('About page is under development.'),
-                    duration: Duration(seconds: 3),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                },
-              ),
+            SettingOptionTile(
+              title: 'About',
+              onTap: ()=> CustomSnackBar.show(context: context, message: 'About page is under development.', type: SnackBarType.info,),
+              icon: Icons.info,
             ),
           ],
         ),

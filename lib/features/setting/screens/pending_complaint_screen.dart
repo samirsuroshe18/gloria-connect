@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
+import 'package:gloria_connect/common_widgets/single_paginated_list_view.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/features/setting/widgets/complaint_card.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
@@ -257,85 +262,36 @@ class _PendingComplaintScreenState extends State<PendingComplaintScreen> with Au
       return RefreshIndicator(
         onRefresh: _onRefresh,
         child: AnimationLimiter(
-          child: _buildEntriesList(complaints),
+          child: SinglePaginatedListView<Complaint>(
+            data: _data,
+            controller: _scrollController,
+            hasMore: _hasMore,
+            itemBuilder: _itemBuilder,
+          ),
         ),
       );
     } else if (_isLazyLoading) {
       return RefreshIndicator(
         onRefresh: _onRefresh,
         child: AnimationLimiter(
-          child: _buildEntriesList(complaints),
+          child: SinglePaginatedListView<Complaint>(
+            data: _data,
+            controller: _scrollController,
+            hasMore: _hasMore,
+            itemBuilder: _itemBuilder,
+          ),
         ),
       );
     } else if (_isLoading && _isLazyLoading==false) {
-      return Center(
-        child: Lottie.asset(
-          'assets/animations/loader.json',
-          width: 100,
-          height: 100,
-          fit: BoxFit.contain,
-        ),
-      );
+      return const CustomLoader();
     }else if (_data.isEmpty && _isError == true && statusCode == 401) {
-      return RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Container(
-            height: MediaQuery.of(context).size.height - 200,
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Lottie.asset(
-                  'assets/animations/error.json',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Something went wrong!",
-                  style:
-                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      return BuildErrorState(onRefresh: _onRefresh);
     } else {
-      return RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Container(
-            height: MediaQuery.of(context).size.height - 200,
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Lottie.asset(
-                  'assets/animations/no_data.json',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "There is no notice",
-                  style:
-                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no pending complaints",);
     }
   }
 
-  Future<void> _cardOnTap(Complaint complaint) async {
+  Future<void> _cardOnTap(Complaint complaint, BuildContext context) async {
     // Store the context read functions before the async gap
     final isAdmin = widget.isAdmin == true;
     final adminBlocFunction = context.read<AdministrationBloc>().add;
@@ -398,170 +354,13 @@ class _PendingComplaintScreenState extends State<PendingComplaintScreen> with Au
     }
   }
 
-  Widget _buildComplaintCard({required Complaint complaint}) {
-    return Card(
-      color: Colors.black.withOpacity(0.2),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: InkWell(
-        onTap: () => _cardOnTap(complaint),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      '#${complaint.complaintId}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                  _buildStatusChip(complaint.status ?? 'pending'),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                complaint.category ?? '',
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white70
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                complaint.description ?? '',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white60,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today, size: 16, color: Colors.white60),
-                      const SizedBox(width: 4),
-                      Text(
-                        DateFormat('MMM dd, yyyy').format(complaint.date!),
-                        style: const TextStyle(
-                          color: Colors.white60,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.comment_outlined, size: 16, color: Colors.white60),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${complaint.responses?.length ?? 0}',
-                        style: const TextStyle(
-                          color: Colors.white60,
-                          fontSize: 14,
-                        ),
-                      ),
-                      if (complaint.review != null && complaint.review! > 0) ...[
-                        const SizedBox(width: 16),
-                        const Icon(Icons.star, size: 16, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text(
-                          complaint.review.toString(),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+  Widget _itemBuilder(item, index) {
+    return StaggeredListAnimation(
+      index: index,
+      child: ComplaintCard(
+        complaint: item,
+        onTap: _cardOnTap,
       ),
-    );
-  }
-
-  Widget _buildStatusChip(String status) {
-    Color backgroundColor;
-    Color textColor;
-    String displayText;
-
-    switch (status.toLowerCase()) {
-      case 'pending':
-        backgroundColor = Colors.orange.shade100;
-        textColor = Colors.orange.shade900;
-        displayText = 'Pending';
-        break;
-      case 'resolved':
-        backgroundColor = Colors.green.shade100;
-        textColor = Colors.green.shade900;
-        displayText = 'Resolved';
-        break;
-      case 'in_progress':
-        backgroundColor = Colors.blue.shade100;
-        textColor = Colors.blue.shade900;
-        displayText = 'In Progress';
-        break;
-      default:
-        backgroundColor = Colors.grey.shade100;
-        textColor = Colors.grey.shade900;
-        displayText = status;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        displayText,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEntriesList(data) {
-
-    return ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: data.length + 1,
-        itemBuilder: (context, index) {
-          if (index < data.length) {
-            return StaggeredListAnimation(index: index, child: _buildComplaintCard(complaint: _data[index]));
-          } else {
-            if (_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: Text("There are no more data")),
-              );
-            }
-          }
-        }
     );
   }
 
@@ -672,9 +471,8 @@ class _PendingComplaintScreenState extends State<PendingComplaintScreen> with Au
   }
 
   Future<void> _onRefresh() async {
-    if(_hasMore) {
-      await _fetchEntries();
-    }
+    _page=1;
+    await _fetchEntries();
   }
 
   @override

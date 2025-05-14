@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/contact_list_tile.dart';
+import 'package:gloria_connect/features/invite_visitors/widgets/custom_search_field.dart';
 
 class MobileContacts extends StatefulWidget {
   final Function(String, String) onContactSelected;
@@ -12,6 +15,7 @@ class MobileContacts extends StatefulWidget {
 }
 
 class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAliveClientMixin {
+  TextEditingController searchController = TextEditingController();
   List<Contact> contacts = [];
   List<Contact> filteredContacts = [];
   String searchQuery = '';
@@ -21,6 +25,7 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
   @override
   void initState() {
     super.initState();
+    searchController.addListener(filterContacts);
     _fetchContacts();
   }
 
@@ -59,7 +64,8 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
     }
   }
 
-  void filterContacts(String query) {
+  void filterContacts() {
+    final query = searchController.text.toLowerCase();
     if (query.isEmpty) {
       setState(() {
         filteredContacts = contacts;
@@ -72,16 +78,10 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
 
     final filtered = contacts.where((contact) {
       final nameLower = contact.displayName.toLowerCase();
-      final phoneLower = contact.phones.isNotEmpty
-          ? contact.phones.first.number.replaceAll(RegExp(r'[^\d]'), '')
-          : '';
+      final phoneLower = contact.phones.isNotEmpty ? contact.phones.first.number.replaceAll(RegExp(r'[^\d]'), '') : '';
 
       // Check if any search term matches name or phone
-      return searchTerms.any((term) =>
-      nameLower.contains(term) ||
-          (phoneLower.isNotEmpty && phoneLower.contains(term))
-      );
-    }).toList();
+      return searchTerms.any((term) => nameLower.contains(term) || (phoneLower.isNotEmpty && phoneLower.contains(term)));}).toList();
 
     setState(() {
       filteredContacts = filtered;
@@ -110,112 +110,55 @@ class _MobileContactsState extends State<MobileContacts> with AutomaticKeepAlive
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              onChanged: (query) => filterContacts(query),
-              style: const TextStyle(color: Colors.black),
-              decoration: InputDecoration(
-                hintText: 'Search by name or mobile number',
-                hintStyle: const TextStyle(color: Colors.white70),
-                prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                filled: true,
-                fillColor: Colors.white.withOpacity(0.2),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+      body: Column(
+        children: [
+          CustomSearchField(controller: searchController, hintText: 'Search by name or mobile number', top: 8,),
+          if (_permissionDenied)
+            const Center(
+                child: Text(
+                  'Permission denied. Please allow contact access in settings.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red),
+                )
             ),
-            const SizedBox(height: 16),
-            if (_permissionDenied)
-              const Center(
-                  child: Text(
-                    'Permission denied. Please allow contact access in settings.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.red),
-                  )
-              ),
-            if (_isLoading)
-              const Center(
-                  child: CircularProgressIndicator()
-              ),
-            if (!_permissionDenied && !_isLoading) Expanded(
+          if (_isLoading)const CustomLoader(),
+
+          if (!_permissionDenied && !_isLoading)
+            Expanded(
               child: filteredContacts.isEmpty
-                  ? Center(
+                ? Center(
                   child: Text(
-                    searchQuery.isEmpty
-                        ? 'No contacts found'
-                        : 'No contacts matching "$searchQuery"',
-                    style: const TextStyle(color: Colors.grey),
+                    searchQuery.isEmpty ? 'No contacts found' : 'No contacts matching "$searchQuery"',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
                   )
-              )
-                  : AnimationLimiter(
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: filteredContacts.length,
-                                    itemBuilder: (context, index) {
-                    final contact = filteredContacts[index];
-                    final phoneNumber = contact.phones.isNotEmpty
-                        ? formatPhoneNumber(contact.phones.first.number)
-                        : 'No phone number';
-                    return StaggeredListAnimation(index: index, child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(15)
-                      ),
-                      child: ListTile(
-                        onTap: () {
-                          if (contact.phones.isNotEmpty) {
-                            widget.onContactSelected(
-                                contact.displayName,
-                                contact.phones.first.number
-                            );
-                          }
-                        },
-                        leading: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.2),
-                          ),
-                          child: contact.photo != null
-                              ? ClipOval(
-                            child: Image.memory(
-                              contact.photo!,
-                              fit: BoxFit.cover,
-                              width: 40,
-                              height: 40,
-                            ),
-                          )
-                              : const Icon(Icons.person, color: Colors.grey),
+                )
+                : AnimationLimiter(
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      final contact = filteredContacts[index];
+                      final phoneNumber = contact.phones.isNotEmpty ? formatPhoneNumber(contact.phones.first.number) : 'No phone number';
+                      return StaggeredListAnimation(
+                        index: index,
+                        child: ContactListTile(
+                          displayName: contact.displayName,
+                          phoneNumber: phoneNumber,
+                          photo: contact.photo,
+                          onContactSelected: (name, number) {
+                            // Handle contact selection
+                            widget.onContactSelected(name, number);
+                          },
                         ),
-                        title: Text(
-                          contact.displayName,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white70
-                          ),
-                        ),
-                        subtitle: Text(
-                          phoneNumber,
-                          style: const TextStyle(
-                            color: Colors.white60,
-                          ),
-                        ),
-                      ),
-                    ));
-                                    },
-                                  ),
+                      );
+                    },
                   ),
-            ),
-          ],
-        ),
+                ),
+          ),
+        ],
       ),
     );
   }

@@ -40,35 +40,27 @@ class _ContactsScreenState extends State<ContactsScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Contact', style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.black.withOpacity(0.2),
-      ),
-      body: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          body: Column(
-            children: [
-              TabBar(
-                controller: _tabController,
-                labelColor: Colors.white70,
-                tabs: const [
-                  Tab(text: 'Contacts'),
-                  Tab(text: 'Add Manually'),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    MobileContacts(onContactSelected: onContactSelected),
-                    ManualContacts(name: selectedName, number: selectedNumber, data: widget.data,),
-                  ],
-                ),
-              ),
+    return DefaultTabController(
+      length: 2,
+      initialIndex: 0,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Select Contact', style: TextStyle(color: Colors.white),),
+          backgroundColor: Colors.black.withOpacity(0.2),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Contacts'),
+              Tab(text: 'Add Manually'),
             ],
           ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            MobileContacts(onContactSelected: onContactSelected),
+            ManualContacts(name: selectedName, number: selectedNumber, data: widget.data,),
+          ],
         ),
       ),
     );

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gloria_connect/features/admin_profile/screens/admin_edit_profile_screen.dart';
+import 'package:gloria_connect/features/admin_profile/screens/admin_members_screen.dart';
 import 'package:gloria_connect/features/administration/screens/all_admin_screen.dart';
 import 'package:gloria_connect/features/administration/screens/all_guard_screen.dart';
 import 'package:gloria_connect/features/administration/screens/all_resident_screen.dart';
@@ -42,7 +44,7 @@ import 'package:gloria_connect/features/guard_profile/screens/gate_pass_banner_s
 import 'package:gloria_connect/features/guard_waiting/models/entry.dart';
 import 'package:gloria_connect/features/guard_waiting/screens/view_resident_approval.dart';
 import 'package:gloria_connect/features/home/screens/admin_home_screen.dart';
-import 'package:gloria_connect/features/guard_profile/screens/edit_profile_screen.dart';
+import 'package:gloria_connect/features/guard_profile/screens/guard_edit_profile_screen.dart';
 import 'package:gloria_connect/features/home/screens/guard_home_screen.dart';
 import 'package:gloria_connect/features/home/screens/landing_screen.dart';
 import 'package:gloria_connect/features/home/screens/resident_home_screen.dart';
@@ -64,15 +66,16 @@ import 'package:gloria_connect/features/notice_board/screens/create_notice_page.
 import 'package:gloria_connect/features/notice_board/screens/general_notice_board_page.dart';
 import 'package:gloria_connect/features/notice_board/screens/notice_board_page.dart';
 import 'package:gloria_connect/features/notice_board/screens/notice_detail_page.dart';
-import 'package:gloria_connect/features/resident_profile/screens/apartment_members_screen.dart';
+import 'package:gloria_connect/features/resident_profile/screens/resident_members_screen.dart';
+import 'package:gloria_connect/features/resident_profile/screens/resident_edit_profile_screen.dart';
 import 'package:gloria_connect/features/setting/screens/change_password_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_details_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_form_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_screen.dart';
 import 'package:gloria_connect/features/setting/screens/setting_screen.dart';
-import 'package:gloria_connect/utils/check_internet_connection.dart';
-import 'package:gloria_connect/utils/error_screen.dart';
-import 'package:gloria_connect/utils/gradient_color.dart';
+import 'package:gloria_connect/common_widgets/check_internet_connection.dart';
+import 'package:gloria_connect/common_widgets/error_screen.dart';
+import 'package:gloria_connect/common_widgets/gradient_color.dart';
 
 class AppRoutes {
 
@@ -232,9 +235,21 @@ class AppRoutes {
         }
       case '/edit-profile-screen':
         if (args != null && args is GetUserModel) {
-          return _animatedRoute(EditProfileScreen(data: args,), name: '/edit-profile-screen');
+          return _animatedRoute(GuardEditProfileScreen(data: args,), name: '/edit-profile-screen');
         } else {
-          return _animatedRoute(const EditProfileScreen(), name: '/edit-profile-screen');
+          return _animatedRoute(const GuardEditProfileScreen(), name: '/edit-profile-screen');
+        }
+      case '/admin-edit-profile-screen':
+        if (args != null && args is GetUserModel) {
+          return _animatedRoute(AdminEditProfileScreen(data: args,), name: '/admin-edit-profile-screen');
+        } else {
+          return _animatedRoute(const AdminEditProfileScreen(), name: '/admin-edit-profile-screen');
+        }
+      case '/resident-edit-profile-screen':
+        if (args != null && args is GetUserModel) {
+          return _animatedRoute(ResidentEditProfileScreen(data: args,), name: '/resident-edit-profile-screen');
+        } else {
+          return _animatedRoute(const ResidentEditProfileScreen(), name: '/resident-edit-profile-screen');
         }
       case '/change-password':
         return _animatedRoute(const ChangePasswordScreen(), name: '/change-password');
@@ -248,6 +263,8 @@ class AppRoutes {
         return _animatedRoute(const CheckoutHistoryScreen(), name: '/checkout-history-screen');
       case '/apartment-member-screen':
         return _animatedRoute(const ApartmentMembersScreen(), name: '/apartment-member-screen');
+      case '/admin-member-screen':
+        return _animatedRoute(const AdminMembersScreen(), name: '/admin-member-screen');
       case '/all-resident-screen':
         return _animatedRoute(const AllResidentScreen(), name: '/all-resident-screen');
       case '/all-guard-screen':
@@ -292,9 +309,9 @@ class AppRoutes {
         return _animatedRoute(const NoticeBoardPage(), name: '/notice-board-screen');
       case '/notice-board-details-screen':
         if (args != null && args is Notice) {
-          return _animatedRoute(NoticeDetailPage(data: args), name: '/notice-board-details-screen');
+          return _animatedRoute(NoticeDetailPage(notice: args), name: '/notice-board-details-screen');
         }else{
-          return _animatedRoute(NoticeDetailPage(data: Notice(/* default values */)), name: '/notice-board-details-screen');
+          return _animatedRoute(NoticeDetailPage(notice: Notice(/* default values */)), name: '/notice-board-details-screen');
         }
       case '/create-notice-board-screen':
         return _animatedRoute(const CreateNoticePage(), name: '/create-notice-board-screen');

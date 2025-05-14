@@ -83,11 +83,11 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           }
           if(state is GuardDutyCheckOutSuccess){
             _isCheckoutLoading = false;
-            CustomSnackbar.show(context: context, message: "Your Duty is finished!", type: SnackbarType.success);
+            CustomSnackBar.show(context: context, message: "Your Duty is finished!", type: SnackBarType.success);
             Navigator.pushReplacementNamed(context, '/duty-login');
           }
           if(state is GuardDutyCheckOutFailure){
-            CustomSnackbar.show(context: context, message: state.message, type: SnackbarType.error);
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
           }
         },
         builder: (context, state){
@@ -227,7 +227,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
         if (_otp != null && _otp!.length == 6) {
           context.read<GuardEntryBloc>().add(CheckInByCode(checkInCode: _otp!));
         } else {
-          _showSnackBar("Enter a valid check-in code", Colors.redAccent);
+          CustomSnackBar.show(context: context, message: "Enter a valid check-in code", type: SnackBarType.error);
         }
       },
       style: ElevatedButton.styleFrom(
@@ -389,17 +389,11 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
   }
 
   void _handleSuccess(String message) {
-    _showSnackBar(message, Colors.green);
+    CustomSnackBar.show(context: context, message: message, type: SnackBarType.success);
   }
 
   void _handleError(String message) {
-    _showSnackBar(message, Colors.redAccent);
-  }
-
-  void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: color),
-    );
+    CustomSnackBar.show(context: context, message: message, type: SnackBarType.error);
   }
 
   Widget _buildEndDutyButton() {

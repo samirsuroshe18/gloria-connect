@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
+import 'package:gloria_connect/common_widgets/single_paginated_list_view.dart';
 import 'package:gloria_connect/features/guard_duty/bloc/guard_duty_bloc.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/features/guard_duty/widgets/filter_button.dart';
+import 'package:gloria_connect/features/guard_duty/widgets/gate_filter_chip.dart';
+import 'package:gloria_connect/features/guard_duty/widgets/guard_log_card.dart';
+import 'package:gloria_connect/features/guard_duty/widgets/shift_filter_chip.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:gloria_connect/features/guard_duty/model/guard_log_model.dart';
-import 'package:lottie/lottie.dart';
 
 class ShiftHistoryScreen extends StatefulWidget {
   final String guardId;
@@ -124,46 +131,9 @@ class _ShiftHistoryScreenState extends State<ShiftHistoryScreen> {
         ),
         actions: [
           // Filter button
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8.0),
-                onTap: () => _showFilterBottomSheet(context),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.filter_list,
-                        color: _hasActiveFilters
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                      ),
-                      if (_hasActiveFilters)
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          FilterButton(
+            onTap: () => _showFilterBottomSheet(context),
+            hasActiveFilters: _hasActiveFilters,
           ),
         ],
       ),
@@ -198,263 +168,50 @@ class _ShiftHistoryScreenState extends State<ShiftHistoryScreen> {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: AnimationLimiter(
-                child: _buildEntriesList(),
+                child: SinglePaginatedListView<GuardLogEntry>(
+                  data: data,
+                  controller: _scrollController,
+                  hasMore: _hasMore,
+                  itemBuilder: _itemBuilder,
+                ),
               ),
             );
           } else if (_isLazyLoading) {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: AnimationLimiter(
-                child: _buildEntriesList(),
+                child: SinglePaginatedListView<GuardLogEntry>(
+                  data: data,
+                  controller: _scrollController,
+                  hasMore: _hasMore,
+                  itemBuilder: _itemBuilder,
+                ),
               ),
             );
           } else if (_isLoading && _isLazyLoading==false) {
-            return Center(
-              child: Lottie.asset(
-                'assets/animations/loader.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-            );
+            return const CustomLoader();
           }else if (data.isEmpty && _isError == true && statusCode == 401) {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/error.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Something went wrong!",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return BuildErrorState(onRefresh: _onRefresh);
           } else {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/animations/no_data.json',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "There is no notice",
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'There are no shifts',);
           }
         },
       ),
     );
   }
 
-  Widget _buildEntriesList() {
-
-    return ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: data.length + 1,
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        itemBuilder: (context, index) {
-          if (index < data.length) {
-            final guardLog = data[index];
-            return StaggeredListAnimation(index: index, child: InkWell(
-              onTap: (){
-                Navigator.pushNamed(context, '/day-checkout-entry', arguments: data[index].checkinTime);
-              },
-              child: Card(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                color: Colors.black.withOpacity(0.2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            guardLog.date != null
-                                ? DateFormat('MMM d, yyyy').format(guardLog.date!)
-                                : 'NA',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.amber.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              guardLog.shift ?? 'NA',
-                              style: const TextStyle(
-                                color: Colors.amber,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Gate',
-                                  style: TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  guardLog.gate ?? 'NA',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Check-in',
-                                  style: TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  guardLog.checkinTime != null
-                                      ? DateFormat('h:mm a').format(guardLog.checkinTime!)
-                                      :'NA',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Check-out',
-                                  style: TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  guardLog.checkoutTime!=null
-                                      ? DateFormat('h:mm a').format(guardLog.checkoutTime!)
-                                      :'NA',
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Checkin Note',
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        guardLog.checkinReason ?? 'NA',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      const SizedBox(height: 12,),
-                      const Text(
-                        'Checkout Note',
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        guardLog.checkoutReason ?? 'NA',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ));
-          } else {
-            if (_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: Text("No more data to load")),
-              );
-            }
-          }
-        }
+  Widget _itemBuilder(item, index) {
+    return StaggeredListAnimation(
+      index: index,
+      child: GuardLogCard(
+        guardLog: item,
+        onTap: _onCardTap,
+      ),
     );
+  }
+
+  void _onCardTap(GuardLogEntry guardLog){
+    Navigator.pushNamed(context, '/day-checkout-entry', arguments: guardLog.checkinTime);
   }
 
   void _showFilterBottomSheet(BuildContext context) {
@@ -511,8 +268,26 @@ class _ShiftHistoryScreenState extends State<ShiftHistoryScreen> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        _buildGateFilterChip('Ground Floor Entry', 'Ground Floor Entry', setModalState),
-                        _buildGateFilterChip('Podium Entry', 'Podium Entry', setModalState),
+                        GateFilterChip(
+                          label: 'Ground Floor Entry',
+                          value: 'Ground Floor Entry',
+                          selectedValue: _selectedGate,
+                          onSelected: (newValue) {
+                            setModalState(() {
+                              _selectedGate = newValue;
+                            });
+                          },
+                        ),
+                        GateFilterChip(
+                          label: 'Podium Entry',
+                          value: 'Podium Entry',
+                          selectedValue: _selectedGate,
+                          onSelected: (newValue) {
+                            setModalState(() {
+                              _selectedGate = newValue;
+                            });
+                          },
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -526,10 +301,43 @@ class _ShiftHistoryScreenState extends State<ShiftHistoryScreen> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        _buildShiftFilterChip('All Shifts', 'All Shifts', setModalState),
-                        _buildShiftFilterChip('Morning', 'Morning', setModalState),
-                        _buildShiftFilterChip('Evening', 'Evening', setModalState),
-                        _buildShiftFilterChip('Night', 'Night', setModalState),
+                        ShiftFilterChip(
+                          label: 'All Shifts',
+                          value: 'All Shifts',
+                          selectedValue: _selectedShift,
+                          onSelected: (newValue) {
+                            setModalState(() {
+                              _selectedShift = newValue;
+                            });
+                          },
+                        ),ShiftFilterChip(
+                          label: 'Morning',
+                          value: 'Morning',
+                          selectedValue: _selectedShift,
+                          onSelected: (newValue) {
+                            setModalState(() {
+                              _selectedShift = newValue;
+                            });
+                          },
+                        ),ShiftFilterChip(
+                          label: 'Evening',
+                          value: 'Evening',
+                          selectedValue: _selectedShift,
+                          onSelected: (newValue) {
+                            setModalState(() {
+                              _selectedShift = newValue;
+                            });
+                          },
+                        ),ShiftFilterChip(
+                          label: 'Night',
+                          value: 'Night',
+                          selectedValue: _selectedShift,
+                          onSelected: (newValue) {
+                            setModalState(() {
+                              _selectedShift = newValue;
+                            });
+                          },
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -600,30 +408,6 @@ class _ShiftHistoryScreenState extends State<ShiftHistoryScreen> {
             );
           },
         );
-      },
-    );
-  }
-
-  Widget _buildGateFilterChip(String label, String value, StateSetter setModalState) {
-    return FilterChip(
-      label: Text(label),
-      selected: _selectedGate == value,
-      onSelected: (selected) {
-        setModalState(() {
-          _selectedGate = selected ? value : '';
-        });
-      },
-    );
-  }
-
-  Widget _buildShiftFilterChip(String label, String value, StateSetter setModalState) {
-    return FilterChip(
-      label: Text(label),
-      selected: _selectedShift == value,
-      onSelected: (selected) {
-        setModalState(() {
-          _selectedShift = selected ? value : '';
-        });
       },
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
 
 class DeliveryMoreOption extends StatefulWidget {
   const DeliveryMoreOption({super.key});
@@ -185,7 +185,7 @@ class _DeliveryMoreOptionState extends State<DeliveryMoreOption> {
                     ),
                     onPressed: () {
                       if(searchName.text.isEmpty){
-                        CustomSnackbar.show(context: context, message: 'This field is required', type: SnackbarType.error);
+                        CustomSnackBar.show(context: context, message: 'This field is required', type: SnackBarType.error);
                         return;
                       }
                       Navigator.pop(context); // Close the dialog

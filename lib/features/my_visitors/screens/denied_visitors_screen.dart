@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
+import 'package:gloria_connect/common_widgets/grouped_paginated_list_view.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/visitor_denied_card.dart';
-import 'package:gloria_connect/utils/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -254,85 +257,42 @@ class _DeniedVisitorsScreenState extends State<DeniedVisitorsScreen> with Automa
                 statusCode= state.status;
                 _hasMore = false;
               }
-                    },
+            },
             builder: (context, state) {
               if (data.isNotEmpty && _isLoading == false) {
                 return RefreshIndicator(
                   onRefresh: _onRefresh,
                   child: AnimationLimiter(
-                    child: _buildGroupedEntriesList(),
+                    child: GroupedPaginatedListView<Entry>(
+                      groupedData: _getGroupedData(),
+                      controller: _scrollController,
+                      hasMore: _hasMore,
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      groupHeaderBuilder: _groupHeaderBuilder,
+                      itemBuilder: _itemBuilder,
+                    ),
                   ),
                 );
               } else if (_isLazyLoading) {
                 return RefreshIndicator(
                   onRefresh: _onRefresh,
                   child: AnimationLimiter(
-                    child: _buildGroupedEntriesList(),
+                    child: GroupedPaginatedListView<Entry>(
+                      groupedData: _getGroupedData(),
+                      controller: _scrollController,
+                      hasMore: _hasMore,
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      groupHeaderBuilder: _groupHeaderBuilder,
+                      itemBuilder: _itemBuilder,
+                    ),
                   ),
                 );
               } else if (_isLoading && _isLazyLoading==false) {
-                return Center(
-                  child: Lottie.asset(
-                    'assets/animations/loader.json',
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.contain,
-                  ),
-                );
+                return const CustomLoader();
               } else if (data.isEmpty && _isError == true && statusCode == 401) {
-                return RefreshIndicator(
-                  onRefresh: _onRefresh,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height - 200,
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Lottie.asset(
-                            'assets/animations/error.json',
-                            width: 200,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "Something went wrong!",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
+                return BuildErrorState(onRefresh: _onRefresh);
               } else {
-                return RefreshIndicator(
-                  onRefresh: _onRefresh,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height - 200,
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Lottie.asset(
-                            'assets/animations/no_data.json',
-                            width: 200,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "There is no denied visitors",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
+                return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no denied visitors",);
               }
             },
           ),
@@ -348,7 +308,7 @@ class _DeniedVisitorsScreenState extends State<DeniedVisitorsScreen> with Automa
     }
   }
 
-  Widget _buildGroupedEntriesList() {
+  Map<String, List<Entry>> _getGroupedData(){
     // Group entries by date
     final Map<String, List<Entry>> groupedEntries = {};
     for (var entry in data) {
@@ -360,55 +320,29 @@ class _DeniedVisitorsScreenState extends State<DeniedVisitorsScreen> with Automa
 
       groupedEntries[dateKey]!.add(entry);
     }
+    return groupedEntries;
+  }
 
-    return ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: groupedEntries.keys.length + 1,
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        itemBuilder: (context, index) {
-          if (index < groupedEntries.keys.length) {
-            final dateKey = groupedEntries.keys.elementAt(index);
-            final entriesInGroup = groupedEntries[dateKey]!;
+  Widget _groupHeaderBuilder(date) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        date,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black87,
+        ),
+      ),
+    );
+  }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    dateKey,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black87,
-                    ),
-                  ),
-                ),
-                ...entriesInGroup.map((entry) {
-                  return StaggeredListAnimation(
-                    index: index,
-                    child: VisitorDeniedCard(data: entry),
-                  );
-                }),
-              ],
-            );
-          } else {
-            if (_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: Text("No more data to load")),
-              );
-            }
-          }
-        }
+  Widget _itemBuilder(entry, index) {
+    return StaggeredListAnimation(
+      index: index,
+      child: VisitorDeniedCard(data: entry),
     );
   }
 

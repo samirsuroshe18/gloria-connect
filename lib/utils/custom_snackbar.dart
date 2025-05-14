@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
-class CustomSnackbar {
+class CustomSnackBar {
   static void show({
     required BuildContext context,
-    required String message,
-    required SnackbarType type,
+    required String? message,
+    required SnackBarType type,
   }) {
     Color backgroundColor;
     IconData icon;
 
     switch (type) {
-      case SnackbarType.success:
+      case SnackBarType.success:
         backgroundColor = const Color(0xFF28A745); // Green
         icon = Icons.check_circle;
         break;
-      case SnackbarType.error:
+      case SnackBarType.error:
         backgroundColor = const Color(0xFFD32F2F); // Red
         icon = Icons.error;
         break;
-      case SnackbarType.info:
+      case SnackBarType.info:
         backgroundColor = const Color(0xFF1976D2); // Blue
         icon = Icons.info;
         break;
@@ -47,7 +47,7 @@ class CustomSnackbar {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                message,
+                message ?? 'message not available',
                 style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
@@ -61,4 +61,4 @@ class CustomSnackbar {
   }
 }
 
-enum SnackbarType { success, error, info }
+enum SnackBarType { success, error, info }

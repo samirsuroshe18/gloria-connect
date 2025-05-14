@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/features/setting/widgets/setting_text_field.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 
 import '../bloc/setting_bloc.dart';
 
@@ -43,19 +44,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             _newPasswordController.clear();
             _confirmPasswordController.clear();
             _isLoading = false;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.response['message']),
-                backgroundColor: Colors.green,
-              ),
-            );
+            CustomSnackBar.show(context: context, message: state.response['message'], type: SnackBarType.success);
           }
           if(state is SettingChangePassFailure){
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message.toString()),
-                backgroundColor: Colors.redAccent,
-              ),
-            );
+            if(state.message == 'data and hash arguments required'){
+              CustomSnackBar.show(context: context, message: 'Unable to change password. Please check your current credentials.', type: SnackBarType.error);
+            }else{
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
+            }
             _isLoading = false;
           }
         },

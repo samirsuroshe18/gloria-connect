@@ -205,30 +205,6 @@ class Notice {
     };
 }
 
-class PublishedBy {
-    final String? id;
-    final String? userName;
-    final String? email;
-
-    PublishedBy({
-        this.id,
-        this.userName,
-        this.email,
-    });
-
-    factory PublishedBy.fromJson(Map<String, dynamic> json) => PublishedBy(
-        id: json["_id"],
-        userName: json["userName"],
-        email: json["email"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "_id": id,
-        "userName": userName,
-        "email": email,
-    };
-}
-
 class Pagination {
     final int? totalEntries;
     final int? entriesPerPage;
