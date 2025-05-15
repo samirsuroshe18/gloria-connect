@@ -8,12 +8,12 @@ class DocumentUploadCard extends StatelessWidget {
   final String label;
 
   const DocumentUploadCard({
-    Key? key,
+    super.key,
     required this.file,
     required this.onRemove,
     required this.onUploadTap,
     this.label = 'Upload Ownership Document',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

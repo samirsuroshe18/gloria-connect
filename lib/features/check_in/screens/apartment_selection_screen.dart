@@ -3,12 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/common_widgets/build_error_state.dart';
 import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
-import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
-import 'package:gloria_connect/features/administration/widgets/search_bar.dart';
 import 'package:gloria_connect/features/check_in/widgets/apartment_card.dart';
 import 'package:gloria_connect/features/check_in/widgets/check_in_search_bar.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:lottie/lottie.dart';
 
 import '../bloc/check_in_bloc.dart';
 

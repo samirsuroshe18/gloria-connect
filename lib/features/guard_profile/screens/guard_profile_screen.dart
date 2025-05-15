@@ -9,7 +9,6 @@ import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/build_action_list.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/build_info_card.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GuardProfileScreen extends StatefulWidget {

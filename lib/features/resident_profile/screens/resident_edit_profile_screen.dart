@@ -8,7 +8,6 @@ import 'package:gloria_connect/features/resident_profile/widgets/custom_button.d
 import 'package:gloria_connect/features/resident_profile/widgets/custom_input_field.dart';
 import 'package:gloria_connect/features/resident_profile/widgets/edit_profile_section.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:gloria_connect/utils/document_picker_utils.dart';
 import 'package:gloria_connect/utils/media_picker_helper.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -52,6 +51,7 @@ class _ResidentEditProfileScreenState extends State<ResidentEditProfileScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }

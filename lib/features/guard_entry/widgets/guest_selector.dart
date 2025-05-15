@@ -7,12 +7,12 @@ class GuestSelector extends StatelessWidget {
   final String Function() guestTextBuilder;
 
   const GuestSelector({
-    Key? key,
+    super.key,
     required this.guestCount,
     required this.onIncrement,
     required this.onDecrement,
     required this.guestTextBuilder,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../auth/models/get_user_model.dart';
-import '../../check_in/bloc/check_in_bloc.dart';
 
 class BuildActionList extends StatelessWidget {
   final GetUserModel? data;

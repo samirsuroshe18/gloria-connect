@@ -1,4 +1,3 @@
-// media_picker_helper.dart
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
@@ -208,7 +207,7 @@ class MediaPickerHelper {
           break;
         }
       } catch (e) {
-        print('Error compressing image: $e');
+        debugPrint('Error compressing image: $e');
         break;
       }
     }

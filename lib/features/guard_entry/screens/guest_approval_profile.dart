@@ -73,6 +73,7 @@ class _GuestApprovalProfileState extends State<GuestApprovalProfile> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }

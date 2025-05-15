@@ -41,7 +41,7 @@ class AddFlatsSection extends StatelessWidget {
 class _Header extends StatelessWidget {
   final VoidCallback onAdd;
 
-  const _Header({Key? key, required this.onAdd}) : super(key: key);
+  const _Header({required this.onAdd});
 
   @override
   Widget build(BuildContext context) {

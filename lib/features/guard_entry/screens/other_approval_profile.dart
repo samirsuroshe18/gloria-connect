@@ -99,6 +99,7 @@ class _OtherApprovalProfileState extends State<OtherApprovalProfile> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }

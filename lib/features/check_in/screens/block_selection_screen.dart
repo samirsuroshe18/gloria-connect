@@ -6,7 +6,6 @@ import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import 'package:gloria_connect/features/check_in/widgets/block_card.dart';
 import 'package:gloria_connect/features/check_in/widgets/check_in_search_bar.dart';
-import 'package:lottie/lottie.dart';
 
 class BlockSelectionScreen extends StatefulWidget {
   final String? entryType;

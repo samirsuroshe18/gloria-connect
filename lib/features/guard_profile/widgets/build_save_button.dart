@@ -40,12 +40,12 @@ class BuildSaveButton extends StatelessWidget {
         ),
         child: Center(
           child: isLoading
-              ? SizedBox(
+              ? const SizedBox(
             height: 28,
             width: 28,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           )
               : const Text(

@@ -7,12 +7,12 @@ class ServiceTypeSelectorTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const ServiceTypeSelectorTile({
-    Key? key,
+    super.key,
     this.logoPath,
     required this.title,
     required this.subtitle,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

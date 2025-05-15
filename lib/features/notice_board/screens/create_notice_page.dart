@@ -43,6 +43,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }
