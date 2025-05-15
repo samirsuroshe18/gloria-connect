@@ -10,7 +10,7 @@ class GenderOptionTile extends StatelessWidget {
   final Color unselectedBorderColor;
 
   const GenderOptionTile({
-    Key? key,
+    super.key,
     required this.value,
     required this.groupValue,
     required this.label,
@@ -18,7 +18,7 @@ class GenderOptionTile extends StatelessWidget {
     required this.onTap,
     this.selectedColor = Colors.white24,
     this.unselectedBorderColor = Colors.grey,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

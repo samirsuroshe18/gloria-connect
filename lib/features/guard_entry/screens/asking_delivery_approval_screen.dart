@@ -8,7 +8,6 @@ import 'package:gloria_connect/features/guard_entry/widgets/entry_type_tag.dart'
 import 'package:gloria_connect/features/guard_entry/widgets/profile_image_avatar.dart';
 import 'package:gloria_connect/features/guard_entry/widgets/read_only_pincode_field.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import '../bloc/guard_entry_bloc.dart';
 import '../widgets/vehicle_option.dart';

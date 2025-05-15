@@ -59,6 +59,7 @@ class _AdminEditProfileScreenState extends State<AdminEditProfileScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }

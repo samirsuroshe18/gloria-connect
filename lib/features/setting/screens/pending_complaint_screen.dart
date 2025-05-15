@@ -13,7 +13,6 @@ import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
 import 'package:gloria_connect/features/setting/widgets/complaint_card.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 
 class PendingComplaintScreen extends StatefulWidget {
   final bool? isAdmin;

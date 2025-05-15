@@ -6,10 +6,10 @@ class ProfileAvatarPicker extends StatelessWidget {
   final VoidCallback onTap;
 
   const ProfileAvatarPicker({
-    Key? key,
+    super.key,
     required this.imageFile,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

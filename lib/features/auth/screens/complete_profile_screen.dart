@@ -12,8 +12,8 @@ import 'package:gloria_connect/utils/media_picker_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-// Even though you didn’t manually install intl, it's likely available because another package depends on it. That’s why importing it works without errors.
-// So in case of intl and path package importing working fine beacause another packages dependent on them
+// Even though you did not manually install intl, it's likely available because another package depends on it. That’s why importing it works without errors.
+// So in case of intl and path package importing working fine because another packages dependent on them
 // intl : awesome_notifications (direct dependency) timeago (indirect dependency)
 // path :flutter_launcher_icons, flutter_native_splash, hive_generator, json_serializable
 // ignore: depend_on_referenced_packages

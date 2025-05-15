@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
-import 'package:gloria_connect/common_widgets/gradient_color.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
-import 'package:lottie/lottie.dart';
 
 import '../bloc/auth_bloc.dart';
 import '../widgets/auth_btn.dart';

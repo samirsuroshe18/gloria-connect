@@ -176,6 +176,7 @@ class _ComplaintFormScreenState extends State<ComplaintFormScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }

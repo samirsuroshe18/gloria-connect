@@ -6,9 +6,7 @@ import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/features/admin_profile/widgets/build_apt_member_card.dart';
 import 'package:gloria_connect/features/resident_profile/bloc/resident_profile_bloc.dart';
-import 'package:gloria_connect/utils/phone_utils.dart';
 import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
 
 import '../../resident_profile/models/member.dart';
 

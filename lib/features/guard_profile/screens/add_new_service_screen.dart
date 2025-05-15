@@ -6,10 +6,10 @@ import 'package:gloria_connect/features/guard_profile/widgets/add_flat_section.d
 import 'package:gloria_connect/features/guard_profile/widgets/build_text_field.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/custom_structure_card.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/document_upload_card.dart';
-import 'package:gloria_connect/features/guard_profile/widgets/geneder_option_tile.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/gender_option_tile.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/image_picker_option.dart';
 import 'package:gloria_connect/features/guard_profile/widgets/profile_avatar_picker.dart';
-import 'package:gloria_connect/features/guard_profile/widgets/service_type_slector_tile.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/service_type_selector_tile.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:gloria_connect/utils/document_picker_utils.dart';
 import 'package:gloria_connect/utils/media_picker_helper.dart';
@@ -84,6 +84,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }
@@ -98,6 +99,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       CustomSnackBar.show(context: context, message: 'Error picking image: $e', type: SnackBarType.error);
     }
   }

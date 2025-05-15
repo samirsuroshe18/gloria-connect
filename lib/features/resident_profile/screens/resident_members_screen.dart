@@ -7,9 +7,7 @@ import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/features/resident_profile/models/member.dart';
 import 'package:gloria_connect/features/resident_profile/bloc/resident_profile_bloc.dart';
 import 'package:gloria_connect/features/resident_profile/widgets/build_resident_member.dart';
-import 'package:gloria_connect/utils/phone_utils.dart';
 import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
-import 'package:lottie/lottie.dart';
 
 class ApartmentMembersScreen extends StatefulWidget {
   const ApartmentMembersScreen({super.key,});

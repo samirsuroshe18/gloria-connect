@@ -9,14 +9,14 @@ class CustomTextInput extends StatelessWidget {
   final TextStyle? textStyle;
 
   const CustomTextInput({
-    Key? key,
+    super.key,
     required this.controller,
     required this.hintText,
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     this.maxLines = 1,
     this.textStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
