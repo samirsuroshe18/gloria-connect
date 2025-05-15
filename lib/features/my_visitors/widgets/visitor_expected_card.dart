@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
 import 'package:gloria_connect/utils/phone_utils.dart';
 // ignore: depend_on_referenced_packages
@@ -35,257 +37,168 @@ class VisitorExpectedCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _showVisitorDetails(context),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header section with status banner
-                Container(
-                  color: Colors.white.withOpacity(0.2),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.event_available,
-                        size: 20,
-                        color: tagColor,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        tag,
-                        style: TextStyle(
-                          color: tagColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        DateFormat('MMM d, y').format(DateTime.parse(date)),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
-                  ),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header section with status banner
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
-
-                // Main content
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile image with tap to expand
-                      GestureDetector(
-                        onTap: () => _showImageDialog(profileImageUrl, context),
-                        child: Hero(
-                          tag: 'profile-$userName',
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.grey[200]!,
-                                width: 2,
-                              ),
-                              image: DecorationImage(
-                                image: AssetImage(profileImageUrl),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                color: Colors.white.withOpacity(0.2),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.event_available,
+                    size: 20,
+                    color: tagColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    tag,
+                    style: TextStyle(
+                      color: tagColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    DateFormat('MMM d, y').format(DateTime.parse(date)),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        
+            // Main content
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Profile image with tap to expand
+                  CustomCachedNetworkImage(
+                    imageUrl: profileImageUrl,
+                    isCircular: true,
+                    borderWidth: 2,
+                    size: 60,
+                    onTap: ()=> CustomFullScreenImageViewer.show(
+                      context,
+                      profileImageUrl
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+        
+                  // Visitor details
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userName,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            color: Colors.white70
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-
-                      // Visitor details
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              userName,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                color: Colors.white70
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            if (serviceName != null || companyName != null)
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                          serviceLogo ?? companyLogo!,
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
+                        const SizedBox(height: 4),
+                        if (serviceName != null || companyName != null)
+                          Row(
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                      serviceLogo ?? companyLogo!,
                                     ),
+                                    fit: BoxFit.cover,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      serviceName ?? companyName!,
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: Colors.white70,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.access_time,
-                                  size: 16,
-                                  color: Colors.white70,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  DateFormat('hh:mm a').format(DateTime.parse(date)),
-                                  style: theme.textTheme.bodySmall?.copyWith(
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  serviceName ?? companyName!,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     color: Colors.white70,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time,
+                              size: 16,
+                              color: Colors.white70,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              DateFormat('hh:mm a').format(DateTime.parse(date)),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.white70,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-
-                // Action buttons
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _ActionButton(
-                          icon: Icons.share,
-                          label: 'Share Code',
-                          isCall: false,
-                          primary: true,
-                          onShare: (){
-                            Navigator.pushNamed(
-                              context,
-                              '/otp-banner',
-                              arguments: data,
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _ActionButton(
-                          mobNumber: data.mobNumber,
-                          icon: Icons.phone,
-                          label: 'Call Visitor',
-                          isCall: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showVisitorDetails(BuildContext context) {
-    // Implement a bottom sheet or dialog with more visitor details
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: ListView(
-            controller: scrollController,
-            padding: const EdgeInsets.all(20),
-            children: [
-              // Add detailed visitor information here
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              // Add more visitor details...
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showImageDialog(String imageUrl, BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        insetPadding: EdgeInsets.zero,
-        backgroundColor: Colors.transparent,
-        child: Stack(
-          fit: StackFit.loose,
-          children: [
-            InteractiveViewer(
-              child: Hero(
-                tag: 'profile-$userName',
-                child: Image.asset(
-                  imageUrl,
-                  fit: BoxFit.contain,
-                ),
+                ],
               ),
             ),
-            Positioned(
-              top: 40,
-              right: 20,
-              child: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 30,
-                ),
+        
+            // Action buttons
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _ActionButton(
+                      icon: Icons.share,
+                      label: 'Share Code',
+                      isCall: false,
+                      primary: true,
+                      onShare: (){
+                        Navigator.pushNamed(
+                          context,
+                          '/otp-banner',
+                          arguments: data,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _ActionButton(
+                      mobNumber: data.mobNumber,
+                      icon: Icons.phone,
+                      label: 'Call Visitor',
+                      isCall: true,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-      ),
     );
   }
 }

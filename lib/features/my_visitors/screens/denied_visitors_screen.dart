@@ -5,6 +5,7 @@ import 'package:gloria_connect/common_widgets/build_error_state.dart';
 import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/common_widgets/grouped_paginated_list_view.dart';
+import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
 import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
 import 'package:gloria_connect/features/my_visitors/widgets/visitor_denied_card.dart';
@@ -128,98 +129,23 @@ class _DeniedVisitorsScreenState extends State<DeniedVisitorsScreen> with Automa
     }
   }
 
-  Widget _buildSearchFilterBar() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          // Search field (expanded to take available width)
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  hintText: 'Search by name, mobile, etc.',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {
-                        _searchQuery = '';
-                        _page = 1;
-                        data.clear();
-                      });
-                      _fetchEntries();
-                    },
-                  )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.2)
-              ),
-              onSubmitted: (value) {
-                setState(() {
-                  _searchQuery = value;
-                  _page = 1;
-                  data.clear();
-                });
-                _fetchEntries();
-              },
-            ),
-          ),
+  void _onSearchSubmitted(value) {
+    setState(() {
+      _searchQuery = value;
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
+  }
 
-          // Small gap between search and filter button
-          const SizedBox(width: 8),
-
-          // Filter button
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8.0),
-                onTap: () => _showFilterBottomSheet(context),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.filter_list,
-                        color: _hasActiveFilters
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                      ),
-                      if (_hasActiveFilters)
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _onClearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchQuery = '';
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
   }
 
   @override
@@ -229,7 +155,16 @@ class _DeniedVisitorsScreenState extends State<DeniedVisitorsScreen> with Automa
         body: Column(
           children: [
             // Persistent search and filter bar at the top
-            _buildSearchFilterBar(),
+            SearchFilterBar(
+            searchController: _searchController,
+            hintText: 'Search by name, mobile, etc.',
+            searchQuery: _searchQuery,
+            onSearchSubmitted: _onSearchSubmitted,
+            onClearSearch: _onClearSearch,
+            isFilterButton: true,
+            hasActiveFilters: _hasActiveFilters,
+            onFilterPressed: () => _showFilterBottomSheet(context),
+          ),
 
             Expanded(
               child: BlocConsumer<MyVisitorsBloc, MyVisitorsState>(
@@ -292,7 +227,7 @@ class _DeniedVisitorsScreenState extends State<DeniedVisitorsScreen> with Automa
               } else if (data.isEmpty && _isError == true && statusCode == 401) {
                 return BuildErrorState(onRefresh: _onRefresh);
               } else {
-                return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no denied visitors",);
+                return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no denied visitors", kToolbarCount: 4,);
               }
             },
           ),

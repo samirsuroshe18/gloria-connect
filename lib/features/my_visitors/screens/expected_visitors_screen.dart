@@ -59,7 +59,6 @@ class _ExpectedVisitorsScreenState extends State<ExpectedVisitorsScreen>
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: data.length,
-                  padding: const EdgeInsets.all(8.0),
                   itemBuilder: (BuildContext context, int index) {
                     return StaggeredListAnimation(index: index, child: VisitorExpectedCard(
                       userName: data[index].name!,

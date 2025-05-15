@@ -13,6 +13,7 @@ class GuardWaitingBloc extends Bloc<GuardWaitingEvent, GuardWaitingState> {
   GuardWaitingBloc({required GuardWaitingRepository guardWaitingRepository})
       : _guardWaitingRepository = guardWaitingRepository,
         super(GuardWaitingInitial()) {
+
     on<WaitingGetEntries>((event, emit) async {
       emit(WaitingGetEntriesLoading());
       try {
@@ -24,6 +25,21 @@ class GuardWaitingBloc extends Bloc<GuardWaitingEvent, GuardWaitingState> {
               message: e.message.toString(), status: e.statusCode));
         } else {
           emit(WaitingGetEntriesFailure(message: e.toString()));
+        }
+      }
+    });
+    
+    on<WaitingGetEntry>((event, emit) async {
+      emit(WaitingGetEntryLoading());
+      try {
+        final VisitorEntries response = await _guardWaitingRepository.getEntry(id: event.id);
+        emit(WaitingGetEntrySuccess(response: response));
+      } catch (e) {
+        if (e is ApiError) {
+          emit(WaitingGetEntryFailure(
+              message: e.message.toString(), status: e.statusCode));
+        } else {
+          emit(WaitingGetEntryFailure(message: e.toString()));
         }
       }
     });

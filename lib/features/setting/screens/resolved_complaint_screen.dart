@@ -278,7 +278,7 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
     }else if (_data.isEmpty && _isError == true && statusCode == 401) {
       return BuildErrorState(onRefresh: _onRefresh);
     } else {
-      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no resolved complaints",);
+      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no resolved complaints", kToolbarCount: 4,);
     }
   }
 

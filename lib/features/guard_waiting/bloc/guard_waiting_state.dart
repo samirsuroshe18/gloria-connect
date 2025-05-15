@@ -20,6 +20,21 @@ final class WaitingGetEntriesFailure extends GuardWaitingState{
   WaitingGetEntriesFailure( {required this.message, this.status});
 }
 
+/// Get entry
+final class WaitingGetEntryLoading extends GuardWaitingState{} 
+
+final class WaitingGetEntrySuccess extends GuardWaitingState{
+  final VisitorEntries response;
+  WaitingGetEntrySuccess({required this.response});
+}
+
+final class WaitingGetEntryFailure extends GuardWaitingState{
+  final String message;
+  final int? status;
+
+  WaitingGetEntryFailure( {required this.message, this.status});
+}
+
 /// Allow by security
 final class WaitingAllowEntryLoading extends GuardWaitingState{}
 
