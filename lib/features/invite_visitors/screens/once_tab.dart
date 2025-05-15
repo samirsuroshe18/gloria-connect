@@ -246,9 +246,14 @@ class _OnceTabState extends State<OnceTab> {
                         elevation: 2,
                       ),
                       child: _isLoading
-                          ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
+                          ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
                           : const Text(
                         'Pre-approve Visit',
                         style: TextStyle(

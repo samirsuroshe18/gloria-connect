@@ -112,7 +112,7 @@ class _GeneralNoticeBoardPageState extends State<GeneralNoticeBoardPage> {
     }
   }
 
-  void _onSearchSubmitted(value) {
+  void _onSearchSubmitted(value) { 
     setState(() {
       _searchQuery = value;
       _page = 1;

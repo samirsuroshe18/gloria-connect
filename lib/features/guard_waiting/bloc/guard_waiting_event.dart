@@ -5,6 +5,12 @@ sealed class GuardWaitingEvent{}
 
 final class WaitingGetEntries extends GuardWaitingEvent{}
 
+final class WaitingGetEntry extends GuardWaitingEvent{
+  final String id;
+
+  WaitingGetEntry({required this.id});
+}
+
 final class WaitingAllowEntry extends GuardWaitingEvent{
   final String id;
 

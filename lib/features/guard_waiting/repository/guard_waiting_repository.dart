@@ -39,6 +39,35 @@ class GuardWaitingRepository {
     }
   }
 
+  Future<VisitorEntries> getEntry({required String id}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final apiUrl ='http://192.168.45.221:8000/api/v1/delivery-entry/get-waiting-entry/$id';
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return VisitorEntries.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
   Future<Map<String, dynamic>> allowEntryBySecurity(
       {required String id}) async {
     try {

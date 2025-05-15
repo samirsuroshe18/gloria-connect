@@ -185,7 +185,7 @@ class CheckoutHistoryCard extends StatelessWidget {
       children: [
         _buildInfoRow(
           Icons.check_circle_outline,
-          'Approved by $approvedBy',
+          'Approved by ${approvedBy ?? 'No one'}',
           Colors.green,
         ),
         const SizedBox(height: 8),

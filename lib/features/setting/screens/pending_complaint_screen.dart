@@ -286,7 +286,7 @@ class _PendingComplaintScreenState extends State<PendingComplaintScreen> with Au
     }else if (_data.isEmpty && _isError == true && statusCode == 401) {
       return BuildErrorState(onRefresh: _onRefresh);
     } else {
-      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no pending complaints",);
+      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no pending complaints", kToolbarCount: 4,);
     }
   }
 

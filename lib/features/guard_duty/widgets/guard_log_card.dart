@@ -18,7 +18,7 @@ class GuardLogCard extends StatelessWidget {
     return InkWell(
       onTap: () => onTap(guardLog),
       child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 4),
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         color: Colors.black.withOpacity(0.2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
