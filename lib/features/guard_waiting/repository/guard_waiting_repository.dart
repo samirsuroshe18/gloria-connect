@@ -44,7 +44,7 @@ class GuardWaitingRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl ='http://192.168.45.221:8000/api/v1/delivery-entry/get-waiting-entry/$id';
+      final apiUrl ='https://invite.iotsense.in/api/v1/delivery-entry/get-waiting-entry/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
