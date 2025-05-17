@@ -96,7 +96,7 @@ class BuildMessageBubble extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     DateFormat('MMM d, h:mm a').format(
-                      DateTime.parse(message['date']),
+                      DateTime.parse(message['date']).toLocal(),
                     ),
                     style: const TextStyle(
                       fontSize: 11,
