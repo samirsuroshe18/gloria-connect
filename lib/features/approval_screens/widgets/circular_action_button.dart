@@ -37,7 +37,7 @@ class CircularActionButton extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: shadowColor.withOpacity(0.5),
+                  color: shadowColor.withValues(alpha: 0.5),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),

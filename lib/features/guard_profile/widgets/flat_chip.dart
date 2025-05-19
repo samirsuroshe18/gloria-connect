@@ -13,7 +13,7 @@ class FlatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white.withOpacity(0.2),
+      color: Colors.white.withValues(alpha: 0.2),
       margin: const EdgeInsets.only(right: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

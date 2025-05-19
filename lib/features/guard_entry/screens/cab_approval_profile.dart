@@ -92,7 +92,7 @@ class _CabApprovalProfileState extends State<CabApprovalProfile> {
           'Add Cab',
           style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: BlocConsumer<CheckInBloc, CheckInState>(
         listener: (context, state) {

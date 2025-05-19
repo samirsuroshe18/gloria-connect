@@ -8,7 +8,7 @@ class CustomStructureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
-      shadowColor: Colors.black.withOpacity(0.3),
+      shadowColor: Colors.black.withValues(alpha: 0.3),
       margin: const EdgeInsets.all(16),
       color: Colors.transparent,
       shape: RoundedRectangleBorder(
@@ -19,19 +19,19 @@ class CustomStructureCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF125AAA).withOpacity(0.7),
-              const Color(0xFFA72524).withOpacity(0.7),
+              const Color(0xFF125AAA).withValues(alpha: 0.7),
+              const Color(0xFFA72524).withValues(alpha: 0.7),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           border: Border.all(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withValues(alpha: 0.15),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 12,
               spreadRadius: 2,
             ),

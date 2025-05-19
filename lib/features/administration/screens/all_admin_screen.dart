@@ -59,7 +59,7 @@ class _AllAdminScreenState extends State<AllAdminScreen> {
             'Society Admin',
             style: TextStyle(color: Colors.white,),
           ),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: CustomSearchBar(filter: _filterAdmin),

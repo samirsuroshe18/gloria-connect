@@ -151,8 +151,7 @@ class _SplashScreenState extends State<SplashScreen> {
         break;
 
       case AuthErrorType.unexpectedError:
-      default:
-        final token = await getAccessToken();
+      final token = await getAccessToken();
         if (!mounted) return; // Check mounted after await
         
         if (token != null) {

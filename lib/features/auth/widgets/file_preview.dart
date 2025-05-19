@@ -20,7 +20,7 @@ class FilePreview extends StatelessWidget {
         child: Container(
           height: 200,
           width: double.infinity,
-          color: Colors.grey.shade100.withOpacity(0.2),
+          color: Colors.grey.shade100.withValues(alpha: 0.2),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

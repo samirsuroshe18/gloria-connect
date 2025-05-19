@@ -27,8 +27,8 @@ class OwenershipSelection extends StatelessWidget {
               ),
               selected: isSelected,
               onSelected: (selected) => onSelected(selected, status),
-              selectedColor: Colors.white.withOpacity(0.15), // subtle white overlay for contrast
-              backgroundColor: Colors.white.withOpacity(0.05), // more subtle, blends with gradient
+              selectedColor: Colors.white.withValues(alpha: 0.15), // subtle white overlay for contrast
+              backgroundColor: Colors.white.withValues(alpha: 0.05), // more subtle, blends with gradient
               shape: StadiumBorder(
                 side: BorderSide(
                   color: isSelected ? Colors.white : Colors.white30,

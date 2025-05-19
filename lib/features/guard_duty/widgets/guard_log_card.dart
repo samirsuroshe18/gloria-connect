@@ -19,7 +19,7 @@ class GuardLogCard extends StatelessWidget {
       onTap: () => onTap(guardLog),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withValues(alpha: 0.2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -43,7 +43,7 @@ class GuardLogCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.1),
+                      color: Colors.amber.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

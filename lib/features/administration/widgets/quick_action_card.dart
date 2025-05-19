@@ -11,7 +11,7 @@ class QuickActionCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Card(
-          color: Colors.black.withOpacity(0.0),
+          color: Colors.black.withValues(alpha: 0.0),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

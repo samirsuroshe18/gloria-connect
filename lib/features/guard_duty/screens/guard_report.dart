@@ -48,7 +48,7 @@ class _GuardReportState extends State<GuardReport> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
@@ -112,7 +112,7 @@ class _GuardReportState extends State<GuardReport> {
       width: double.infinity,
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -169,7 +169,7 @@ class _GuardReportState extends State<GuardReport> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Row(
@@ -202,7 +202,7 @@ class _GuardReportState extends State<GuardReport> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
@@ -259,7 +259,7 @@ class _GuardReportState extends State<GuardReport> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -347,7 +347,7 @@ class _GuardReportState extends State<GuardReport> {
   //       borderRadius: BorderRadius.circular(12),
   //       boxShadow: [
   //         BoxShadow(
-  //           color: Colors.black.withOpacity(0.05),
+  //           color: Colors.black.withValues(alpha: 0.05),
   //           blurRadius: 10,
   //           offset: const Offset(0, 2),
   //         ),
@@ -455,7 +455,7 @@ class _GuardReportState extends State<GuardReport> {
   //       borderRadius: BorderRadius.circular(12),
   //       boxShadow: [
   //         BoxShadow(
-  //           color: Colors.black.withOpacity(0.05),
+  //           color: Colors.black.withValues(alpha: 0.05),
   //           blurRadius: 10,
   //           offset: const Offset(0, 2),
   //         ),
@@ -652,7 +652,7 @@ class _GuardReportState extends State<GuardReport> {
   //   return Container(
   //     padding: const EdgeInsets.all(12),
   //     decoration: BoxDecoration(
-  //       color: color.withOpacity(0.1),
+  //       color: color.withValues(alpha: 0.1),
   //       borderRadius: BorderRadius.circular(8),
   //     ),
   //     child: Column(
@@ -677,7 +677,7 @@ class _GuardReportState extends State<GuardReport> {
   //           label,
   //           style: TextStyle(
   //             fontSize: 12,
-  //             color: color.withOpacity(0.8),
+  //             color: color.withValues(alpha: 0.8),
   //           ),
   //           textAlign: TextAlign.center,
   //         ),

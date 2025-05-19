@@ -101,7 +101,7 @@ class _AllResidentScreenState extends State<AllResidentScreen> {
             'Society Members',
             style: TextStyle(color: Colors.white,),
           ),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: SearchFilterBar(

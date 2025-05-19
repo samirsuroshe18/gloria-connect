@@ -42,7 +42,7 @@ class _GuardApprovalScreenState extends State<GuardApprovalScreen> {
           'Guard Approval',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: BlocConsumer<AdministrationBloc, AdministrationState>(
         listener: (context, state) {

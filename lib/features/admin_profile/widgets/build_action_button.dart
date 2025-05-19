@@ -15,7 +15,7 @@ class BuildActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -33,7 +33,7 @@ class BuildActionButton extends StatelessWidget {
             const Spacer(),
             Icon(
               Icons.arrow_forward_ios,
-              color: color.withOpacity(0.5),
+              color: color.withValues(alpha: 0.5),
               size: 16,
             ),
           ],

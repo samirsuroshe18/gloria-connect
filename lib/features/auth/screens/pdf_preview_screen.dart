@@ -21,7 +21,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: Text(
           path.basename(widget.file.path),
           style: const TextStyle(color: Colors.white70),
@@ -54,7 +54,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
           if (_isLoading)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.3), // Slight dim effect
+                color: Colors.black.withValues(alpha: 0.3), // Slight dim effect
                 child: const Center(
                   child: CircularProgressIndicator(
                     color: Colors.white, // White spinner for contrast

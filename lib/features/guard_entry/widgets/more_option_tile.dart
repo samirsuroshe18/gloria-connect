@@ -12,7 +12,7 @@ class MoreOptionsTile extends StatelessWidget {
         margin: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
         ),
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,

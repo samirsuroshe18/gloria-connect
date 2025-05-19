@@ -131,8 +131,8 @@ class _FrequentlyTabState extends State<FrequentlyTab> {
                           child: Container(
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? Colors.blue.shade700.withOpacity(0.2)
-                                  : Colors.white.withOpacity(0.2),
+                                  ? Colors.blue.shade700.withValues(alpha: 0.2)
+                                  : Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: isSelected
@@ -421,7 +421,7 @@ class _FrequentlyTabState extends State<FrequentlyTab> {
         ),
         const SizedBox(height: 8),
         Card(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(color: Colors.grey.shade300),

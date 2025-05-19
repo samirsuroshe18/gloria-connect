@@ -190,8 +190,8 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
                                           begin: Alignment.topCenter,
                                           end: Alignment.bottomCenter,
                                           colors: [
-                                            Colors.black.withOpacity(0.1),
-                                            Colors.black.withOpacity(1),
+                                            Colors.black.withValues(alpha: 0.1),
+                                            Colors.black.withValues(alpha: 1),
                                           ],
                                         ),
                                       ),
@@ -218,7 +218,7 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
                                           Text(
                                             feature['description'],
                                             style: TextStyle(
-                                              color: Colors.white.withOpacity(0.9),
+                                              color: Colors.white.withValues(alpha: 0.9),
                                               fontSize: 16,
                                               letterSpacing: 0.3,
                                             ),
@@ -248,7 +248,7 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
@@ -286,7 +286,7 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
                                 margin: const EdgeInsets.symmetric(horizontal: 4.0),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(
+                                  color: Colors.white.withValues(alpha: 
                                     _currentCarouselIndex == entry.key ? 1.0 : 0.5,
                                   ),
                                 ),
@@ -304,7 +304,7 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
                   child: Container(
                     margin: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(30)
                     ),
                     child: Padding(
@@ -414,7 +414,7 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
                 //             borderRadius: BorderRadius.circular(16),
                 //             boxShadow: [
                 //               BoxShadow(
-                //                 color: Colors.black.withOpacity(0.05),
+                //                 color: Colors.black.withValues(alpha: 0.05),
                 //                 blurRadius: 10,
                 //                 offset: const Offset(0, 4),
                 //               ),
@@ -532,7 +532,7 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
   //       borderRadius: BorderRadius.circular(16),
   //       boxShadow: [
   //         BoxShadow(
-  //           color: Colors.black.withOpacity(0.05),
+  //           color: Colors.black.withValues(alpha: 0.05),
   //           blurRadius: 10,
   //           offset: const Offset(0, 4),
   //         ),
@@ -544,7 +544,7 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
   //           height: 48,
   //           width: 48,
   //           decoration: BoxDecoration(
-  //             color: color.withOpacity(0.1),
+  //             color: color.withValues(alpha: 0.1),
   //             borderRadius: BorderRadius.circular(12),
   //           ),
   //           child: Icon(

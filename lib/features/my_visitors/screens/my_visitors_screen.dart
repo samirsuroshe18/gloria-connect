@@ -18,7 +18,7 @@ class _MyVisitorsScreenState extends State<MyVisitorsScreen> {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
           title: const Text(
             'My Visitors',
             style: TextStyle(
@@ -29,7 +29,7 @@ class _MyVisitorsScreenState extends State<MyVisitorsScreen> {
         body: Column(
           children: [
             Container(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               child: const TabBar(
                 labelColor: Colors.white70, // Text color for selected tab
                 unselectedLabelColor: Colors.white60, // Text color for unselected tabs

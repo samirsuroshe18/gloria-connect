@@ -147,7 +147,7 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: Text(widget.title!, style: const TextStyle(color: Colors.white),),
         actions: [
           // Download button with loading indicator
@@ -172,7 +172,7 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
         children: [
           if (widget.isTenantAgreement! && widget.startDate != null && widget.endDate != null)
             Container(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,

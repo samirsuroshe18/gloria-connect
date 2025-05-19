@@ -61,7 +61,7 @@ class _BlockSelectionScreenState extends State<BlockSelectionScreen> {
               Navigator.of(context).pop();
             },
           ),
-          backgroundColor: Colors.black.withOpacity(0.2),  // Change AppBar color here
+          backgroundColor: Colors.black.withValues(alpha: 0.2),  // Change AppBar color here
           title: const Text(
             'Select Block',
             style: TextStyle(fontSize: 20, color: Colors.white70, fontWeight: FontWeight.bold),  // Text color adjusted to white for visibility

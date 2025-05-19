@@ -36,8 +36,8 @@ class BuildMessageBubble extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isMe
-                    ? Colors.black.withOpacity(0.2)
-                    : Colors.white.withOpacity(0.2),
+                    ? Colors.black.withValues(alpha: 0.2)
+                    : Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -68,10 +68,10 @@ class BuildMessageBubble extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isMe
-                                ? Colors.white.withOpacity(0.2)
+                                ? Colors.white.withValues(alpha: 0.2)
                                 : Theme.of(context)
                                 .primaryColor
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: const Text(

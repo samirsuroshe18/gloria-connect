@@ -10,7 +10,7 @@ class ProfileTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: isSelected ? Colors.white.withOpacity(0.5) : Colors.white.withOpacity(0.2),
+      color: isSelected ? Colors.white.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),

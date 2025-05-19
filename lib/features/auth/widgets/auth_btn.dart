@@ -29,7 +29,7 @@ class AuthBtn extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 5,
             spreadRadius: 2,
             offset: const Offset(0, 3),

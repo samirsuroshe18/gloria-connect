@@ -33,7 +33,7 @@ class _InviteGuestScreenState extends State<InviteGuestScreen> with SingleTicker
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Add Guest', style: TextStyle(color: Colors.white),),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
           bottom: TabBar(
             controller: _tabController,
             tabs: const [

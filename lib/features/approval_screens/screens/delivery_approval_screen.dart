@@ -99,7 +99,7 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen> {
                           height: 320.0, // Increased height
                           padding: const EdgeInsets.all(16.0),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12.0),
                             boxShadow: const [
                               BoxShadow(

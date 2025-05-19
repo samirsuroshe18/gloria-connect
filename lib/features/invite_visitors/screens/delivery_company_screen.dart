@@ -74,7 +74,7 @@ class _DeliveryCompanyScreenState extends State<DeliveryCompanyScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Select Company', style: TextStyle(color: Colors.white, fontSize: 20)),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: CustomSearchField(

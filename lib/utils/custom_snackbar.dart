@@ -31,11 +31,11 @@ class CustomSnackBar {
       content: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: backgroundColor.withOpacity(0.9), // Semi-transparent effect
+          color: backgroundColor.withValues(alpha: 0.9), // Semi-transparent effect
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               spreadRadius: 2,
             ),

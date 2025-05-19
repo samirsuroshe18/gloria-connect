@@ -5,7 +5,7 @@ class CustomFullScreenImageViewer {
   static void show(BuildContext context, String? imageUrl, {IconData errorImage=Icons.person}) {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.9),
+      barrierColor: Colors.black.withValues(alpha: 0.9),
       barrierDismissible: true,
       builder: (context) {
         return GestureDetector(
@@ -38,7 +38,7 @@ class CustomFullScreenImageViewer {
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     padding: const EdgeInsets.all(8),

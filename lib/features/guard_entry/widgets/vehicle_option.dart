@@ -24,7 +24,7 @@ class VehicleOption extends StatelessWidget {
             color: isSelected ? Colors.blue : Colors.grey,
           ),
           borderRadius: BorderRadius.circular(10),
-          color: isSelected ? Colors.white.withOpacity(0.2) : Colors.black.withOpacity(0.2),
+          color: isSelected ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.2),
         ),
         padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
         child: Column(

@@ -15,7 +15,7 @@ class CustomSearchBar extends StatelessWidget {
           hintText: 'Search by name or mobile number',
           prefixIcon: const Icon(Icons.search, color: Colors.white70),
           filled: true,
-          fillColor: Colors.white.withOpacity(0.2),
+          fillColor: Colors.white.withValues(alpha: 0.2),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,

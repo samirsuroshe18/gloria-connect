@@ -177,7 +177,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           ),
         ],
       ),
-      backgroundColor: Colors.black.withOpacity(0.2),
+      backgroundColor: Colors.black.withValues(alpha: 0.2),
     );
   }
 
@@ -280,7 +280,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       boxShadows: [
-        BoxShadow(offset: const Offset(0, 4), blurRadius: 8, color: Colors.black.withOpacity(0.1)),
+        BoxShadow(offset: const Offset(0, 4), blurRadius: 8, color: Colors.black.withValues(alpha: 0.1)),
       ],
       cursorColor: Colors.white70,
       animationType: AnimationType.fade,
@@ -354,7 +354,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
               shape: const CircleBorder(),
               child: CircleAvatar(
                 radius: 25,
-                backgroundColor: Colors.white.withOpacity(0.2),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
                 child: Icon(icon, size: 25, color: Colors.white70),
               ),
             ),
@@ -408,7 +408,7 @@ class _GuardEntryScreenState extends State<GuardEntryScreen> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.redAccent.withOpacity(0.9),
+          backgroundColor: Colors.redAccent.withValues(alpha: 0.9),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 4,
         ),

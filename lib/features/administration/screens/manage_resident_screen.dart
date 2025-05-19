@@ -14,7 +14,7 @@ class ManageResidentScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

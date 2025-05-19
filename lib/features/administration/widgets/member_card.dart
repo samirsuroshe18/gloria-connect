@@ -13,7 +13,7 @@ class MemberCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       child: ListTile(
         leading: CustomCachedNetworkImage(
           isCircular: true,

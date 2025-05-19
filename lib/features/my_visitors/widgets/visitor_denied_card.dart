@@ -15,7 +15,7 @@ class VisitorDeniedCard extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Card(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: Padding(
@@ -135,7 +135,7 @@ class VisitorDeniedCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, size: 20, color: Colors.white60),

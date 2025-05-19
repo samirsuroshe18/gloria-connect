@@ -69,7 +69,7 @@ class _OtpBannerState extends State<OtpBanner> {
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
+                      color: Colors.black.withValues(alpha: 0.25),
                       spreadRadius: 6,
                       blurRadius: 15,
                       offset: const Offset(0, 10),
@@ -96,7 +96,7 @@ class _OtpBannerState extends State<OtpBanner> {
                         shadows: [
                           Shadow(
                             blurRadius: 8.0,
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             offset: const Offset(2, 2),
                           ),
                         ],
@@ -109,7 +109,7 @@ class _OtpBannerState extends State<OtpBanner> {
                         borderRadius: BorderRadius.circular(16.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             spreadRadius: 4,
                             blurRadius: 10,
                             offset: const Offset(0, 6),
@@ -182,7 +182,7 @@ class _OtpBannerState extends State<OtpBanner> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
+                                      color: Colors.black.withValues(alpha: 0.3),
                                       spreadRadius: 6,
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
@@ -235,7 +235,7 @@ class _OtpBannerState extends State<OtpBanner> {
                                     shadows: [
                                       Shadow(
                                         blurRadius: 8.0,
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         offset: const Offset(3, 3),
                                       ),
                                     ],
@@ -267,7 +267,7 @@ class _OtpBannerState extends State<OtpBanner> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             spreadRadius: 6,
                             blurRadius: 12,
                             offset: const Offset(0, 6),

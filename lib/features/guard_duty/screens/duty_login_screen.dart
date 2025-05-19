@@ -122,7 +122,7 @@ class _DutyLoginScreenState extends State<DutyLoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: const Text(
           'Start Duty',
           style: TextStyle(

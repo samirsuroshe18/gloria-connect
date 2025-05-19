@@ -54,7 +54,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
           'View Residents Approval',
           style: TextStyle(color: Colors.white70),
         ),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: BlocConsumer<GuardWaitingBloc, GuardWaitingState>(
         listener: (context, state) {
@@ -193,7 +193,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
               color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
                 ),
@@ -239,7 +239,7 @@ class _ViewResidentApprovalState extends State<ViewResidentApproval> {
 
   Widget _buildDeliveryCard() {
     return Card(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

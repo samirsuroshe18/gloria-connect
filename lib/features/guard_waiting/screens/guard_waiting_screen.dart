@@ -37,7 +37,7 @@ class _GuardWaitingScreenState extends State<GuardWaitingScreen> {
             'Waiting for Approval',
             style: TextStyle(color: Colors.white70),
           ),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
         ),
         body: BlocConsumer<GuardWaitingBloc, GuardWaitingState>(
           listener: (context, state) {

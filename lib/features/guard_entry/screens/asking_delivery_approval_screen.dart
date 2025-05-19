@@ -39,7 +39,7 @@ class _GateEntryScreenState extends State<AskingResidentApprovalScreen> {
           'Gate Entry',
           style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: BlocListener<GuardEntryBloc, GuardEntryState>(
         listener: (context, state) {
@@ -101,7 +101,7 @@ class _GateEntryScreenState extends State<AskingResidentApprovalScreen> {
 
   Widget _buildDeliveryCard() {
     return Card(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

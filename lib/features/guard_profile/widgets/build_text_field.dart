@@ -46,7 +46,7 @@ class BuildTextField extends StatelessWidget {
               borderSide: BorderSide(color: Theme.of(context).primaryColor),
             ),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.2),
+            fillColor: Colors.white.withValues(alpha: 0.2),
           ),
         ),
       ],

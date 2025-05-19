@@ -17,7 +17,7 @@ class CustomSearchField extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(left: 8, bottom: 8, right: 8, top: top),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: TextField(

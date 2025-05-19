@@ -20,7 +20,7 @@ class DocumentUploadCard extends StatelessWidget {
     String? fileType = isOwner ? ownershipDocumentType : tenantAgreementType;
 
     return Card(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: Colors.grey.shade300),
@@ -74,7 +74,7 @@ class DocumentUploadCard extends StatelessWidget {
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100.withOpacity(0.3),
+                        color: Colors.grey.shade100.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Column(
