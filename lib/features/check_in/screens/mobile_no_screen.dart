@@ -51,7 +51,7 @@ class _MobileNoScreenState extends State<MobileNoScreen> {
           'Mobile Number',
           style: TextStyle(color: Colors.white70),
         ),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: Form(
         key: _formKey,
@@ -74,7 +74,7 @@ class _MobileNoScreenState extends State<MobileNoScreen> {
               child: AuthTextField(
                 icon: const Icon(Icons.phone),
                 iconColor: Colors.white70,
-                fillColor: Colors.white.withOpacity(0.2),
+                fillColor: Colors.white.withValues(alpha: 0.2),
                 hintText: 'Phone number',
                 controller: _phoneController,
                 errorMsg: 'Please enter phone number',

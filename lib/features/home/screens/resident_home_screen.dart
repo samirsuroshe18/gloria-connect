@@ -42,7 +42,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -52,8 +52,8 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.indigo.shade900.withOpacity(0.85),
-              Colors.deepPurple.shade900.withOpacity(0.85),
+              Colors.indigo.shade900.withValues(alpha: 0.85),
+              Colors.deepPurple.shade900.withValues(alpha: 0.85),
             ],
           ),
         ),
@@ -71,7 +71,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
               elevation: 0,
               height: 60,
               labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-              indicatorColor: Colors.white.withOpacity(0.12), // More subtle indicator
+              indicatorColor: Colors.white.withValues(alpha: 0.12), // More subtle indicator
               animationDuration: const Duration(milliseconds: 400),
               destinations: const [
                 NavigationDestination(

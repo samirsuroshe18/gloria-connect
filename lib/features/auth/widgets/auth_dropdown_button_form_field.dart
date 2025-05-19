@@ -58,7 +58,7 @@ class AuthDropdownButtonFormField<T> extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
             border: Border.all(color: Colors.black54, width: 1.0), // Use dynamic border color
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha: 0.1),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           height: 55, // Adjust the button height

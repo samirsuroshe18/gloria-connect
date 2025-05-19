@@ -711,11 +711,15 @@ class RejectedByClass {
   final String? id;
   final String? userName;
   final String? email;
+  final String? phoneNo;
+  final String? profile;
 
   RejectedByClass({
     this.id,
     this.userName,
     this.email,
+    this.phoneNo,
+    this.profile,
   });
 
   factory RejectedByClass.fromJson(Map<String, dynamic> json) =>
@@ -723,12 +727,16 @@ class RejectedByClass {
         id: json["_id"],
         userName: json["userName"],
         email: json["email"],
+        phoneNo: json["phoneNo"],
+        profile: json["profile"],
       );
 
   Map<String, dynamic> toJson() => {
     "_id": id,
     "userName": userName,
     "email": email,
+    "phoneNo": phoneNo,
+    "profile": profile,
   };
 }
 

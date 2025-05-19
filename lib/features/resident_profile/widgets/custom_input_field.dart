@@ -13,7 +13,7 @@ class CustomInputField extends StatelessWidget {
         hintText: hintText,
         hintStyle: const TextStyle(color: Colors.white60),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.2),
+        fillColor: Colors.white.withValues(alpha: 0.2),
         contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

@@ -47,7 +47,7 @@ class SearchFilterBar extends StatelessWidget {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.2),
+                fillColor: Colors.white.withValues(alpha: 0.2),
               ),
               onSubmitted: onSearchSubmitted,
             ),
@@ -60,7 +60,7 @@ class SearchFilterBar extends StatelessWidget {
           if(isFilterButton)
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8.0),
             ),
             child: Material(

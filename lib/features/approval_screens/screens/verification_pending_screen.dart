@@ -46,7 +46,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.blue.withOpacity(0.2),
+        backgroundColor: Colors.blue.withValues(alpha: 0.2),
         title: const Text(
           'Verification Status',
           style: TextStyle(
@@ -99,11 +99,11 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     // Profile Section
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50.withOpacity(0.2),
+                        color: Colors.blue.shade50.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: Colors.grey.withValues(alpha: 0.1),
                             spreadRadius: 2,
                             blurRadius: 10,
                             offset: const Offset(0, 2),
@@ -168,7 +168,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     // Information Card
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50.withOpacity(0.2),
+                        color: Colors.blue.shade50.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       padding: const EdgeInsets.all(16),
@@ -196,7 +196,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                     OutlinedButton(
                       onPressed: ()=> PhoneUtils.sendEmail(context: context, email: contactEmail ?? ''),
                       style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.black.withOpacity(0.2),
+                        backgroundColor: Colors.black.withValues(alpha: 0.2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

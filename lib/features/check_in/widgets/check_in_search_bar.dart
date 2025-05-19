@@ -13,7 +13,7 @@ class CheckInSearchBar extends StatelessWidget {
         controller: searchController,
         decoration: InputDecoration(
           filled: true, // Enables the fill color
-          fillColor: Colors.white.withOpacity(0.2),
+          fillColor: Colors.white.withValues(alpha: 0.2),
           contentPadding: const EdgeInsets.symmetric(vertical: 5),
           hintText: hintText,
           hintStyle: const TextStyle(color: Colors.white60),

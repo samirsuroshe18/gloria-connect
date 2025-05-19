@@ -34,7 +34,7 @@ class GuardExitScreen extends StatelessWidget {
             'Main-Gates-Exit',
             style: TextStyle(color: Colors.white70),
           ),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
           bottom: TabBar(
             tabAlignment: TabAlignment.center,
             tabs: _tabData.map((tab) => Tab(child: Text(tab['title'] as String, style: _tabTextStyle))

@@ -53,7 +53,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: const Text('Create Notice',
             style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
         centerTitle: true,
@@ -280,7 +280,7 @@ class _CreateNoticePageState extends State<CreateNoticePage> {
               height: 150,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100.withOpacity(0.2),
+                color: Colors.grey.shade100.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.grey.shade300),
               ),

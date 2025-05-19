@@ -121,7 +121,7 @@ class _ShiftHistoryScreenState extends State<ShiftHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: const Text(
           'Shift History',
           style: TextStyle(

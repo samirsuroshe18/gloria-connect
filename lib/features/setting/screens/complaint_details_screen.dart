@@ -33,6 +33,8 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   Complaint? complaintModel;
   late String userId;
   bool _isLoading = false;
+  bool _isActionLoading = false;
+  bool _isMessageLoading = false;
   int? statusCode;
   String complaintId = "...";
   DateTime? complaintDate;
@@ -84,7 +86,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -122,31 +124,24 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
           if (complaintModel != null && _isLoading == false) {
             return RefreshIndicator(
               onRefresh: _onRefresh,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: _buildComplaintDetails(),
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(child: _buildComplaintDetails()),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                            (context, index) => BuildMessageBubble(
+                          message: messages![index].toJson(),
+                          userId: userId,
                         ),
-                        SliverPadding(
-                          padding: const EdgeInsets.all(16),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) => BuildMessageBubble(
-                                message: messages![index].toJson(),
-                                userId: userId,
-                              ),
-                              childCount: messages?.length,
-                            ),
-                          ),
-                        ),
-                      ],
+                        childCount: messages?.length,
+                      ),
                     ),
                   ),
-                  _buildBottomSection(),
+                  // SliverToBoxAdapter(child: _buildBottomSection()),
                 ],
               ),
             );
@@ -157,6 +152,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
           }
         },
       ),
+      bottomNavigationBar: _buildBottomSection(),
     );
   }
 
@@ -194,7 +190,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -284,16 +280,23 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
 
   Widget _buildBottomSection() {
     if (isResolved) {
-      return ResolvedBottomSection(onReopen: _onReopen);
+      return ResolvedBottomSection(onReopen: _onReopen, isActionLoading: _isActionLoading,);
     }
 
-    return PendingBottomSection(messageController: _messageController, sendMessage: _sendMessage, onIsResolved: _onIsResolved);
+    return PendingBottomSection(messageController: _messageController, sendMessage: _sendMessage, onIsResolved: _onIsResolved, isActionLoading: _isActionLoading, isLoading: _isMessageLoading);
   }
 
   void _blocListener(BuildContext context, SettingState state) {
-    if (state is SettingAddResponseLoading) {}
+    if (state is SettingAddResponseLoading) {
+      setState(() {
+        _isMessageLoading = true;
+      });
+    }
 
     if (state is SettingAddResponseSuccess) {
+      setState(() {
+        _isMessageLoading = false;
+      });
       if (state.response.responses!.isNotEmpty) {
         messages?.add(state.response.responses![state.response.responses!.length - 1]);
         complaintModel = state.response;
@@ -310,42 +313,58 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
     }
 
     if (state is SettingAddResponseFailure) {
+      setState(() {
+        _isMessageLoading = false;
+      });
       _showErrorSnackBar(state.message);
     }
 
     if (state is SettingResolveLoading) {
-      // Show loading indicator if needed
+      setState(() {
+        _isActionLoading = true;
+      });
     }
 
     if (state is SettingResolveSuccess) {
       setState(() {
         isResolved = state.response.status == 'resolved';
+        _isActionLoading = false;
       });
       complaintModel = state.response;
     }
 
     if (state is SettingResolveFailure) {
+      setState(() {
+        _isActionLoading = false;
+      });
       _showErrorSnackBar(state.message);
     }
 
     if (state is SettingReopenLoading) {
-      // Show loading indicator if needed
+      setState(() {
+        _isActionLoading = true;
+      });
     }
 
     if (state is SettingReopenSuccess) {
       setState(() {
+        _isActionLoading = false;
         isResolved = state.response.status == 'resolved';
       });
       complaintModel = state.response;
     }
 
     if (state is SettingReopenFailure) {
+      setState(() {
+        _isActionLoading = false;
+      });
       _showErrorSnackBar(state.message);
     }
 
     if (state is SettingGetResponseLoading) {
       _isLoading = true;
     }
+
     if (state is SettingGetResponseSuccess) {
       complaintModel = state.response;
       messages = complaintModel!.responses;

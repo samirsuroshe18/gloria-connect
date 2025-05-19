@@ -18,7 +18,7 @@ class SettingTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
 
         ),
-        fillColor: Colors.blue.withOpacity(0.1),
+        fillColor: Colors.blue.withValues(alpha: 0.1),
         filled: true,
         prefixIcon: icon,
       ),

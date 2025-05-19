@@ -58,7 +58,7 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
+                      color: Colors.black.withValues(alpha: 0.25),
                       spreadRadius: 6,
                       blurRadius: 15,
                       offset: const Offset(0, 10), // Stronger shadow for depth
@@ -90,7 +90,7 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
                         shadows: [
                           Shadow(
                             blurRadius: 8.0,
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             offset: const Offset(2, 2),
                           ),
                         ],
@@ -104,7 +104,7 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
                         borderRadius: BorderRadius.circular(16.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             spreadRadius: 4,
                             blurRadius: 10,
                             offset: const Offset(0, 6), // Adjusted for depth
@@ -188,7 +188,7 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.3), // Shadow color
+                                      color: Colors.black.withValues(alpha: 0.3), // Shadow color
                                       blurRadius: 30, // How blurry the shadow is
                                       spreadRadius: 0.1, // Shadow position (x, y)
                                     ),
@@ -243,7 +243,7 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
                                     shadows: [
                                       Shadow(
                                         blurRadius: 8.0,
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         offset: const Offset(3, 3),
                                       ),
                                     ],
@@ -279,7 +279,7 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             spreadRadius: 6,
                             blurRadius: 12,
                             offset: const Offset(0, 6),

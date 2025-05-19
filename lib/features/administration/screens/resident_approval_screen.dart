@@ -44,7 +44,7 @@ class _ResidentApprovalScreenState extends State<ResidentApprovalScreen> {
           'Resident Approval',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blue.withOpacity(0.2),
+        backgroundColor: Colors.blue.withValues(alpha: 0.2),
       ),
       body: BlocConsumer<AdministrationBloc, AdministrationState>(
         listener: (context, state) {

@@ -46,7 +46,7 @@ class _ContactsScreenState extends State<ContactsScreen> with SingleTickerProvid
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Select Contact', style: TextStyle(color: Colors.white),),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
           bottom: TabBar(
             controller: _tabController,
             tabs: const [

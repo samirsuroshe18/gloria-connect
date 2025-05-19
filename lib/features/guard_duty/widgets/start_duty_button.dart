@@ -62,7 +62,7 @@ class StartDutyButton extends StatelessWidget {
           }
         },
         style: ElevatedButton.styleFrom(
-          disabledBackgroundColor: Colors.indigo.withOpacity(0.3),
+          disabledBackgroundColor: Colors.indigo.withValues(alpha: 0.3),
           disabledForegroundColor: Colors.white70,
           textStyle: const TextStyle(
             fontSize: 18,

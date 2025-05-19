@@ -18,7 +18,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
         slivers: [
           SliverAppBar(
             centerTitle: true,
-            backgroundColor: Colors.black.withOpacity(0.2),
+            backgroundColor: Colors.black.withValues(alpha: 0.2),
             title: const Text(
               'Administration',
               style: TextStyle(

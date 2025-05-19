@@ -55,7 +55,7 @@ class _CabMoreOptionState extends State<CabMoreOption> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Select Company', style: TextStyle(color: Colors.white70, fontSize: 20)),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -64,7 +64,7 @@ class _CabMoreOptionState extends State<CabMoreOption> {
             // Search bar with more padding and enhanced UI
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: TextField(
@@ -92,7 +92,7 @@ class _CabMoreOptionState extends State<CabMoreOption> {
                     final image = company['image'];
                     final name = company['name'] ?? '';
                     return StaggeredListAnimation(index: index, child: Card(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -157,7 +157,7 @@ class _CabMoreOptionState extends State<CabMoreOption> {
                       labelText: 'Enter other cab service name',
                       border: const OutlineInputBorder(),
                       labelStyle: const TextStyle(color: Colors.white70),
-                      fillColor: Colors.white.withOpacity(0.2)
+                      fillColor: Colors.white.withValues(alpha: 0.2)
                     ),
                   ),
                   const SizedBox(height: 16),

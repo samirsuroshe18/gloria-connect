@@ -73,7 +73,7 @@ class _DeliveryMoreOptionState extends State<DeliveryMoreOption> {
       appBar: AppBar(
         title: const Text('Select Company', style: TextStyle(color: Colors.white70, fontSize: 20)),
         elevation: 0,
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -82,7 +82,7 @@ class _DeliveryMoreOptionState extends State<DeliveryMoreOption> {
             // Search bar with more padding and enhanced UI
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: TextField(
@@ -110,7 +110,7 @@ class _DeliveryMoreOptionState extends State<DeliveryMoreOption> {
                     final image = company['image'];
                     final name = company['name'] ?? '';
                     return StaggeredListAnimation(index: index, child: Card(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -175,7 +175,7 @@ class _DeliveryMoreOptionState extends State<DeliveryMoreOption> {
                       labelText: 'Enter delivery name',
                       border: const OutlineInputBorder(),
                       labelStyle: const TextStyle(color: Colors.white70),
-                      fillColor: Colors.white.withOpacity(0.2)
+                      fillColor: Colors.white.withValues(alpha: 0.2)
                     ),
                   ),
                   const SizedBox(height: 16),

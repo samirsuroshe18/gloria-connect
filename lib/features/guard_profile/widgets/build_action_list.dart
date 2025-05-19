@@ -46,7 +46,7 @@ class BuildActionList extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListView.separated(
@@ -61,7 +61,7 @@ class BuildActionList extends StatelessWidget {
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: action['color'].withOpacity(0.1),
+                color: action['color'].withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

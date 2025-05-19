@@ -9,7 +9,7 @@ class BuildManageResidentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: const BorderRadius.all(
           Radius.circular(20),
         ),
@@ -20,7 +20,7 @@ class BuildManageResidentTile extends StatelessWidget {
           width: 40,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha: 0.1),
           ),
           child: const Icon(
             Icons.home,
@@ -35,7 +35,7 @@ class BuildManageResidentTile extends StatelessWidget {
           height: 30,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha: 0.1),
           ),
           child: const Icon(
             Icons.keyboard_arrow_right,

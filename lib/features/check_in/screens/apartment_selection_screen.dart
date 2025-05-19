@@ -64,7 +64,7 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2), // Change AppBar color here
+        backgroundColor: Colors.black.withValues(alpha: 0.2), // Change AppBar color here
         title: const Text(
           'Select apartment',
           style: TextStyle(
@@ -136,7 +136,7 @@ class _ApartmentSelectionScreenState extends State<ApartmentSelectionScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Chip(
-                            backgroundColor: Colors.black.withOpacity(0.2),
+                            backgroundColor: Colors.black.withValues(alpha: 0.2),
                             label: Text(selectedFlats[index], style: const TextStyle(color: Colors.white70),),
                             onDeleted: () {
                               toggleFlatSelection(selectedFlats[index]);

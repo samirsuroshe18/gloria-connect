@@ -30,7 +30,7 @@ class ModernTextField extends StatelessWidget {
             ),
             filled: true,
             counterText: '',
-            fillColor: Colors.black.withOpacity(0.2)
+            fillColor: Colors.black.withValues(alpha: 0.2)
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {

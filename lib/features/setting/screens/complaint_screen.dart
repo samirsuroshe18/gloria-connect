@@ -32,7 +32,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: const Text(
           "Complaints",
           style: TextStyle(

@@ -197,7 +197,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2), // Change AppBar color here
+        backgroundColor: Colors.black.withValues(alpha: 0.2), // Change AppBar color here
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -296,10 +296,10 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -541,7 +541,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? Colors.white.withOpacity(0.2)
+              ? Colors.white.withValues(alpha: 0.2)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -575,8 +575,8 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? Colors.white.withOpacity(0.2)
-              : Colors.blue.withOpacity(0.4),
+              ? Colors.white.withValues(alpha: 0.2)
+              : Colors.blue.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
@@ -660,7 +660,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               border: Border.all(color: Colors.grey[300]!),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -704,7 +704,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey[300]!),
               borderRadius: BorderRadius.circular(12),
-              color: Colors.white.withOpacity(0.2)
+              color: Colors.white.withValues(alpha: 0.2)
             ),
             child: Row(
               children: [

@@ -54,7 +54,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             title: const Text(
               'Forgot Password',
             ),
-            backgroundColor: Colors.black.withOpacity(0.2),
+            backgroundColor: Colors.black.withValues(alpha: 0.2),
           ),
           body: Padding(
             padding: const EdgeInsets.all(40),

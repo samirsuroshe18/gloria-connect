@@ -79,7 +79,7 @@ class _OtherPreapproveScreenState extends State<OtherPreapproveScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Select services', style: TextStyle(color: Colors.white, fontSize: 20)),
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: CustomSearchField(

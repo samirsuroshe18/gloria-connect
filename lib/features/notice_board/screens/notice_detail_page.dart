@@ -39,12 +39,12 @@
 //                 ? 240.0
 //                 : 0.0,
 //             pinned: true,
-//             backgroundColor: Colors.black.withOpacity(0.2),
+//             backgroundColor: Colors.black.withValues(alpha: 0.2),
 //             leading: IconButton(
 //               icon: Container(
 //                 padding: const EdgeInsets.all(8),
 //                 decoration: BoxDecoration(
-//                   color: Colors.white.withOpacity(0.2),
+//                   color: Colors.white.withValues(alpha: 0.2),
 //                   shape: BoxShape.circle,
 //                 ),
 //                 child: const Icon(Icons.arrow_back, color: Colors.white70),
@@ -56,11 +56,11 @@
 //                 icon: Container(
 //                   padding: const EdgeInsets.all(8),
 //                   decoration: BoxDecoration(
-//                     color: Colors.white.withOpacity(0.2),
+//                     color: Colors.white.withValues(alpha: 0.2),
 //                     shape: BoxShape.circle,
 //                     boxShadow: [
 //                       BoxShadow(
-//                         color: Colors.black.withOpacity(0.1),
+//                         color: Colors.black.withValues(alpha: 0.1),
 //                         blurRadius: 8,
 //                         offset: const Offset(0, 2),
 //                       ),
@@ -142,7 +142,7 @@
 //                             end: Alignment.bottomCenter,
 //                             colors: [
 //                               Colors.transparent,
-//                               Colors.black.withOpacity(0.7),
+//                               Colors.black.withValues(alpha: 0.7),
 //                             ],
 //                             stops: const [0.6, 1.0],
 //                           ),
@@ -171,7 +171,7 @@
 //                     Container(
 //                       margin: const EdgeInsets.only(bottom: 16),
 //                       decoration: BoxDecoration(
-//                         color: Colors.white.withOpacity(0.2), // background of chip container
+//                         color: Colors.white.withValues(alpha: 0.2), // background of chip container
 //                         borderRadius: BorderRadius.circular(20), // match Chip’s roundness
 //                       ),
 //                       child: Padding(
@@ -228,7 +228,7 @@
 //                         children: [
 //                           CircleAvatar(
 //                             radius: 14,
-//                             backgroundColor: Colors.white.withOpacity(0.2),
+//                             backgroundColor: Colors.white.withValues(alpha: 0.2),
 //                             child: Text(
 //                               (data.publishedBy?.userName?.isNotEmpty ?? false)
 //                                   ? data.publishedBy!.userName![0].toUpperCase()
@@ -348,7 +348,7 @@
 //                           style: TextStyle(color: Colors.white60),
 //                         ),
 //                         style: OutlinedButton.styleFrom(
-//                           backgroundColor: Colors.deepPurple.withOpacity(0.2),
+//                           backgroundColor: Colors.deepPurple.withValues(alpha: 0.2),
 //                           side: const BorderSide(color: Color(0xFF3498DB)),
 //                           padding: const EdgeInsets.symmetric(
 //                               horizontal: 20, vertical: 12),
@@ -383,7 +383,7 @@
 //         ),
 //         const SizedBox(height: 12),
 //         Card(
-//           color: Colors.black.withOpacity(0.2),
+//           color: Colors.black.withValues(alpha: 0.2),
 //           margin: const EdgeInsets.only(bottom: 8),
 //           shape: RoundedRectangleBorder(
 //             borderRadius: BorderRadius.circular(8),

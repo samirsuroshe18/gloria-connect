@@ -356,20 +356,20 @@ class AppRoutes {
     }
   }
 
-  static Route<dynamic> _materialRoute(Widget view, {String? name}) {
-    return MaterialPageRoute(
-      builder: (_) => GradientColor(child: Builder(
-        builder: (context) {
-          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarColor: Colors.black.withOpacity(0.2), // Apply opacity to the color
-            statusBarIconBrightness: Brightness.light, // Adjust for visibility
-          ));
-          return view;
-        }
-      )),
-      settings: RouteSettings(name: name),
-    );
-  }
+  // static Route<dynamic> _materialRoute(Widget view, {String? name}) {
+  //   return MaterialPageRoute(
+  //     builder: (_) => GradientColor(child: Builder(
+  //       builder: (context) {
+  //         SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //           statusBarColor: Colors.black.withValues(alpha: 0.2), // Apply opacity to the color
+  //           statusBarIconBrightness: Brightness.light, // Adjust for visibility
+  //         ));
+  //         return view;
+  //       }
+  //     )),
+  //     settings: RouteSettings(name: name),
+  //   );
+  // }
 
   // static Route<dynamic> _animatedRoute(Widget page, {String? name}) {
   //   return PageRouteBuilder(
@@ -378,7 +378,7 @@ class AppRoutes {
   //     reverseTransitionDuration: const Duration(milliseconds: 300),
   //     pageBuilder: (context, animation, secondaryAnimation) {
   //       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-  //         statusBarColor: Colors.black.withOpacity(0.2), // Apply opacity to the color
+  //         statusBarColor: Colors.black.withValues(alpha: 0.2), // Apply opacity to the color
   //         statusBarIconBrightness: Brightness.light, // Adjust for visibility
   //       ));
   //       return page;
@@ -405,7 +405,7 @@ class AppRoutes {
         child: Builder(
           builder: (context) {
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              statusBarColor: Colors.black.withOpacity(0.2),
+              statusBarColor: Colors.black.withValues(alpha: 0.2),
               statusBarIconBrightness: Brightness.light,
             ));
             return view;

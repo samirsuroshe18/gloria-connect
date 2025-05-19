@@ -36,7 +36,7 @@ class CustomServiceDialog extends StatelessWidget {
                   labelText: labelText,
                   border: const OutlineInputBorder(),
                   labelStyle: const TextStyle(color: Colors.white70),
-                  fillColor: Colors.white.withOpacity(0.2),
+                  fillColor: Colors.white.withValues(alpha: 0.2),
                 ),
               ),
               const SizedBox(height: 16),

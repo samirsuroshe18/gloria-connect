@@ -13,7 +13,7 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: const Text(
           "Pre-Approve"
         ),
@@ -105,7 +105,7 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -116,7 +116,7 @@ class _InviteVisitorsScreenState extends State<InviteVisitorsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, size: 32, color: color),

@@ -57,7 +57,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                     flexibleSpace: FlexibleSpaceBar(
                       background: Container(
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                         ),
                         child: SafeArea(
                           child: Column(
@@ -96,7 +96,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white.withOpacity(0.2),
+                                  backgroundColor: Colors.white.withValues(alpha: 0.2),
                                   foregroundColor: Colors.white70,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 24,

@@ -28,7 +28,7 @@ ThemeData theme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: Colors.white.withOpacity(0.2), // Light background for input fields
+      fillColor: Colors.white.withValues(alpha: 0.2), // Light background for input fields
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,

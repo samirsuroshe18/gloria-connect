@@ -39,7 +39,7 @@ class _ApartmentMembersScreenState extends State<ApartmentMembersScreen> {
           title: const Text(
             'Apartment Members',
           ),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
         ),
       body: BlocConsumer<ResidentProfileBloc, ResidentProfileState>(
         listener: (context, state){

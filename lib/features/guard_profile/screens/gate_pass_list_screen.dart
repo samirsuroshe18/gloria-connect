@@ -137,7 +137,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
           title: const Text(
             "Gate Pass",
             style: TextStyle(

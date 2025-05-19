@@ -287,7 +287,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                backgroundColor: Colors.white.withOpacity(0.8),
+                                backgroundColor: Colors.white.withValues(alpha: 0.8),
                                 foregroundColor: Colors.black, // Text color
                               ),
                               child: _isLoading
@@ -322,7 +322,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.2),
+              color: Colors.blue.withValues(alpha: 0.2),
               borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(45), bottomRight: Radius.circular(45))
           ),
           child: Column(

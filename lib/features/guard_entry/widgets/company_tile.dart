@@ -21,7 +21,7 @@ class CompanyTile extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white.withOpacity(0.2) : Colors.black.withOpacity(0.2),
+          color: isSelected ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(
