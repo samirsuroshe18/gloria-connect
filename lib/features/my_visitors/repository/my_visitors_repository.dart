@@ -6,6 +6,7 @@ import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.d
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class MyVisitorsRepository {
@@ -15,7 +16,7 @@ class MyVisitorsRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-current';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-current';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -47,9 +48,15 @@ class MyVisitorsRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/delivery-entry/get-past', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-past';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -77,9 +84,15 @@ class MyVisitorsRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/delivery-entry/get-denied', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-denied';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -108,7 +121,7 @@ class MyVisitorsRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/invite-visitors/get-expected';
+          '${ServerConstant.baseUrl}/api/v1/invite-visitors/get-expected';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -141,7 +154,7 @@ class MyVisitorsRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-service-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-service-entries';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{

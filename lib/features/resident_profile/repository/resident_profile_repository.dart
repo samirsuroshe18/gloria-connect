@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 import '../../resident_profile/models/member.dart';
 
@@ -13,7 +14,7 @@ class ResidentProfileRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl = 'https://invite.iotsense.in/api/v1/resident/get-members';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/resident/get-members';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{

@@ -6,6 +6,8 @@ import 'package:gloria_connect/utils/api_error.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
+
 class GuardDutyRepository{
 
   Future<Map<String, dynamic>> guardDutyCheckin({required String gate, required String checkinReason, required String shift}) async {
@@ -20,7 +22,7 @@ class GuardDutyRepository{
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/guard-duty/check-in';
+          '${ServerConstant.baseUrl}/api/v1/guard-duty/check-in';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -56,7 +58,7 @@ class GuardDutyRepository{
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/guard-duty/check-out';
+          '${ServerConstant.baseUrl}/api/v1/guard-duty/check-out';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -88,7 +90,7 @@ class GuardDutyRepository{
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrl =
-          'https://invite.iotsense.in/api/v1/guard-duty/get-report/$id';
+          '${ServerConstant.baseUrl}/api/v1/guard-duty/get-report/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -118,9 +120,15 @@ class GuardDutyRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/guard-duty/get-logs', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/guard-duty/get-logs';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',

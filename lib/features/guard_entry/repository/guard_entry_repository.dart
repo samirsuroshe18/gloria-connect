@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class GuardEntryRepository {
@@ -50,9 +51,9 @@ class GuardEntryRepository {
     try {
       // Determine which API URL to use based on whether it's a multipart request
       const apiUrlString =
-          'https://invite.iotsense.in/api/v1/delivery-entry/add-delivery-entry-2';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/add-delivery-entry-2';
       const apiUrlFile =
-          'https://invite.iotsense.in/api/v1/delivery-entry/add-delivery-entry';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/add-delivery-entry';
 
       http.Response response;
 
@@ -142,7 +143,7 @@ class GuardEntryRepository {
         'id': id,
       };
       const apiKey =
-          'https://invite.iotsense.in/api/v1/delivery-entry/approve-delivery';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/approve-delivery';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -179,7 +180,7 @@ class GuardEntryRepository {
         'id': id,
       };
       const apiKey =
-          'https://invite.iotsense.in/api/v1/delivery-entry/reject-delivery';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/reject-delivery';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -217,7 +218,7 @@ class GuardEntryRepository {
         'checkInCode': checkInCode,
       };
       const apiKey =
-          'https://invite.iotsense.in/api/v1/check-in-by-code/add-entry';
+          '${ServerConstant.baseUrl}/api/v1/check-in-by-code/add-entry';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{

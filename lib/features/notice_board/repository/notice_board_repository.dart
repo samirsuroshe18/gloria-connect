@@ -5,6 +5,7 @@ import 'package:gloria_connect/features/notice_board/models/notice_board_model.d
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class NoticeBoardRepository {
@@ -14,8 +15,7 @@ class NoticeBoardRepository {
     String? accessToken = prefs.getString('accessToken');
 
     try {
-      const apiUrlFile =
-          'https://invite.iotsense.in/api/v1/notice/create-notice';
+      const apiUrlFile = '${ServerConstant.baseUrl}/api/v1/notice/create-notice';
 
       // Multipart request for both file and text fields
       var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
@@ -55,7 +55,7 @@ class NoticeBoardRepository {
 
     try {
       final apiUrlFile =
-          'https://invite.iotsense.in/api/v1/notice/update-notice/$id';
+          '${ServerConstant.baseUrl}/api/v1/notice/update-notice/$id';
 
       // Multipart request for both file and text fields
       var request = http.MultipartRequest('PUT', Uri.parse(apiUrlFile))
@@ -94,9 +94,15 @@ class NoticeBoardRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/notice/get-notices', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/notice/get-notices';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -124,7 +130,7 @@ class NoticeBoardRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = 'https://invite.iotsense.in/api/v1/notice/get-notice/$id';
+      final apiUrl = '${ServerConstant.baseUrl}/api/v1/notice/get-notice/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -155,7 +161,7 @@ class NoticeBoardRepository {
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrl =
-          'https://invite.iotsense.in/api/v1/notice/delete-notice/$id';
+          '${ServerConstant.baseUrl}/api/v1/notice/delete-notice/$id';
       final response = await http.delete(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -186,7 +192,7 @@ class NoticeBoardRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/notice/is-unread-notice';
+          '${ServerConstant.baseUrl}/api/v1/notice/is-unread-notice';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
