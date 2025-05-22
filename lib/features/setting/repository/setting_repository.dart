@@ -5,6 +5,7 @@ import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class SettingRepository{
@@ -19,8 +20,7 @@ class SettingRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/users/change-password';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/change-password';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -51,7 +51,7 @@ class SettingRepository{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
     try {
-      const apiUrlFile = 'https://invite.iotsense.in/api/v1/complaint/submit';
+      const apiUrlFile = '${ServerConstant.baseUrl}/api/v1/complaint/submit';
 
       // Multipart request for both file and text fields
       var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
@@ -91,9 +91,15 @@ class SettingRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/complaint/get-complaints', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/complaint/get-complaints';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -120,9 +126,15 @@ class SettingRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/complaint/get-pending-complaints', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/complaint/get-pending-complaints';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -149,9 +161,15 @@ class SettingRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/complaint/get-resolved-complaints', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/complaint/get-resolved-complaints';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -179,7 +197,7 @@ class SettingRepository{
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrl =
-          'https://invite.iotsense.in/api/v1/complaint/get-details/$id';
+          '${ServerConstant.baseUrl}/api/v1/complaint/get-details/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -214,7 +232,7 @@ class SettingRepository{
       };
 
       final apiUrl =
-          'https://invite.iotsense.in/api/v1/complaint/add-response/$id';
+          '${ServerConstant.baseUrl}/api/v1/complaint/add-response/$id';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -246,7 +264,7 @@ class SettingRepository{
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrl =
-          'https://invite.iotsense.in/api/v1/complaint/resolved/$id';
+          '${ServerConstant.baseUrl}/api/v1/complaint/resolved/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -277,7 +295,7 @@ class SettingRepository{
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrl =
-          'https://invite.iotsense.in/api/v1/complaint/reopen/$id';
+          '${ServerConstant.baseUrl}/api/v1/complaint/reopen/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -308,7 +326,7 @@ class SettingRepository{
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrl =
-          'https://invite.iotsense.in/api/v1/complaint/get-response/$id';
+          '${ServerConstant.baseUrl}/api/v1/complaint/get-response/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{

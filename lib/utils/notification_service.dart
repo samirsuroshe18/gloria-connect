@@ -11,8 +11,9 @@ import 'package:gloria_connect/utils/route_observer_with_stack.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../constants/server_constant.dart';
 import '../main.dart';
-import 'constants.dart';
+import '../constants/notification_constant.dart';
 
 class NotificationController {
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -54,8 +55,8 @@ class NotificationController {
 
     if (android != null) {
       await android.createNotificationChannel(const AndroidNotificationChannel(
-          actionChannelId, actionChannelName,
-          description: actionChannelDesc,
+          NotificationConstant.actionChannelId, NotificationConstant.actionChannelName,
+          description: NotificationConstant.actionChannelDesc,
           importance: Importance.max,
           playSound: true,
           sound: RawResourceAndroidNotificationSound('res_emergency_sound'),
@@ -64,8 +65,8 @@ class NotificationController {
       ));
 
       await android.createNotificationChannel(const AndroidNotificationChannel(
-          basicChannelId, basicChannelName,
-          description: basicChannelDesc,
+          NotificationConstant.basicChannelId, NotificationConstant.basicChannelName,
+          description: NotificationConstant.basicChannelDesc,
           playSound: true,
           sound: RawResourceAndroidNotificationSound('res_bell_sound'),
           importance: Importance.max,
@@ -102,9 +103,9 @@ class NotificationController {
     }
 
     final androidDetails = AndroidNotificationDetails(
-      withActions ? actionChannelId : basicChannelId,
-      withActions ? actionChannelName : basicChannelName,
-      channelDescription: withActions ? actionChannelDesc : basicChannelDesc,
+      withActions ? NotificationConstant.actionChannelId : NotificationConstant.basicChannelId,
+      withActions ? NotificationConstant.actionChannelName : NotificationConstant.basicChannelName,
+      channelDescription: withActions ? NotificationConstant.actionChannelDesc : NotificationConstant.basicChannelDesc,
       playSound: true,
       enableVibration: true,
       enableLights: true,
@@ -163,7 +164,7 @@ class NotificationController {
       if (actionId == 'APPROVE') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? accessToken = prefs.getString('accessToken');
-        const apiKey = 'https://invite.iotsense.in/api/v1/delivery-entry/approve-delivery';
+        const apiKey = '${ServerConstant.baseUrl}/api/v1/delivery-entry/approve-delivery';
         final Map<String, dynamic> data = {
           'id': payload['id'],
         };
@@ -185,7 +186,7 @@ class NotificationController {
       } else if (actionId == 'REJECT') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? accessToken = prefs.getString('accessToken');
-        const apiKey = 'https://invite.iotsense.in/api/v1/delivery-entry/reject-delivery';
+        const apiKey = '${ServerConstant.baseUrl}/api/v1/delivery-entry/reject-delivery';
         final Map<String, dynamic> data = {
           'id': payload['id'],
         };

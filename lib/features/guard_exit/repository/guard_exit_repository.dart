@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:gloria_connect/constants/server_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,7 +14,7 @@ class GuardExitRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-allowed-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-entries';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -46,7 +47,7 @@ class GuardExitRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-allowed-guest-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-guest-entries';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -79,7 +80,7 @@ class GuardExitRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-allowed-cab-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-cab-entries';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -112,7 +113,7 @@ class GuardExitRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-allowed-delivery-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-delivery-entries';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -145,7 +146,7 @@ class GuardExitRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-allowed-other-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-other-entries';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -181,8 +182,8 @@ class GuardExitRepository {
       final Map<String, dynamic> data = {'id': id};
 
       String apiUrl = entryType == 'delivery'
-          ? 'https://invite.iotsense.in/api/v1/delivery-entry/exit-entry'
-          : 'https://invite.iotsense.in/api/v1/invite-visitors/exit-entry';
+          ? '${ServerConstant.baseUrl}/api/v1/delivery-entry/exit-entry'
+          : '${ServerConstant.baseUrl}/api/v1/invite-visitors/exit-entry';
 
       final response = await http.post(
         Uri.parse(apiUrl),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 import '../models/entry.dart';
 
@@ -13,7 +14,7 @@ class GuardWaitingRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/get-delivery-waiting-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-delivery-waiting-entries';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -44,7 +45,7 @@ class GuardWaitingRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl ='https://invite.iotsense.in/api/v1/delivery-entry/get-waiting-entry/$id';
+      final apiUrl ='${ServerConstant.baseUrl}/api/v1/delivery-entry/get-waiting-entry/$id';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -79,7 +80,7 @@ class GuardWaitingRepository {
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/allow-delivery-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/allow-delivery-entries';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -115,7 +116,7 @@ class GuardWaitingRepository {
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/delivery-entry/deny-delivery-entries';
+          '${ServerConstant.baseUrl}/api/v1/delivery-entry/deny-delivery-entries';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{

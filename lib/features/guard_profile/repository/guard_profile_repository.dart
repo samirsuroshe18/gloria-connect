@@ -6,6 +6,7 @@ import 'package:gloria_connect/features/guard_profile/models/checkout_history.da
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class GuardProfileRepository{
@@ -15,7 +16,7 @@ class GuardProfileRepository{
     String? accessToken = prefs.getString('accessToken');
 
     try {
-      const apiUrlFile = 'https://invite.iotsense.in/api/v1/users/update-details';
+      const apiUrlFile = '${ServerConstant.baseUrl}/api/v1/users/update-details';
 
       // Multipart request for both file and text fields
       var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
@@ -59,9 +60,15 @@ class GuardProfileRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/delivery-entry/get-checkout-history', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-checkout-history';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -89,7 +96,7 @@ class GuardProfileRepository{
     String? accessToken = prefs.getString('accessToken');
 
     try {
-      const apiUrlFile = 'https://invite.iotsense.in/api/v1/invite-visitors/add-gate-pass';
+      const apiUrlFile = '${ServerConstant.baseUrl}/api/v1/invite-visitors/add-gate-pass';
 
       // Multipart request for both file and text fields
       var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
@@ -138,9 +145,15 @@ class GuardProfileRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/invite-visitors/get-gate-pass', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/invite-visitors/get-gate-pass';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',

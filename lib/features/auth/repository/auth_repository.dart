@@ -10,12 +10,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class AuthRepository {
   Future<Map<String, dynamic>> signUpUser({required String userName, required String email, required String password, required String confirmPassword}) async {
     try {
-      const apiUrl = 'https://invite.iotsense.in/api/v1/users/register';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/register';
       final Map<String, dynamic> data = {
         'userName': userName,
         'email': email,
@@ -54,7 +55,7 @@ class AuthRepository {
         'password': password,
         'FCMToken': FCMToken
       };
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/login';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/login';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -111,7 +112,7 @@ class AuthRepository {
         'FCMToken': FCMToken
       };
 
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/google-signin';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/google-signin';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -165,7 +166,7 @@ class AuthRepository {
         'profile': googleSignInAccount.photoUrl
       };
 
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/link-google';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/link-google';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -198,7 +199,7 @@ class AuthRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/logout';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/logout';
       final response = await http.get(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -233,7 +234,7 @@ class AuthRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl = 'https://invite.iotsense.in/api/v1/users/get-current-user';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/get-current-user';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -263,7 +264,7 @@ class AuthRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/extra-info';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/extra-info';
       var request = http.MultipartRequest('POST', Uri.parse(apiKey));
       request.headers['Authorization'] = 'Bearer $accessToken';
 
@@ -326,7 +327,7 @@ class AuthRepository {
         'role': role,
       };
 
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/add-apartment';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/add-apartment';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -362,7 +363,7 @@ class AuthRepository {
         'gateAssign': gateAssign,
       };
 
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/add-gate';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/add-gate';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -399,7 +400,7 @@ class AuthRepository {
         'FCMToken': FCMToken,
       };
 
-      const apiKey = 'https://invite.iotsense.in/api/v1/users/update-fcm';
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/update-fcm';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{
@@ -430,7 +431,7 @@ class AuthRepository {
   Future<List<Society>> getSocietyDetails() async {
     try {
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/society/get-all-societies';
+          '${ServerConstant.baseUrl}/api/v1/society/get-all-societies';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -462,7 +463,7 @@ class AuthRepository {
         'email': email,
       };
 
-      const apiUrl = 'https://invite.iotsense.in/api/v1/users/forgot-password';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/forgot-password';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -493,7 +494,7 @@ class AuthRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl = 'https://invite.iotsense.in/api/v1/users/get-contact-email';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/get-contact-email';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class CheckInRepository {
@@ -11,7 +12,7 @@ class CheckInRepository {
     String? accessToken = prefs.getString('accessToken');
 
     try {
-      const apiUrl = 'https://invite.iotsense.in/api/v1/check-in/get-blocks';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/check-in/get-blocks';
 
       final response = await http.get(
         Uri.parse(apiUrl),
@@ -49,7 +50,7 @@ class CheckInRepository {
 
     try {
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/check-in/get-apartments';
+          '${ServerConstant.baseUrl}/api/v1/check-in/get-apartments';
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -89,7 +90,7 @@ class CheckInRepository {
     };
 
     try {
-      const apiUrl = 'https://invite.iotsense.in/api/v1/check-in/get-mobile';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/check-in/get-mobile';
 
       final response = await http.post(
         Uri.parse(apiUrl),

@@ -4,6 +4,7 @@ import 'package:gloria_connect/features/invite_visitors/models/pre_approved_bann
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class InviteVisitorsRepository {
@@ -42,7 +43,7 @@ class InviteVisitorsRepository {
       };
 
       const apiKey =
-          'https://invite.iotsense.in/api/v1/invite-visitors/add-pre-approval';
+          '${ServerConstant.baseUrl}/api/v1/invite-visitors/add-pre-approval';
       final response = await http.post(
         Uri.parse(apiKey),
         headers: <String, String>{

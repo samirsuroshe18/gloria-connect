@@ -8,6 +8,7 @@ import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
 
 class AdministrationRepository {
@@ -18,7 +19,7 @@ class AdministrationRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/profile-verification/get-pending-resident-req';
+          '${ServerConstant.baseUrl}/api/v1/profile-verification/get-pending-resident-req';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -50,7 +51,7 @@ class AdministrationRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/profile-verification/get-pending-guard-req';
+          '${ServerConstant.baseUrl}/api/v1/profile-verification/get-pending-guard-req';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -90,7 +91,7 @@ class AdministrationRepository {
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/profile-verification/verify-resident-req';
+          '${ServerConstant.baseUrl}/api/v1/profile-verification/verify-resident-req';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -128,7 +129,7 @@ class AdministrationRepository {
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/profile-verification/verify-guard-req';
+          '${ServerConstant.baseUrl}/api/v1/profile-verification/verify-guard-req';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -159,9 +160,15 @@ class AdministrationRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-resident', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-resident';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -190,7 +197,7 @@ class AdministrationRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/admin/get-guards';
+          '${ServerConstant.baseUrl}/api/v1/admin/get-guards';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -223,7 +230,7 @@ class AdministrationRepository {
       String? accessToken = prefs.getString('accessToken');
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/admin/get-admins';
+          '${ServerConstant.baseUrl}/api/v1/admin/get-admins';
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -259,8 +266,7 @@ class AdministrationRepository {
         'email': email,
       };
 
-      const apiUrl =
-          'https://invite.iotsense.in/api/v1/admin/make-admin';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/make-admin';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -296,7 +302,7 @@ class AdministrationRepository {
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/admin/remove-admin';
+          '${ServerConstant.baseUrl}/api/v1/admin/remove-admin';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -332,7 +338,7 @@ class AdministrationRepository {
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/admin/remove-resident';
+          '${ServerConstant.baseUrl}/api/v1/admin/remove-resident';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -368,7 +374,7 @@ class AdministrationRepository {
       };
 
       const apiUrl =
-          'https://invite.iotsense.in/api/v1/admin/remove-guard';
+          '${ServerConstant.baseUrl}/api/v1/admin/remove-guard';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -399,10 +405,15 @@ class AdministrationRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-complaints', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-complaints';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
 
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -430,10 +441,15 @@ class AdministrationRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-pending-complaints', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-pending-complaints';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
 
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -461,10 +477,15 @@ class AdministrationRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final apiUrl = Uri.https('invite.iotsense.in', '/api/v1/admin/get-resolved-complaints', queryParams);
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-resolved-complaints';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
 
       final response = await http.get(
-        apiUrl,
+        Uri.parse(apiUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
