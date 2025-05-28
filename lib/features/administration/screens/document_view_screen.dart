@@ -104,12 +104,21 @@ class _DocumentViewScreenState extends State<DocumentViewScreen> {
     try {
       // If local file exists, share the local file
       if (_localPath != null) {
-        await Share.shareXFiles([XFile(_localPath!)], text: widget.title);
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(_localPath!)],
+            text: widget.title
+          ),
+        );
         return;
       }
 
-      // If no local file, share the URL
-      await Share.share(widget.documentUrl!, subject: widget.title);
+      await SharePlus.instance.share(
+        ShareParams(
+          text: widget.documentUrl!,
+          subject: widget.title
+        ),
+      );
     } catch (e) {
       if(!mounted)return;
       CustomSnackBar.show(context: context, message: 'Sharing failed: $e', type: SnackBarType.error);

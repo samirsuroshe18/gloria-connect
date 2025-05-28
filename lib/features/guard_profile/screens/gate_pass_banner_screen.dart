@@ -28,10 +28,11 @@ class _GatePassBannerScreenState extends State<GatePassBannerScreen> {
       final imagePath = File('${directory.path}/otp_banner.png');
       await imagePath.writeAsBytes(image);
 
-      // Share the image using share_plus
-      await Share.shareXFiles(
-        [XFile(imagePath.path)],
-        text: 'Here is your Gate pass OTP!',
+      await SharePlus.instance.share(
+        ShareParams(
+            files: [XFile(imagePath.path)],
+            text: 'Here is your Gate pass OTP!'
+        ),
       );
     }
   }
