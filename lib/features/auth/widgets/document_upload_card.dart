@@ -66,11 +66,12 @@ class DocumentUploadCard extends StatelessWidget {
                   height: 200,
                   width: double.infinity,
                   child: DottedBorder(
-                    color: Colors.grey.shade300,
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(12),
-                    dashPattern: const [8, 4],
-                    strokeWidth: 1,
+                    options: RoundedRectDottedBorderOptions(
+                      color: Colors.grey.shade300,
+                      radius: const Radius.circular(12),
+                      dashPattern: [8, 4],
+                      strokeWidth: 1,
+                    ),
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(

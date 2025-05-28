@@ -24,25 +24,27 @@ class NoticeSharingService {
         // Save the image
         await file.writeAsBytes(bytes);
 
-        // Share image + text
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: shareText,
-          subject: notice.title,
+        await SharePlus.instance.share(
+          ShareParams(
+              files: [XFile(file.path)],
+              text: notice.title
+          ),
         );
       } catch (e) {
         debugPrint('Error sharing image: $e');
-        // Fallback to text only
-        await Share.share(
-          shareText,
-          subject: notice.title,
+        await SharePlus.instance.share(
+          ShareParams(
+              text: shareText,
+              subject: notice.title
+          ),
         );
       }
     } else {
-      // Share text only
-      await Share.share(
-        shareText,
-        subject: notice.title,
+      await SharePlus.instance.share(
+        ShareParams(
+            text: shareText,
+            subject: notice.title
+        ),
       );
     }
   }

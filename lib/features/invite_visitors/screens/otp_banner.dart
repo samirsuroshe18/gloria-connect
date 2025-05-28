@@ -26,9 +26,11 @@ class _OtpBannerState extends State<OtpBanner> {
       final imagePath = File('${directory.path}/otp_banner.png');
       await imagePath.writeAsBytes(image);
 
-      await Share.shareXFiles(
-        [XFile(imagePath.path)],
-        text: 'Here is your OTP invite!',
+      await SharePlus.instance.share(
+        ShareParams(
+            files: [XFile(imagePath.path)],
+            text: 'Here is your OTP invite!'
+        ),
       );
     }
   }
