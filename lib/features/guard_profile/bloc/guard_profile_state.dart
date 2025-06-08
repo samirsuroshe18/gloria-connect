@@ -39,7 +39,7 @@ final class GetCheckoutHistoryFailure extends GuardProfileState{
 final class AddGatePassLoading extends GuardProfileState{}
 
 final class AddGatePassSuccess extends GuardProfileState{
-  final GatePassBanner response;
+  final GatePassBannerGuard response;
   AddGatePassSuccess({required this.response});
 }
 
@@ -63,4 +63,64 @@ final class GetGatePassFailure extends GuardProfileState{
   final int? status;
 
   GetGatePassFailure( {required this.message, this.status});
+}
+
+/// Get Pending gate pass
+final class GetPendingGatePassLoading extends GuardProfileState{}
+
+final class GetPendingGatePassSuccess extends GuardProfileState{
+  final List<GatePassBannerGuard> response;
+  GetPendingGatePassSuccess({required this.response});
+}
+
+final class GetPendingGatePassFailure extends GuardProfileState{
+  final String message;
+  final int? status;
+
+  GetPendingGatePassFailure( {required this.message, this.status});
+}
+
+/// Get Checkout history
+final class GetExpiredGatePassSecurityLoading extends GuardProfileState{}
+
+final class GetExpiredGatePassSecuritySuccess extends GuardProfileState{
+  final GatePassModel response;
+  GetExpiredGatePassSecuritySuccess({required this.response});
+}
+
+final class GetExpiredGatePassSecurityFailure extends GuardProfileState{
+  final String message;
+  final int? status;
+
+  GetExpiredGatePassSecurityFailure( {required this.message, this.status});
+}
+
+/// Get Checkout history
+final class GetGatePassDetailsLoading extends GuardProfileState{}
+
+final class GetGatePassDetailsSuccess extends GuardProfileState{
+  final GatePassBannerGuard response;
+  GetGatePassDetailsSuccess({required this.response});
+}
+
+final class GetGatePassDetailsFailure extends GuardProfileState{
+  final String message;
+  final int? status;
+
+  GetGatePassDetailsFailure( {required this.message, this.status});
+}
+
+/// Get Checkout history
+final class RemoveGetGatePassLoading extends GuardProfileState{}
+
+final class RemoveGetGatePassSuccess extends GuardProfileState{
+  final Map<String, dynamic> response;
+  RemoveGetGatePassSuccess({required this.response});
+}
+
+final class RemoveGetGatePassFailure extends GuardProfileState{
+  final String message;
+  final int? status;
+
+  RemoveGetGatePassFailure( {required this.message, this.status});
 }

@@ -206,14 +206,17 @@ class _PendingComplaintScreenState extends State<PendingComplaintScreen> with Au
             builder: (context, state) {
               return Column(
                 children: [
-                  SearchFilterBar(
-                      searchController: _searchController,
-                      hintText: "Search by id, category, etc.",
-                      searchQuery: _searchQuery,
-                      hasActiveFilters: _hasActiveFilters,
-                      onFilterPressed: () => _showFilterBottomSheet(context),
-                      onSearchSubmitted: _onSearchSubmitted,
-                      onClearSearch: _onClearSearch
+                  Container(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    child: SearchFilterBar(
+                        searchController: _searchController,
+                        hintText: "Search by id, category, etc.",
+                        searchQuery: _searchQuery,
+                        hasActiveFilters: _hasActiveFilters,
+                        onFilterPressed: () => _showFilterBottomSheet(context),
+                        onSearchSubmitted: _onSearchSubmitted,
+                        onClearSearch: _onClearSearch
+                    ),
                   ),
                   Expanded(
                       child: _buildComplaintList(_data)

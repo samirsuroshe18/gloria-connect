@@ -195,6 +195,13 @@ class _ResidentProfileScreenState extends State<ResidentProfileScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 BuildActionButton(
+                                  title: 'Manage GatePass',
+                                  icon: Icons.vpn_key,
+                                  color: const Color(0xFF4A90E2),
+                                  onTap: () => Navigator.pushNamed(context, '/gate-pass-resident-screen'),
+                                ),
+                                const SizedBox(height: 12),
+                                BuildActionButton(
                                   title: 'Settings',
                                   icon: Icons.settings_outlined,
                                   color: Colors.white60,

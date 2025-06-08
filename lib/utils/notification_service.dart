@@ -352,6 +352,27 @@ class NotificationController {
       case "GUARD_DUTY_CHECKOUT":
         return 'Guard duty ended';
 
+      case "NOTIFY_GATE_PASS_RESIDENT":
+        return payload['title'];
+
+      case "NOTIFY_GATE_PASS_APPROVED":
+        return payload['title'];
+
+      case "NOTIFY_GUARD_PASS_EXPIRED":
+        return payload['title'];
+
+      case "NOTIFY_RESIDENT_PASS_EXPIRED":
+        return payload['title'];
+
+      case "NOTIFY_GATE_PASS_ACTIVATED":
+        return payload['title'];
+
+      case "ADD_APARTMENT_TO_GATE_PASS":
+        return payload['title'];
+
+      case "REMOVE_APARTMENT_FROM_GATE_PASS":
+        return payload['title'];
+
       default:
         return payload['title'] ?? "Notification";
     }
@@ -471,6 +492,27 @@ class NotificationController {
         String guardName = payload['guardName'] ?? 'Unknown';
         String guardGate = payload['guardGate'];
         return '$guardName has ended duty at $guardGate.';
+
+      case "NOTIFY_GATE_PASS_RESIDENT":
+        return payload['message'];
+
+      case "NOTIFY_GATE_PASS_APPROVED":
+        return payload['message'];
+
+      case "NOTIFY_GUARD_PASS_EXPIRED":
+        return payload['message'];
+
+      case "NOTIFY_RESIDENT_PASS_EXPIRED":
+        return payload['message'];
+
+      case "NOTIFY_GATE_PASS_ACTIVATED":
+        return payload['message'];
+
+      case "ADD_APARTMENT_TO_GATE_PASS":
+        return payload['message'];
+
+      case "REMOVE_APARTMENT_FROM_GATE_PASS":
+        return payload['message'];
 
       default:
         return payload['body'] ?? "You have a new notification";

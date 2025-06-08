@@ -46,7 +46,7 @@ class GuardProfileBloc extends Bloc<GuardProfileEvent, GuardProfileState>{
     on<AddGatePass>((event, emit) async {
       emit(AddGatePassLoading());
       try{
-        final GatePassBanner response = await _guardProfileRepository.addGatePass(name: event.name, profile: event.profile, mobNumber: event.mobNumber, serviceName: event.serviceName, serviceLogo: event.serviceLogo, gender: event.gender, address: event.address, addressProof: event.addressProof, gatepassAptDetails: event.gatepassAptDetails, checkInCodeStartDate: event.checkInCodeStartDate, checkInCodeExpiryDate: event.checkInCodeExpiryDate, checkInCodeStart: event.checkInCodeStart, checkInCodeExpiry: event.checkInCodeExpiry);
+        final GatePassBannerGuard response = await _guardProfileRepository.addGatePass(name: event.name, profile: event.profile, mobNumber: event.mobNumber, serviceName: event.serviceName, serviceLogo: event.serviceLogo, gender: event.gender, address: event.address, addressProof: event.addressProof, gatepassAptDetails: event.gatepassAptDetails, checkInCodeStartDate: event.checkInCodeStartDate, checkInCodeExpiryDate: event.checkInCodeExpiryDate, checkInCodeStart: event.checkInCodeStart, checkInCodeExpiry: event.checkInCodeExpiry);
         emit(AddGatePassSuccess(response: response));
       }catch(e){
         if (e is ApiError) {
@@ -67,6 +67,62 @@ class GuardProfileBloc extends Bloc<GuardProfileEvent, GuardProfileState>{
           emit(GetGatePassFailure(message: e.message.toString(), status: e.statusCode));
         }else{
           emit(GetGatePassFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<GetPendingGatePass>((event, emit) async {
+      emit(GetPendingGatePassLoading());
+      try{
+        final List<GatePassBannerGuard> response = await _guardProfileRepository.getPendingGatePass();
+        emit(GetPendingGatePassSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(GetPendingGatePassFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(GetPendingGatePassFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<GetExpiredGatePassSecurity>((event, emit) async {
+      emit(GetExpiredGatePassSecurityLoading());
+      try{
+        final GatePassModel response = await _guardProfileRepository.getExpiredGatePassSecurity(queryParams: event.queryParams);
+        emit(GetExpiredGatePassSecuritySuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(GetExpiredGatePassSecurityFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(GetExpiredGatePassSecurityFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<GetGatePassDetails>((event, emit) async {
+      emit(GetGatePassDetailsLoading());
+      try{
+        final GatePassBannerGuard response = await _guardProfileRepository.getGatePassDetails(id: event.id);
+        emit(GetGatePassDetailsSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(GetGatePassDetailsFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(GetGatePassDetailsFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<RemoveGatePass>((event, emit) async {
+      emit(RemoveGetGatePassLoading());
+      try{
+        final Map<String, dynamic> response = await _guardProfileRepository.removeGatePass(id: event.id);
+        emit(RemoveGetGatePassSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(RemoveGetGatePassFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(RemoveGetGatePassFailure(message: e.toString()));
         }
       }
     });

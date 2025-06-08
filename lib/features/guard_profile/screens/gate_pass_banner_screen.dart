@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class GatePassBannerScreen extends StatefulWidget {
-  final GatePassBanner? data;
+  final GatePassBannerGuard? data;
   const GatePassBannerScreen({super.key, this.data});
 
   @override
