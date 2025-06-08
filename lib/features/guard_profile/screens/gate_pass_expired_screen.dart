@@ -6,26 +6,26 @@ import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
 import 'package:gloria_connect/common_widgets/single_paginated_list_view.dart';
-import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
-import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
-import 'package:gloria_connect/features/setting/models/complaint_model.dart';
+import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
+import 'package:gloria_connect/features/guard_profile/widgets/expired_gate_pass_card.dart';
 import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
-import 'package:gloria_connect/features/setting/widgets/complaint_card.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
-class ResolvedComplaintScreen extends StatefulWidget {
-  final bool? isAdmin;
-  const ResolvedComplaintScreen({super.key, this.isAdmin = false});
+import '../bloc/guard_profile_bloc.dart';
+
+class GatePassExpiredScreen extends StatefulWidget {
+  const GatePassExpiredScreen({super.key});
 
   @override
-  State<ResolvedComplaintScreen> createState() => _ResolvedComplaintScreenState();
+  State<GatePassExpiredScreen> createState() => _GatePassExpiredScreenState();
 }
 
-class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with AutomaticKeepAliveClientMixin {
+class _GatePassExpiredScreenState extends State<GatePassExpiredScreen> with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  List<Complaint> _data = [];
+  List<GatePassBannerGuard> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;
@@ -34,9 +34,12 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
   final int _limit = 10;
   bool _hasMore = true;
   String _searchQuery = '';
+  String _selectedStatusType = '';
   DateTime? _startDate;
   DateTime? _endDate;
   bool _hasActiveFilters = false;
+  int? cardIndex;
+  List<bool> isLoadingList = [];
 
   @override
   void initState() {
@@ -54,7 +57,7 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      if (!_isLoading && _hasMore && _data.length>=_limit) {
+      if (!_isLoading && _hasMore) {
         _isLazyLoading = true;
         _fetchEntries();
       }
@@ -71,6 +74,10 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
       queryParams['search'] = _searchQuery;
     }
 
+    if (_selectedStatusType.isNotEmpty) {
+      queryParams['status'] = _selectedStatusType;
+    }
+
     if (_startDate != null) {
       queryParams['startDate'] = DateFormat('yyyy-MM-dd').format(_startDate!);
     }
@@ -78,15 +85,16 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
     if (_endDate != null) {
       queryParams['endDate'] = DateFormat('yyyy-MM-dd').format(_endDate!);
     }
-    widget.isAdmin == true ? context.read<AdministrationBloc>().add(AdminGetResolvedComplaint(queryParams: queryParams)) : context.read<SettingBloc>().add(SettingGetResolvedComplaint(queryParams: queryParams));
+
+    context.read<GuardProfileBloc>().add(GetExpiredGatePassSecurity(queryParams: queryParams));
   }
 
   void _applyFilters() {
     setState(() {
       _page = 1;
       _hasMore = true;
-      _data.clear();
-      _hasActiveFilters = _startDate != null || _endDate != null;
+      data.clear();
+      _hasActiveFilters = _selectedStatusType.isNotEmpty || _startDate != null || _endDate != null;
     });
     _fetchEntries();
   }
@@ -109,47 +117,21 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
     }
   }
 
-  Future<void> _raiseComplaint(BuildContext context) async {
-    // Store the context read functions before the async gap
-    final isAdmin = widget.isAdmin == true;
-    final adminBlocFunction = context.read<AdministrationBloc>().add;
-    final settingBlocFunction = context.read<SettingBloc>().add;
-
-    final data = await Navigator.pushNamed(context, '/complaint-form-screen');
-
-    // Check if the widget is still mounted before proceeding
-    if (!mounted) return;
-
-    if (data is Map<String, dynamic>) {
-      if (isAdmin) {
-        adminBlocFunction(AdminGetPendingComplaint(queryParams: const {
-          'page': '1',
-          'limit': '10',
-        }));
-      } else {
-        settingBlocFunction(SettingGetPendingComplaint(queryParams: const {
-          'page': '1',
-          'limit': '10',
-        }));
-      }
-    }
-  }
-
-  void _onClearSearch(){
-    _searchController.clear();
-    setState(() {
-      _searchQuery = '';
-      _page = 1;
-      _data.clear();
-    });
-    _fetchEntries();
-  }
-
   void _onSearchSubmitted(value) {
     setState(() {
       _searchQuery = value;
       _page = 1;
-      _data.clear();
+      data.clear();
+    });
+    _fetchEntries();
+  }
+
+  void _onClearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchQuery = '';
+      _page = 1;
+      data.clear();
     });
     _fetchEntries();
   }
@@ -158,202 +140,121 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      body: BlocConsumer<AdministrationBloc, AdministrationState>(
+      body: BlocConsumer<GuardProfileBloc, GuardProfileState>(
         listener: (context, state) {
-          if (state is AdminGetResolvedComplaintLoading) {
+          if (state is GetExpiredGatePassSecurityLoading) {
             _isLoading = true;
             _isError = false;
           }
-          if (state is AdminGetResolvedComplaintSuccess) {
-            if (state.response.pagination?.currentPage == 1) {
-              _data.clear();
-              _page=1;
+          if (state is GetExpiredGatePassSecuritySuccess) {
+            if (_page == 1) {
+              data.clear();
             }
-            _data.addAll(state.response.complaints as Iterable<Complaint>);
+            data.addAll(state.response.gatePassBanner as Iterable<GatePassBannerGuard>);
             _page++;
             _hasMore = state.response.pagination?.hasMore ?? false;
             _isLoading = false;
             _isLazyLoading = false;
             _isError = false;
+            isLoadingList = List.generate(data.length, (index) => false,);
           }
-          if (state is AdminGetResolvedComplaintFailure) {
-            _data = [];
+          if (state is GetExpiredGatePassSecurityFailure) {
+            data = [];
             _isLoading = false;
             _isLazyLoading = false;
             _isError = true;
             statusCode= state.status;
             _hasMore = false;
           }
+
+          if(state is RemoveGetGatePassLoading){
+            setState(() {
+              isLoadingList[cardIndex!] = true;
+            });
+          }
+          if(state is RemoveGetGatePassSuccess){
+            setState(() {
+              isLoadingList[cardIndex!] = false;
+            });
+            _page = 1;
+            _fetchEntries();
+          }
+          if(state is RemoveGetGatePassFailure){
+            setState(() {
+              isLoadingList[cardIndex!] = false;
+            });
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
+          }
         },
         builder: (context, state) {
-          return BlocConsumer<SettingBloc, SettingState>(
-            listener: (context, state) {
-              if (state is SettingGetResolvedComplaintLoading) {
-                _isLoading = true;
-                _isError = false;
-              }
-              if (state is SettingGetResolvedComplaintSuccess) {
-                if (state.response.pagination?.currentPage == 1) {
-                  _data.clear();
-                  _page=1;
-                }
-                _data.addAll(state.response.complaints as Iterable<Complaint>);
-                _page++;
-                _hasMore = state.response.pagination?.hasMore ?? false;
-                _isLoading = false;
-                _isLazyLoading = false;
-                _isError = false;
-              }
-              if (state is SettingGetResolvedComplaintFailure) {
-                _data = [];
-                _isLoading = false;
-                _isLazyLoading = false;
-                _isError = true;
-                statusCode= state.status;
-                _hasMore = false;
-              }
-            },
-            builder: (context, state) {
-              return Column(
-                children: [
-                  Container(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    child: SearchFilterBar(
-                        searchController: _searchController,
-                        hintText: "Search by id, category, etc.",
-                        searchQuery: _searchQuery,
-                        hasActiveFilters: _hasActiveFilters,
-                        onFilterPressed: () => _showFilterBottomSheet(context),
-                        onSearchSubmitted: _onSearchSubmitted,
-                        onClearSearch: _onClearSearch
-                    ),
-                  ),
-                  Expanded(
-                      child: _buildComplaintList(_data, context)
-                  ),
-                ],
-              );
-            },
+          return Column(
+            children: [
+              Container(
+                color: Colors.black.withValues(alpha: 0.2),
+                child: SearchFilterBar(
+                  searchController: _searchController,
+                  hintText: 'Search by name, mobile, etc.',
+                  searchQuery: _searchQuery,
+                  onSearchSubmitted: _onSearchSubmitted,
+                  onClearSearch: _onClearSearch,
+                  isFilterButton: true,
+                  hasActiveFilters: _hasActiveFilters,
+                  onFilterPressed: () => _showFilterBottomSheet(context),
+                ),
+              ),
+              Expanded(
+                  child: _buildGatePassList()
+              ),
+            ],
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'pendingFAB',
-        onPressed: () => _raiseComplaint(context),
-        backgroundColor: Colors.blue,
-        icon: const Icon(Icons.add, color: Colors.white70),
-        label: const Text(
-          'New Complaint',
-          style: TextStyle(color: Colors.white70),
-        ),
       ),
     );
   }
 
-
-  Widget _buildComplaintList(List<Complaint> complaints, BuildContext context) {
-    if (_data.isNotEmpty && _isLoading == false) {
+  Widget _buildGatePassList(){
+    if (data.isNotEmpty && _isLoading == false) {
       return RefreshIndicator(
         onRefresh: _onRefresh,
         child: AnimationLimiter(
-          child: SinglePaginatedListView<Complaint>(
-            data: _data,
-            controller: _scrollController,
-            hasMore: _hasMore,
-            itemBuilder: _itemBuilder,
-          ),
+            child: SinglePaginatedListView<GatePassBannerGuard>(
+              data: data,
+              controller: _scrollController,
+              hasMore: _hasMore,
+              itemBuilder: _itemBuilder,
+            )
         ),
       );
     } else if (_isLazyLoading) {
       return RefreshIndicator(
         onRefresh: _onRefresh,
         child: AnimationLimiter(
-          child: SinglePaginatedListView<Complaint>(
-            data: _data,
-            controller: _scrollController,
-            hasMore: _hasMore,
-            itemBuilder: _itemBuilder,
-          ),
+            child: SinglePaginatedListView<GatePassBannerGuard>(
+              data: data,
+              controller: _scrollController,
+              hasMore: _hasMore,
+              itemBuilder: _itemBuilder,
+            )
         ),
       );
     } else if (_isLoading && _isLazyLoading==false) {
       return const CustomLoader();
-    }else if (_data.isEmpty && _isError == true && statusCode == 401) {
-      return BuildErrorState(onRefresh: _onRefresh);
+    } else if (data.isEmpty && _isError == true && statusCode == 401) {
+      return BuildErrorState(onRefresh: _onRefresh, kToolbarCount: 4,);
     } else {
-      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: "There are no resolved complaints", kToolbarCount: 4,);
+      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'No Gate Pass Entries Found', kToolbarCount: 4);
     }
   }
 
   Widget _itemBuilder(item, index) {
     return StaggeredListAnimation(
       index: index,
-      child: ComplaintCard(
-        complaint: item,
-        onTap: _cardOnTap,
+      child: ExpiredGatePassCard(
+        gatePass: item,
+          onDelete: ()=> _onDelete(data[index].id!, index),
+          isLoading: isLoadingList[index]
       ),
     );
-  }
-
-  Future<void> _cardOnTap(Complaint complaint, BuildContext context) async {
-    // Store the context read functions before the async gap
-    final isAdmin = widget.isAdmin == true;
-    final adminBlocFunction = context.read<AdministrationBloc>().add;
-    final settingBlocFunction = context.read<SettingBloc>().add;
-
-    Map<String, dynamic> args = {'id': complaint.id,};
-
-    var result = await Navigator.pushNamed(
-      context,
-      '/complaint-details-screen',
-      arguments: args,
-    );
-
-    // Check if the widget is still mounted before proceeding
-    if (!mounted) return;
-
-    if (result is Complaint) {
-      setState(() {
-        int index = _data.indexWhere((item) => item.complaintId == complaint.complaintId);
-        if (index != -1) {
-          // _data[index] = result;
-          _data.removeAt(index);
-        }
-      });
-      if(result.status == 'resolved'){
-        if (isAdmin) {
-          setState(() {
-            _data.clear();
-            _page = 1;
-          });
-          adminBlocFunction(AdminGetResolvedComplaint(queryParams: const {
-            'page': '1',
-            'limit': '10',
-          }));
-        } else {
-          setState(() {
-            _data.clear();
-            _page = 1;
-          });
-          settingBlocFunction(SettingGetResolvedComplaint(queryParams: const {
-            'page': '1',
-            'limit': '10',
-          }));
-        }
-      }else{
-        if (isAdmin) {
-          adminBlocFunction(AdminGetPendingComplaint(queryParams: const {
-            'page': '1',
-            'limit': '10',
-          }));
-        } else {
-          settingBlocFunction(SettingGetPendingComplaint(queryParams: const {
-            'page': '1',
-            'limit': '10',
-          }));
-        }
-      }
-    }
   }
 
   void _showFilterBottomSheet(BuildContext context) {
@@ -380,7 +281,7 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Date Range',
+                          'Filter Entries',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -389,6 +290,7 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
                         TextButton(
                           onPressed: () {
                             setModalState(() {
+                              _selectedStatusType = '';
                               _startDate = null;
                               _endDate = null;
                             });
@@ -396,6 +298,13 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
                           child: const Text('Reset'),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Date Range',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     InkWell(
@@ -464,7 +373,12 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
 
   Future<void> _onRefresh() async {
     _page=1;
-    await _fetchEntries();
+    _fetchEntries();
+  }
+
+  void _onDelete(String id, int index){
+    cardIndex = index;
+    context.read<GuardProfileBloc>().add(RemoveGatePass(id: id));
   }
 
   @override

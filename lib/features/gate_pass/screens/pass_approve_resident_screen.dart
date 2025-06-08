@@ -6,25 +6,25 @@ import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
 import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
 import 'package:gloria_connect/common_widgets/single_paginated_list_view.dart';
-import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
-import 'package:gloria_connect/features/guard_profile/widgets/gate_pass_card.dart';
+import 'package:gloria_connect/features/gate_pass/bloc/gate_pass_bloc.dart';
+import 'package:gloria_connect/features/gate_pass/models/gate_pass_model.dart';
+import 'package:gloria_connect/features/gate_pass/widgets/approved_gate_pass_card.dart';
 import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
-import '../bloc/guard_profile_bloc.dart';
-
-class GatePassListScreen extends StatefulWidget {
-  const GatePassListScreen({super.key});
+class PassApproveResidentScreen extends StatefulWidget {
+  const PassApproveResidentScreen({super.key});
 
   @override
-  State<GatePassListScreen> createState() => _GatePassListScreenState();
+  State<PassApproveResidentScreen> createState() => _PassApproveResidentScreenState();
 }
 
-class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticKeepAliveClientMixin {
+class _PassApproveResidentScreenState extends State<PassApproveResidentScreen> with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  List<GatePassBannerGuard> data = [];
+  List<GatePassBanner> data = [];
   bool _isLoading = false;
   bool _isError = false;
   int? statusCode;
@@ -37,6 +37,8 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
   DateTime? _startDate;
   DateTime? _endDate;
   bool _hasActiveFilters = false;
+  int? cardIndex;
+  List<bool> isLoadingList = [];
 
   @override
   void initState() {
@@ -83,7 +85,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
       queryParams['endDate'] = DateFormat('yyyy-MM-dd').format(_endDate!);
     }
 
-    context.read<GuardProfileBloc>().add(GetGatePass(queryParams: queryParams));
+    context.read<GatePassBloc>().add(GatePassGetApprovedRes(queryParams: queryParams));
   }
 
   void _applyFilters() {
@@ -137,30 +139,50 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-        body: BlocConsumer<GuardProfileBloc, GuardProfileState>(
+        body: BlocConsumer<GatePassBloc, GatePassState>(
           listener: (context, state) {
-            if (state is GetGatePassLoading) {
+            if (state is GatePassGetApprovedResLoading) {
               _isLoading = true;
               _isError = false;
             }
-            if (state is GetGatePassSuccess) {
+            if (state is GatePassGetApprovedResSuccess) {
               if (_page == 1) {
                 data.clear();
               }
-              data.addAll(state.response.gatePassBanner as Iterable<GatePassBannerGuard>);
+              data.addAll(state.response.gatePassBanner as Iterable<GatePassBanner>);
               _page++;
               _hasMore = state.response.pagination?.hasMore ?? false;
               _isLoading = false;
               _isLazyLoading = false;
               _isError = false;
+              isLoadingList = List.generate(data.length, (index) => false,);
             }
-            if (state is GetGatePassFailure) {
+            if (state is GatePassGetApprovedResFailure) {
               data = [];
               _isLoading = false;
               _isLazyLoading = false;
               _isError = true;
               statusCode= state.status;
               _hasMore = false;
+            }
+
+            if(state is GatePassRemoveApartmentResidentLoading){
+              setState(() {
+                isLoadingList[cardIndex!] = true;
+              });
+            }
+            if(state is GatePassRemoveApartmentResidentSuccess){
+              setState(() {
+                isLoadingList[cardIndex!] = false;
+              });
+              _page = 1;
+              _fetchEntries();
+            }
+            if(state is GatePassRemoveApartmentResidentFailure){
+              setState(() {
+                isLoadingList[cardIndex!] = false;
+              });
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
             }
           },
           builder: (context, state) {
@@ -194,7 +216,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
       return RefreshIndicator(
         onRefresh: _onRefresh,
         child: AnimationLimiter(
-            child: SinglePaginatedListView<GatePassBannerGuard>(
+            child: SinglePaginatedListView<GatePassBanner>(
               data: data,
               controller: _scrollController,
               hasMore: _hasMore,
@@ -206,7 +228,7 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
       return RefreshIndicator(
         onRefresh: _onRefresh,
         child: AnimationLimiter(
-            child: SinglePaginatedListView<GatePassBannerGuard>(
+            child: SinglePaginatedListView<GatePassBanner>(
               data: data,
               controller: _scrollController,
               hasMore: _hasMore,
@@ -219,17 +241,24 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
     } else if (data.isEmpty && _isError == true && statusCode == 401) {
       return BuildErrorState(onRefresh: _onRefresh, kToolbarCount: 4,);
     } else {
-      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'There are no gate passes or services.', kToolbarCount: 4);
+      return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'No Gate Pass Found', kToolbarCount: 4);
     }
   }
 
   Widget _itemBuilder(item, index) {
     return StaggeredListAnimation(
       index: index,
-      child: GatePassCard(
-        gatePassBanner: item,
+      child: ApprovedGatepassCard(
+        gatePass: item,
+        onDelete: ()=> _onDelete(data[index].id!, index),
+        isLoading: isLoadingList[index]
       ),
     );
+  }
+
+  void _onDelete(String gatePassId, int index) {
+    cardIndex = index;
+    context.read<GatePassBloc>().add(GatePassRemoveApartmentResident(id: gatePassId));
   }
 
   void _showFilterBottomSheet(BuildContext context) {
@@ -272,22 +301,6 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
                           },
                           child: const Text('Reset'),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Status',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        _buildFilterChip('All', 'all', setModalState),
-                        _buildFilterChip('Active', 'active', setModalState),
-                        _buildFilterChip('Expired', 'expired', setModalState),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -362,22 +375,9 @@ class _GatePassListScreenState extends State<GatePassListScreen> with AutomaticK
     );
   }
 
-  Widget _buildFilterChip(String label, String value, StateSetter setModalState) {
-    return FilterChip(
-      label: Text(label),
-      selected: _selectedStatusType == value,
-      onSelected: (selected) {
-        setModalState(() {
-          _selectedStatusType = selected ? value : '';
-        });
-      },
-    );
-  }
-
   Future<void> _onRefresh() async {
-    if(_hasMore) {
-      await _fetchEntries();
-    }
+    _page = 1;
+    _fetchEntries();
   }
 
   @override

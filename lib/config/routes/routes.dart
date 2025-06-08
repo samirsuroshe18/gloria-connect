@@ -13,6 +13,7 @@ import 'package:gloria_connect/features/approval_screens/screens/delivery_approv
 import 'package:gloria_connect/features/approval_screens/screens/delivery_approval_screen.dart';
 import 'package:gloria_connect/features/approval_screens/screens/verification_pending_screen.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
+import 'package:gloria_connect/features/gate_pass/screens/gate_pass_resident_screen.dart';
 import 'package:gloria_connect/features/guard_duty/screens/checkout_entry_screen.dart';
 import 'package:gloria_connect/features/guard_duty/screens/duty_login_screen.dart';
 import 'package:gloria_connect/features/auth/screens/forgot_password_screen.dart';
@@ -37,10 +38,11 @@ import 'package:gloria_connect/features/guard_entry/screens/guest_approval_profi
 import 'package:gloria_connect/features/guard_entry/screens/other_approval_profile.dart';
 import 'package:gloria_connect/features/guard_entry/screens/other_more_option.dart';
 import 'package:gloria_connect/features/guard_profile/models/gate_pass_banner.dart';
-import 'package:gloria_connect/features/guard_profile/screens/gate_pass_list_screen.dart';
 import 'package:gloria_connect/features/guard_profile/screens/add_new_service_screen.dart';
 import 'package:gloria_connect/features/guard_profile/screens/checkout_history_screen.dart';
 import 'package:gloria_connect/features/guard_profile/screens/gate_pass_banner_screen.dart';
+import 'package:gloria_connect/features/guard_profile/screens/gate_pass_guard_screen.dart';
+import 'package:gloria_connect/features/guard_profile/screens/gatepass_service_screen.dart';
 import 'package:gloria_connect/features/guard_waiting/models/entry.dart';
 import 'package:gloria_connect/features/guard_waiting/screens/view_resident_approval.dart';
 import 'package:gloria_connect/features/home/screens/admin_home_screen.dart';
@@ -279,10 +281,14 @@ class AppRoutes {
         } else {
           return _animatedRoute(const AddNewServiceScreen(), name: '/add-service-screen');
         }
-      case '/gate-pass-list-screen':
-        return _animatedRoute(const GatePassListScreen(), name: '/gate-pass-list-screen');
+      case '/gate-pass-screen':
+        return _animatedRoute(const GatePassGuardScreen(), name: '/gate-pass-screen');
+      case '/gate-pass-resident-screen':
+        return _animatedRoute(const GatePassResidentScreen(), name: '/gate-pass-resident-screen');
+      case '/gate-pass-service-screen':
+        return _animatedRoute(GatepassServiceScreen(data: args as GatePassBannerGuard), name: '/gate-pass-service-screen');
       case '/gate-pass-banner-screen':
-        if (args != null && args is GatePassBanner) {
+        if (args != null && args is GatePassBannerGuard) {
           return _animatedRoute(GatePassBannerScreen(data: args), name: '/gate-pass-banner-screen');
         } else {
           return _animatedRoute(const GatePassBannerScreen(), name: '/gate-pass-banner-screen');

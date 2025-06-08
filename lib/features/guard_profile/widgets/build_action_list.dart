@@ -18,10 +18,10 @@ class BuildActionList extends StatelessWidget {
         'route': '/checkout-history-screen',
       },
       {
-        'title': 'View Gate Pass',
+        'title': 'Manage Gate Pass',
         'icon': Icons.visibility,
         'color': Colors.white70,
-        'route': '/gate-pass-list-screen',
+        'route': '/gate-pass-screen',
       },
       {
         'title': 'Add Gate Pass',

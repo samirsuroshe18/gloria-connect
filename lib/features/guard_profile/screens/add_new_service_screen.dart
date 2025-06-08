@@ -390,7 +390,7 @@ class _AddNewServiceScreenState extends State<AddNewServiceScreen> {
                   onPickPDF: null,
                   isOnlyImage: true,
                 ),
-                label: 'Upload Ownership Document',
+                label: 'Upload Identity Document',
               ),
             ],
           ),

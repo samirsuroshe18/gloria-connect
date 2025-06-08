@@ -1,20 +1,20 @@
 import 'dart:convert';
 
-GatePassModel gatePassModelFromJson(String str) => GatePassModel.fromJson(json.decode(str));
+GatePassModelResident gatePassModelFromJson(String str) => GatePassModelResident.fromJson(json.decode(str));
 
-String gatePassModelToJson(GatePassModel data) => json.encode(data.toJson());
+String gatePassModelToJson(GatePassModelResident data) => json.encode(data.toJson());
 
-class GatePassModel {
-  final List<GatePassBannerGuard>? gatePassBanner;
+class GatePassModelResident {
+  final List<GatePassBanner>? gatePassBanner;
   final Pagination? pagination;
 
-  GatePassModel({
+  GatePassModelResident({
     this.gatePassBanner,
     this.pagination,
   });
 
-  factory GatePassModel.fromJson(Map<String, dynamic> json) => GatePassModel(
-    gatePassBanner: json["gatePassBanner"] == null ? [] : List<GatePassBannerGuard>.from(json["gatePassBanner"]!.map((x) => GatePassBannerGuard.fromJson(x))),
+  factory GatePassModelResident.fromJson(Map<String, dynamic> json) => GatePassModelResident(
+    gatePassBanner: json["gatePassBanner"] == null ? [] : List<GatePassBanner>.from(json["gatePassBanner"]!.map((x) => GatePassBanner.fromJson(x))),
     pagination: json["pagination"] == null ? null : Pagination.fromJson(json["pagination"]),
   );
 
@@ -24,7 +24,7 @@ class GatePassModel {
   };
 }
 
-class GatePassBannerGuard {
+class GatePassBanner {
   final GuardStatus? guardStatus;
   final String? id;
   final ApprovedBy? approvedBy;
@@ -51,7 +51,7 @@ class GatePassBannerGuard {
   final DateTime? updatedAt;
   final int? v;
 
-  GatePassBannerGuard({
+  GatePassBanner({
     this.guardStatus,
     this.id,
     this.approvedBy,
@@ -79,7 +79,7 @@ class GatePassBannerGuard {
     this.v,
   });
 
-  factory GatePassBannerGuard.fromJson(Map<String, dynamic> json) => GatePassBannerGuard(
+  factory GatePassBanner.fromJson(Map<String, dynamic> json) => GatePassBanner(
     guardStatus: json["guardStatus"] == null ? null : GuardStatus.fromJson(json["guardStatus"]),
     id: json["_id"],
     approvedBy: json["approvedBy"] == null ? null : ApprovedBy.fromJson(json["approvedBy"]),

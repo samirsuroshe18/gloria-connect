@@ -53,3 +53,23 @@ final class GetGatePass extends GuardProfileEvent {
 
   GetGatePass({required this.queryParams});
 }
+
+final class GetExpiredGatePassSecurity extends GuardProfileEvent {
+  final Map<String, dynamic> queryParams;
+
+  GetExpiredGatePassSecurity({required this.queryParams});
+}
+
+final class GetGatePassDetails extends GuardProfileEvent {
+  final String id;
+
+  GetGatePassDetails({required this.id});
+}
+
+final class RemoveGatePass extends GuardProfileEvent {
+  final String id;
+
+  RemoveGatePass({required this.id});
+}
+
+final class GetPendingGatePass extends GuardProfileEvent {}

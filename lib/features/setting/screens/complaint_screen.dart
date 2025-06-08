@@ -41,6 +41,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> with SingleTickerProv
         ),
         bottom: TabBar(
           controller: _tabController,
+          dividerColor: Colors.transparent,
           tabs: const [
             Tab(text: "Pending"),
             Tab(text: "Resolved"),
