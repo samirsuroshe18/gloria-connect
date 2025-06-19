@@ -78,7 +78,8 @@ import 'package:gloria_connect/features/setting/screens/setting_screen.dart';
 import 'package:gloria_connect/common_widgets/check_internet_connection.dart';
 import 'package:gloria_connect/common_widgets/error_screen.dart';
 import 'package:gloria_connect/common_widgets/gradient_color.dart';
-
+import 'package:gloria_connect/features/administration/screens/manage_technician_screen.dart';
+import 'package:gloria_connect/features/administration/screens/add_technician_screen.dart';
 class AppRoutes {
 
   static Route onGenerateRoutes(RouteSettings settings){
@@ -357,7 +358,11 @@ class AppRoutes {
         return _animatedRoute(CheckoutEntryScreen(checkinTime: args as DateTime), name: '/day-checkout-entry');
       case '/shift-history-screen':
         return _animatedRoute(ShiftHistoryScreen(guardId: args as String,), name: '/shift-history-screen');
-      default:
+      case '/manage-technician-screen':
+        return _animatedRoute(const ManageTechnicianScreen(), name: '/manage-technician-screen');
+      case '/add-technician-screen':
+        return _animatedRoute(const AddTechnicianScreen(), name: '/add-technician-screen');
+        default:
         return _animatedRoute(const SplashScreen(), name: '/');
     }
   }
