@@ -37,6 +37,13 @@ class BuildAdminMenuItem extends StatelessWidget {
         color: Colors.deepOrange,
         description: 'Oversee security staff details',
       ),
+      AdminMenuItem(
+        title: 'Manage Technician',
+        icon: Icons.build_rounded,
+        route: '/manage-technician-screen',
+        color: Colors.blue,
+        description: 'Oversee technician staff details',
+      ),
     ];
 
     return SliverPadding(
