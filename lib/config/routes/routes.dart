@@ -50,6 +50,7 @@ import 'package:gloria_connect/features/guard_profile/screens/guard_edit_profile
 import 'package:gloria_connect/features/home/screens/guard_home_screen.dart';
 import 'package:gloria_connect/features/home/screens/landing_screen.dart';
 import 'package:gloria_connect/features/home/screens/resident_home_screen.dart';
+import 'package:gloria_connect/features/home/screens/technician_home_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/cab_company_screen.dart';
 import 'package:gloria_connect/features/invite_visitors/screens/delivery_company_screen.dart';
@@ -362,7 +363,9 @@ class AppRoutes {
         return _animatedRoute(const ManageTechnicianScreen(), name: '/manage-technician-screen');
       case '/add-technician-screen':
         return _animatedRoute(const AddTechnicianScreen(), name: '/add-technician-screen');
-        default:
+      case '/technician-home-screen':
+        return _animatedRoute(const TechnicianHomeScreen(), name: '/technician-home-screen');
+      default:
         return _animatedRoute(const SplashScreen(), name: '/');
     }
   }

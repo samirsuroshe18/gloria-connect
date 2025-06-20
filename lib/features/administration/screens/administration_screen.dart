@@ -14,18 +14,18 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
+        centerTitle: true,
+        title: const Text(
+          'Administration',
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
+      ),
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            centerTitle: true,
-            backgroundColor: Colors.black.withValues(alpha: 0.2),
-            title: const Text(
-              'Administration',
-              style: TextStyle(
-                color: Colors.white
-              ),
-            ),
-          ),
           const BuildAdminMenuItem(),
           const QuickActionCard(),
         ],

@@ -215,3 +215,47 @@ final class AdminGetResolvedComplaintFailure extends AdministrationState{
   AdminGetResolvedComplaintFailure( {required this.message, this.status});
 }
 
+///add technician
+final class AdminAddTechnicianLoading extends AdministrationState{}
+
+final class AdminAddTechnicianSuccess extends AdministrationState{
+  final Map<String, dynamic> response;
+  AdminAddTechnicianSuccess({required this.response});
+}
+
+final class AdminAddTechnicianFailure extends AdministrationState{
+  final String message;
+  final int? status;
+
+  AdminAddTechnicianFailure( {required this.message, this.status});
+}
+
+/// To Get all technician
+final class AdminGetTechnicianLoading extends AdministrationState{}
+
+final class AdminGetTechnicianSuccess extends AdministrationState{
+  final TechnicianModel response;
+  AdminGetTechnicianSuccess({required this.response});
+}
+
+final class AdminGetTechnicianFailure extends AdministrationState{
+  final String message;
+  final int? status;
+
+  AdminGetTechnicianFailure( {required this.message, this.status});
+}
+
+///remove technician
+final class AdminRemoveTechnicianLoading extends AdministrationState{}
+
+final class AdminRemoveTechnicianSuccess extends AdministrationState{
+  final Map<String, dynamic> response;
+  AdminRemoveTechnicianSuccess({required this.response});
+}
+
+final class AdminRemoveTechnicianFailure extends AdministrationState{
+  final String message;
+  final int? status;
+
+  AdminRemoveTechnicianFailure( {required this.message, this.status});
+}
