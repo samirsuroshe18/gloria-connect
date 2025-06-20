@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:gloria_connect/common_widgets/build_error_state.dart';
+import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/common_widgets/data_not_found_widget.dart';
+import 'package:gloria_connect/common_widgets/search_filter_bar.dart';
+import 'package:gloria_connect/common_widgets/single_paginated_list_view.dart';
+import 'package:gloria_connect/common_widgets/staggered_list_animation.dart';
+import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/administration/models/technician_model.dart';
+import 'package:gloria_connect/features/administration/widgets/technician_card.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 
 class ManageTechnicianScreen extends StatefulWidget {
   const ManageTechnicianScreen({super.key});
@@ -8,373 +19,325 @@ class ManageTechnicianScreen extends StatefulWidget {
 }
 
 class _ManageTechnicianScreenState extends State<ManageTechnicianScreen> {
+  final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  final List<Technician> _technicians = []; // Changed to final to ensure we modify the same list
-  List<Technician> _filteredTechnicians = [];
+  List<Technician> data = [];
+  bool _isLoading = false;
+  bool _isLazyLoading = false;
+  bool _isError = false;
+  int? statusCode;
+  int _page = 1;
+  final int _limit = 10;
+  bool _hasMore = true;
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    // Initialize with empty list, will be populated when technicians are added
-    _filteredTechnicians = List.from(_technicians); // Create a new list from _technicians
+    _fetchEntries();
+    _scrollController.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
-  void _filterTechnicians(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredTechnicians = List.from(_technicians);
-      } else {
-        _filteredTechnicians = _technicians
-            .where((technician) =>
-            technician.name.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+  void _scrollListener() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (!_isLoading && _hasMore && data.length>=_limit) {
+        _isLazyLoading = true;
+        _fetchEntries();
       }
-    });
+    }
   }
+
+  Future<void> _fetchEntries()async {
+    final queryParams = {
+      'page': _page.toString(),
+      'limit': _limit.toString(),
+    };
+
+    if (_searchQuery.isNotEmpty) {
+      queryParams['search'] = _searchQuery;
+    }
+
+    context.read<AdministrationBloc>().add(AdminGetTechnician(queryParams: queryParams));
+  }
+
+  void _onSearchSubmitted(value) {
+    setState(() {
+      _searchQuery = value;
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
+  }
+
+  void _onClearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchQuery = '';
+      _page = 1;
+      data.clear();
+    });
+    _fetchEntries();
+  }
+
   void _addTechnician() async {
     final result = await Navigator.pushNamed(context, '/add-technician-screen');
     if (result != null && result is Technician) {
       setState(() {
-
-        _technicians.add(result);
-        _filteredTechnicians = List.from(_technicians);
-
+        data.add(result);
       });
-
     }
   }
+
   void _showDeleteConfirmation(BuildContext context, Technician technician) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color.fromRGBO(255, 235, 235, 1),
-                  ),
-                  child: const Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Delete Technician Account',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text.rich(
-                  TextSpan(
-                    text: 'Are you sure you want to delete ',
-                    children: [
-                      TextSpan(
-                        text: '${technician.name}\'s',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const TextSpan(
-                        text: ' account? This action cannot be undone.',
-                      ),
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Row(
+        return BlocConsumer<AdministrationBloc, AdministrationState>(
+          listener: (context, state) {
+            if(state is AdminRemoveTechnicianLoading){
+              debugPrint('loading');
+            }
+            // Close dialog when deletion is complete (success or error)
+            if (state is AdminRemoveTechnicianSuccess) {
+              data.removeWhere((tech) => tech.id == technician.id);
+              Navigator.pop(context);
+              // Show success snackbar
+              CustomSnackBar.show(context: context, message: '${technician.userName} has been deleted successfully', type: SnackBarType.success);
+            } else if (state is AdminRemoveTechnicianFailure) {
+              debugPrint('error : ${state.message}');
+              Navigator.pop(context);
+              // Show error snackbar
+              CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
+            }
+          },
+          builder: (context, state) {
+            bool isDeleting = state is AdminRemoveTechnicianLoading;
+
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: Colors.grey[200],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(color: Colors.black87),
-                        ),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color.fromRGBO(255, 235, 235, 1),
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.red,
+                        size: 32,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          // TODO: Implement delete functionality
-                          setState(() {
-                            _technicians.remove(technician);
-                            _filteredTechnicians = List.from(_technicians);
-                          });
-                          Navigator.pop(context);
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: Colors.red,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Delete Technician Account',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text.rich(
+                      TextSpan(
+                        text: 'Are you sure you want to delete ',
+                        children: [
+                          TextSpan(
+                            text: '${technician.userName ?? "NA"}\'s',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const TextSpan(
+                            text: ' account? This action cannot be undone.',
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: isDeleting ? null : () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              backgroundColor: isDeleting ? Colors.grey[300] : Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(color: Colors.black87),
+                            ),
                           ),
                         ),
-                        child: const Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.white),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: isDeleting
+                                ? null
+                                : () {
+                              context.read<AdministrationBloc>().add(
+                                  AdminRemoveTechnician(id: technician.id!)
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              backgroundColor: isDeleting ? Colors.red[300] : Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: isDeleting
+                                ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Deleting...',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            )
+                                : const Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: const Text(
           'Manage Technicians',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white70,
+          ),
         ),
-        backgroundColor: Colors.black.withValues(alpha: 0.2),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: SearchFilterBar(
+            searchController: _searchController,
+            hintText: 'Search by name, mobile, etc.',
+            searchQuery: _searchQuery,
+            onSearchSubmitted: _onSearchSubmitted,
+            onClearSearch: _onClearSearch,
+            isFilterButton: false,
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTechnician,
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add, color: Colors.white),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search technicians...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+      body: BlocConsumer<AdministrationBloc, AdministrationState>(
+        listener: (context, state) {
+          if (state is AdminGetTechnicianLoading) {
+            _isLoading = true;
+            _isError = false;
+          }
+          if (state is AdminGetTechnicianSuccess) {
+            if (_page == 1) {
+              data.clear();
+            }
+            data.addAll(state.response.technicians as Iterable<Technician>);
+            _page++;
+            _hasMore = state.response.pagination?.hasMore ?? false;
+            _isLoading = false;
+            _isLazyLoading = false;
+            _isError = false;
+          }
+          if (state is AdminGetTechnicianFailure) {
+            data = [];
+            _isLoading = false;
+            _isLazyLoading = false;
+            _isError = true;
+            statusCode= state.status;
+            _hasMore = false;
+          }
+        },
+        builder: (context, state) {
+          if (data.isNotEmpty && _isLoading == false) {
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: AnimationLimiter(
+                child: SinglePaginatedListView<Technician>(
+                  data: data,
+                  controller: _scrollController,
+                  hasMore: _hasMore,
+                  itemBuilder: _itemBuilder,
                 ),
-                contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
-              onChanged: _filterTechnicians,
-            ),
-          ),
-          Expanded(
-            child: _buildTechniciansList(),
-          ),
-        ],
+            );
+          } else if (_isLazyLoading) {
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: AnimationLimiter(
+                child: SinglePaginatedListView<Technician>(
+                  data: data,
+                  controller: _scrollController,
+                  hasMore: _hasMore,
+                  itemBuilder: _itemBuilder,
+                ),
+              ),
+            );
+          } else if (_isLoading && _isLazyLoading==false) {
+            return const CustomLoader();
+          } else if (data.isEmpty && _isError == true && statusCode == 401) {
+            return BuildErrorState(onRefresh: _onRefresh);
+          } else {
+            return DataNotFoundWidget(onRefresh: _onRefresh, infoMessage: 'There are no technician.',);
+          }
+        },
       ),
     );
   }
 
-  Widget _buildTechniciansList() {
-
-    if (_filteredTechnicians.isEmpty) {
-      return const Center(
-        child: Text(
-          'No technicians found',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _filteredTechnicians.length,
-      itemBuilder: (context, index) {
-        final technician = _filteredTechnicians[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF23243B),
-                  Color(0xFF3B1F24),
-                ],
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.blue.withValues(alpha: 0.2),
-                        child: const Icon(Icons.person, size: 32, color: Colors.blue),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  technician.name,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Text(
-                                    'Active',
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              technician.role,
-                              style: TextStyle(
-                                color: Colors.blue[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  WidgetSpan(
-                                    child: Icon(Icons.call, size: 16, color: Colors.green),
-                                  ),
-                                  const WidgetSpan(child: SizedBox(width: 4)),
-                                  TextSpan(
-                                    text: technician.phoneNo,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.email_outlined, size: 16, color: Colors.blueGrey),
-                                SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    technician.email,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 13,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(Icons.location_on_outlined, size: 16, color: Colors.deepOrange),
-                                SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    technician.address,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 13,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _showDeleteConfirmation(context, technician),
-                          icon: const Icon(Icons.delete_outline, color: Colors.red),
-                          label: const Text('Delete Account'),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            // TODO: Implement share credentials
-                          },
-                          icon: const Icon(Icons.share_outlined),
-                          label: const Text('Share Creds'),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+  Widget _itemBuilder(item, index) {
+    return StaggeredListAnimation(
+      index: index,
+      child: TechnicianCard(data: item, showDeleteConfirmation: ()=> _showDeleteConfirmation(context, item)),
     );
+  }
+
+  Future<void> _onRefresh() async {
+    _page = 1;
+    await _fetchEntries();
   }
 }

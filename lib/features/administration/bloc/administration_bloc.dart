@@ -4,6 +4,7 @@ import 'package:gloria_connect/features/administration/models/guard_requests_mod
 import 'package:gloria_connect/features/administration/models/resident_requests_model.dart';
 import 'package:gloria_connect/features/administration/models/society_guard.dart';
 import 'package:gloria_connect/features/administration/models/society_member.dart';
+import 'package:gloria_connect/features/administration/models/technician_model.dart';
 import 'package:gloria_connect/features/administration/repository/administration_repository.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 
@@ -208,6 +209,48 @@ class AdministrationBloc extends Bloc<AdministrationEvent, AdministrationState>{
           emit(AdminGetResolvedComplaintFailure(message: e.message.toString(), status: e.statusCode));
         }else{
           emit(AdminGetResolvedComplaintFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<AdminAddTechnician>((event, emit) async {
+      emit(AdminAddTechnicianLoading());
+      try{
+        final Map<String, dynamic> response = await _administrationRepository.addTechnicians(userName: event.userName, email: event.email, phoneNo: event.phoneNo, role: event.role);
+        emit(AdminAddTechnicianSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(AdminAddTechnicianFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(AdminAddTechnicianFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<AdminGetTechnician>((event, emit) async {
+      emit(AdminGetTechnicianLoading());
+      try{
+        final TechnicianModel response = await _administrationRepository.getTechnician(queryParams: event.queryParams);
+        emit(AdminGetTechnicianSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(AdminGetTechnicianFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(AdminGetTechnicianFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<AdminRemoveTechnician>((event, emit) async {
+      emit(AdminRemoveTechnicianLoading());
+      try{
+        final Map<String, dynamic> response = await _administrationRepository.removeTechnician(id: event.id);
+        emit(AdminRemoveTechnicianSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(AdminRemoveTechnicianFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(AdminRemoveTechnicianFailure(message: e.toString()));
         }
       }
     });

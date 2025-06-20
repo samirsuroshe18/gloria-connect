@@ -4,6 +4,7 @@ import 'package:gloria_connect/features/administration/models/guard_requests_mod
 import 'package:gloria_connect/features/administration/models/resident_requests_model.dart';
 import 'package:gloria_connect/features/administration/models/society_guard.dart';
 import 'package:gloria_connect/features/administration/models/society_member.dart';
+import 'package:gloria_connect/features/administration/models/technician_model.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -495,6 +496,117 @@ class AdministrationRepository {
 
       if (response.statusCode == 200) {
         return ComplaintModel.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> addTechnicians({required String userName, required String email, required String phoneNo, required String role}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final Map<String, dynamic> payload = {
+        'userName': userName,
+        'email': email,
+        'phoneNo': phoneNo,
+        'role': role
+      };
+
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/create-technician';
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(payload),
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {...jsonBody, "data": Technician.fromJson(jsonBody['data'])};
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<TechnicianModel> getTechnician({required Map<String, dynamic> queryParams}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      // Build query string using the same 'queryParams' name
+      String queryString = Uri(queryParameters: queryParams).query;
+      String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-technicians';
+      if (queryString.isNotEmpty) {
+        apiUrl += '?$queryString';
+      }
+
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return TechnicianModel.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> removeTechnician({required String id}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final Map<String, dynamic> data = {
+        'id': id,
+      };
+
+      const apiUrl =
+          '${ServerConstant.baseUrl}/api/v1/admin/remove-technician';
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(data),
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return jsonBody;
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

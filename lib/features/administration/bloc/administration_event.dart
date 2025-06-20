@@ -74,3 +74,25 @@ final class AdminGetResolvedComplaint extends AdministrationEvent{
 
   AdminGetResolvedComplaint({required this.queryParams});
 }
+
+
+final class AdminAddTechnician extends AdministrationEvent{
+  final String userName;
+  final String email;
+  final String phoneNo;
+  final String role;
+
+  AdminAddTechnician({required this.userName, required this.email, required this.phoneNo, required this.role});
+}
+
+final class AdminGetTechnician extends AdministrationEvent{
+  final Map<String, dynamic> queryParams;
+
+  AdminGetTechnician({required this.queryParams});
+}
+
+final class AdminRemoveTechnician extends AdministrationEvent{
+  final String id;
+
+  AdminRemoveTechnician({required this.id});
+}

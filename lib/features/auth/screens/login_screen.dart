@@ -59,6 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.pushReplacementNamed(context, '/user-input');
             } else if (state.response.role == 'admin') {
               Navigator.pushReplacementNamed(context, '/admin-home');
+            } else if (state.response.userType == 'Technician') {
+              Navigator.pushNamedAndRemoveUntil(context, '/technician-home-screen', (Route<dynamic> route) => false);
             } else if (state.response.role == 'user' &&
                 state.response.userType == 'Resident' &&
                 state.response.isUserTypeVerified == false) {
