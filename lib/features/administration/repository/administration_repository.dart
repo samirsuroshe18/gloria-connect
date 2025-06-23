@@ -620,4 +620,40 @@ class AdministrationRepository {
     }
   }
 
+  Future<Map<String, dynamic>> assignTechnician({required String complaintId, required String technicianId}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final Map<String, dynamic> data = {
+        'complaintId': complaintId,
+        'technicianId': technicianId,
+      };
+
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/reject-resolution';
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(data),
+      );
+      final jsonBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return jsonBody;
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode, message: jsonBody['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
 }

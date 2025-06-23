@@ -255,5 +255,19 @@ class AdministrationBloc extends Bloc<AdministrationEvent, AdministrationState>{
       }
     });
 
+    on<AssignTechnician>((event, emit) async {
+      emit(AssignTechnicianLoading());
+      try{
+        final Map<String, dynamic> response = await _administrationRepository.assignTechnician(complaintId: event.complaintId, technicianId: event.technicianId);
+        emit(AssignTechnicianSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(AssignTechnicianFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(AssignTechnicianFailure(message: e.toString()));
+        }
+      }
+    });
+
   }
 }
