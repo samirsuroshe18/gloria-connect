@@ -59,7 +59,7 @@ class _TechnicianHomeScreenState extends State<TechnicianHomeScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2),
             child: NavigationBar(
               selectedIndex: _selectedIndex,
               onDestinationSelected: (index) {
