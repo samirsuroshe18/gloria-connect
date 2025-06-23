@@ -81,6 +81,7 @@ import 'package:gloria_connect/common_widgets/error_screen.dart';
 import 'package:gloria_connect/common_widgets/gradient_color.dart';
 import 'package:gloria_connect/features/administration/screens/manage_technician_screen.dart';
 import 'package:gloria_connect/features/administration/screens/add_technician_screen.dart';
+import 'package:gloria_connect/features/setting/screens/resident_complaint_details_screen.dart';
 class AppRoutes {
 
   static Route onGenerateRoutes(RouteSettings settings){
@@ -313,6 +314,8 @@ class AppRoutes {
         return _animatedRoute(const ComplaintFormScreen(), name: '/complaint-form-screen');
       case '/complaint-details-screen':
         return _animatedRoute(ComplaintDetailsScreen(data: args as Map<String, dynamic>), name: '/complaint-details-screen');
+      case '/resident-complaint-details-screen':
+        return _animatedRoute(ResidentComplaintDetailsScreen(data: args as Map<String, dynamic>), name: '/resident-complaint-details-screen');
       case '/notice-board-screen':
         return _animatedRoute(const NoticeBoardPage(), name: '/notice-board-screen');
       case '/notice-board-details-screen':
