@@ -17,6 +17,7 @@ import 'package:gloria_connect/features/my_visitors/bloc/my_visitors_bloc.dart';
 import 'package:gloria_connect/features/notice_board/bloc/notice_board_bloc.dart';
 import 'package:gloria_connect/features/resident_profile/bloc/resident_profile_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
+import 'package:gloria_connect/features/technician_home/bloc/technician_home_bloc.dart';
 import 'package:gloria_connect/init_dependencies.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
 import 'package:gloria_connect/utils/route_observer_with_stack.dart';
@@ -104,6 +105,9 @@ void main() async {
             ),
             BlocProvider(
               create: (_) => serviceLocator<GatePassBloc>(),
+            ),
+            BlocProvider(
+              create: (_) => serviceLocator<TechnicianHomeBloc>(),
             ),
           ],
           child: const MyApp()

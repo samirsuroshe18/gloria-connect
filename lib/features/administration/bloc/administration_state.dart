@@ -259,3 +259,18 @@ final class AdminRemoveTechnicianFailure extends AdministrationState{
 
   AdminRemoveTechnicianFailure( {required this.message, this.status});
 }
+
+///assign technician
+final class AssignTechnicianLoading extends AdministrationState{}
+
+final class AssignTechnicianSuccess extends AdministrationState{
+  final Map<String, dynamic> response;
+  AssignTechnicianSuccess({required this.response});
+}
+
+final class AssignTechnicianFailure extends AdministrationState{
+  final String message;
+  final int? status;
+
+  AssignTechnicianFailure( {required this.message, this.status});
+}

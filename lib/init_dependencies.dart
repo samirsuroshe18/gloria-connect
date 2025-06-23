@@ -27,6 +27,8 @@ import 'package:gloria_connect/features/resident_profile/repository/resident_pro
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/setting/repository/setting_repository.dart';
 import 'package:get_it/get_it.dart';
+import 'package:gloria_connect/features/technician_home/bloc/technician_home_bloc.dart';
+import 'package:gloria_connect/features/technician_home/repository/technician_home_repository.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -45,6 +47,7 @@ Future<void> initDependencies()async {
   _initNoticeBoard();
   _initGuardDuty();
   _initGatePass();
+  _initTechnicianHome();
 }
 
 void _initAuth(){
@@ -115,4 +118,9 @@ void _initGuardDuty(){
 void _initGatePass(){
   serviceLocator.registerLazySingleton<GatePassRepository>(() => GatePassRepository());
   serviceLocator.registerLazySingleton(()=> GatePassBloc(gatePassRepository: serviceLocator()));
+}
+
+void _initTechnicianHome(){
+  serviceLocator.registerLazySingleton<TechnicianHomeRepository>(() => TechnicianHomeRepository());
+  serviceLocator.registerLazySingleton(()=> TechnicianHomeBloc(technicianHomeRepository: serviceLocator()));
 }

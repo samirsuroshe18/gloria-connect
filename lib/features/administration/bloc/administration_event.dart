@@ -96,3 +96,10 @@ final class AdminRemoveTechnician extends AdministrationEvent{
 
   AdminRemoveTechnician({required this.id});
 }
+
+final class AssignTechnician extends AdministrationEvent{
+  final String complaintId;
+  final String technicianId;
+
+  AssignTechnician({required this.complaintId, required this.technicianId});
+}
