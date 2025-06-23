@@ -303,7 +303,7 @@ class _PendingComplaintScreenState extends State<PendingComplaintScreen> with Au
 
     var result = await Navigator.pushNamed(
       context,
-      '/complaint-details-screen',
+      isAdmin ? '/complaint-details-screen' : '/resident-complaint-details-screen',
       arguments: args,
     );
 

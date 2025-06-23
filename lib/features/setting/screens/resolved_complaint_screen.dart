@@ -305,7 +305,7 @@ class _ResolvedComplaintScreenState extends State<ResolvedComplaintScreen> with 
 
     var result = await Navigator.pushNamed(
       context,
-      '/complaint-details-screen',
+      isAdmin ? '/complaint-details-screen' : '/resident-complaint-details-screen',
       arguments: args,
     );
 

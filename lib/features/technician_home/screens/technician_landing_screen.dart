@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gloria_connect/features/technician_home/screens/technician_pending.dart';
 import 'package:gloria_connect/features/technician_home/screens/technician_resolved.dart';
@@ -27,7 +26,7 @@ class _TechnicianLandingScreenState extends State<TechnicianLandingScreen> with 
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
             TechnicianPending(),
             TechnicianResolved(),
@@ -36,5 +35,4 @@ class _TechnicianLandingScreenState extends State<TechnicianLandingScreen> with 
       ),
     );
   }
-
 }
