@@ -372,12 +372,15 @@ class Complaint {
   final String? category;
   final String? subCategory;
   final String? status;
+  final String? assignStatus;
+  final AssignedBy? technicianId;
   final String? description;
   final String? complaintId;
   final String? imageUrl;
   final DateTime? date;
   final int? review;
   final List<Response>? responses;
+  final ResolutionResolution? resolution;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -388,12 +391,15 @@ class Complaint {
     this.category,
     this.subCategory,
     this.status,
+    this.assignStatus,
+    this.technicianId,
     this.description,
     this.complaintId,
     this.imageUrl,
     this.date,
     this.review,
     this.responses,
+    this.resolution,
     this.createdAt,
     this.updatedAt,
   });
@@ -405,12 +411,15 @@ class Complaint {
     category: json["category"],
     subCategory: json["subCategory"],
     status: json["status"],
+    assignStatus: json["assignStatus"],
+    technicianId: json["technicianId"] == null ? null : AssignedBy.fromJson(json["technicianId"]),
     description: json["description"],
     complaintId: json["complaintId"],
     imageUrl: json["imageUrl"],
     date: json["date"] == null ? null : DateTime.parse(json["date"]),
     review: json["review"],
     responses: json["responses"] == null ? [] : List<Response>.from(json["responses"]!.map((x) => Response.fromJson(x))),
+    resolution: json["resolution"] == null ? null : ResolutionResolution.fromJson(json["resolution"]),
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
     updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
   );
@@ -422,12 +431,15 @@ class Complaint {
     "category": category,
     "subCategory": subCategory,
     "status": status,
+    "assignStatus": assignStatus,
+    "technicianId": technicianId?.toJson(),
     "description": description,
     "complaintId": complaintId,
     "imageUrl": imageUrl,
     "date": date?.toIso8601String(),
     "review": review,
     "responses": responses == null ? [] : List<dynamic>.from(responses!.map((x) => x.toJson())),
+    "resolution": resolution?.toJson(),
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
   };
@@ -581,3 +593,94 @@ class User {
   };
 }
 
+class AssignedBy {
+  final String? id;
+  final String? userName;
+  final String? email;
+  final String? profile;
+  final String? role;
+  final String? phoneNo;
+
+  AssignedBy({
+    this.id,
+    this.userName,
+    this.email,
+    this.profile,
+    this.role,
+    this.phoneNo,
+  });
+
+  factory AssignedBy.fromJson(Map<String, dynamic> json) => AssignedBy(
+    id: json["_id"],
+    userName: json["userName"],
+    email: json["email"],
+    profile: json["profile"],
+    role: json["role"],
+    phoneNo: json["phoneNo"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "_id": id,
+    "userName": userName,
+    "email": email,
+    "profile": profile,
+    "role": role,
+    "phoneNo": phoneNo,
+  };
+}
+
+class ResolutionResolution {
+  final String? id;
+  final String? complaintId;
+  final String? resolutionAttachment;
+  final String? resolutionNote;
+  final String? rejectedNote;
+  final AssignedBy? resolvedBy;
+  final DateTime? resolutionSubmittedAt;
+  final String? status;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final int? v;
+
+  ResolutionResolution({
+    this.id,
+    this.complaintId,
+    this.resolutionAttachment,
+    this.resolutionNote,
+    this.rejectedNote,
+    this.resolvedBy,
+    this.resolutionSubmittedAt,
+    this.status,
+    this.createdAt,
+    this.updatedAt,
+    this.v,
+  });
+
+  factory ResolutionResolution.fromJson(Map<String, dynamic> json) => ResolutionResolution(
+    id: json["_id"],
+    complaintId: json["complaintId"],
+    resolutionAttachment: json["resolutionAttachment"],
+    resolutionNote: json["resolutionNote"],
+    rejectedNote: json["rejectedNote"],
+    resolvedBy: json["resolvedBy"] == null ? null : AssignedBy.fromJson(json["resolvedBy"]),
+    resolutionSubmittedAt: json["resolutionSubmittedAt"] == null ? null : DateTime.parse(json["resolutionSubmittedAt"]),
+    status: json["status"],
+    createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
+    updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+    v: json["__v"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "_id": id,
+    "complaintId": complaintId,
+    "resolutionAttachment": resolutionAttachment,
+    "resolutionNote": resolutionNote,
+    "rejectedNote": rejectedNote,
+    "resolvedBy": resolvedBy?.toJson(),
+    "resolutionSubmittedAt": resolutionSubmittedAt?.toIso8601String(),
+    "status": status,
+    "createdAt": createdAt?.toIso8601String(),
+    "updatedAt": updatedAt?.toIso8601String(),
+    "__v": v,
+  };
+}

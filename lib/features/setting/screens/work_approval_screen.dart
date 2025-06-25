@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
 import 'package:gloria_connect/config/theme/app_colors.dart';
+import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
+import 'package:gloria_connect/features/technician_home/bloc/technician_home_bloc.dart';
+import 'package:gloria_connect/utils/custom_snackbar.dart';
 
 class WorkApprovalScreen extends StatefulWidget {
-  final String userRole;
-  const WorkApprovalScreen({super.key, required this.userRole});
+  final Map<String, dynamic> data;
+  const WorkApprovalScreen({super.key, required this.data});
 
   @override
   State<WorkApprovalScreen> createState() => _WorkApprovalScreenState();
@@ -11,6 +16,9 @@ class WorkApprovalScreen extends StatefulWidget {
 
 class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTickerProviderStateMixin {
   bool _isReworking = false;
+  bool _isApproveLoading = false;
+  bool _isRejectLoading = false;
+  bool _isAdmin = true;
   final TextEditingController _reworkController = TextEditingController();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -18,6 +26,7 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
   @override
   void initState() {
     super.initState();
+    _isAdmin = widget.data['userRole'] == 'admin';
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -37,64 +46,85 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final bool isResident = widget.userRole == 'resident';
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF032F7C), // Deep blue
-            Color(0xFF640018), // Deep maroon
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.black.withOpacity(0.2),
-          title: const Text(
-            'Work Approval',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          elevation: 0,
-        ),
-        body: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionTitle('Photo of Work Done'),
-                const SizedBox(height: 16),
-                _buildImageContainer(),
-                const SizedBox(height: 24),
-                _buildSectionTitle('Technician\'s Resolution'),
-                const SizedBox(height: 16),
-                _buildResolutionBox(),
-                const SizedBox(height: 24),
-                if (!_isReworking)
-                  _buildActionButtons(isResident)
-                else
-                  _buildReworkForm(),
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black.withValues(alpha: 0.2),
+        title: const Text(
+          'Work Approval',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
+        elevation: 0,
       ),
+      body: BlocConsumer<TechnicianHomeBloc, TechnicianHomeState>(
+        listener: (context, state) {
+          if(state is ApproveResolutionLoading){
+            _isApproveLoading = true;
+          }
+          if(state is ApproveResolutionSuccess){
+            _isApproveLoading = false;
+            context.read<SettingBloc>().add(SettingGetResponse(id: widget.data['complaint'].id!));
+            Navigator.of(context).pop();
+          }
+          if(state is ApproveResolutionFailure){
+            _isApproveLoading = false;
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
+          }
+
+          if(state is RejectResolutionLoading){
+            _isRejectLoading = true;
+          }
+          if(state is RejectResolutionSuccess){
+            _isRejectLoading = false;
+            context.read<SettingBloc>().add(SettingGetResponse(id: widget.data['complaint'].id!));
+            Navigator.of(context).pop();
+          }
+          if(state is RejectResolutionFailure){
+            _isRejectLoading = false;
+            CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
+          }
+        },
+        builder: (context, state){
+          return FadeTransition(
+            opacity: _fadeAnimation,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionTitle('Photo of Work Done'),
+                  const SizedBox(height: 16),
+                  _buildImageContainer(),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('Technician\'s Resolution'),
+                  const SizedBox(height: 16),
+                  _buildResolutionBox(),
+                  const SizedBox(height: 24),
+                  if(_isAdmin) ...[
+                    if (!_isReworking && widget.data['complaint'].status != 'resolved')
+                      _buildActionButtons(_isAdmin),
+                    if(_isReworking)
+                      _buildReworkForm(),
+                  ]
+                ],
+              ),
+            ),
+          );
+        },
+      )
     );
   }
+
+
 
   Widget _buildSectionTitle(String title) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -116,62 +146,65 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
   }
 
   Widget _buildImageContainer() {
-    return Container(
-      height: 300,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white24, width: 1),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.network(
-              'https://via.placeholder.com/400x250',
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                        : null,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white70),
+    return InkWell(
+      onTap: () => CustomFullScreenImageViewer.show(context, widget.data['complaint']?.resolution?.resolutionAttachment, errorImage: Icons.image),
+      child: Container(
+        height: 300,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white24, width: 1),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(
+                widget.data['complaint']?.resolution?.resolutionAttachment ?? 'https://via.placeholder.com/400x250',
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                          : null,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white70),
+                    ),
+                  );
+                },
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.8),
+                        Colors.transparent,
+                      ],
+                    ),
                   ),
-                );
-              },
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.8),
-                      Colors.transparent,
-                    ],
+                  child: const Text(
+                    'Tap to view full image',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                child: const Text(
-                  'Tap to view full image',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -182,7 +215,7 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white24, width: 1),
       ),
@@ -199,9 +232,9 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
           ),
           const SizedBox(height: 8),
           Text(
-            'The issue has been resolved by replacing the faulty component and testing the system thoroughly. All functionality has been restored to normal working condition.',
+            widget.data['complaint']?.resolution?.resolutionNote ?? 'NA',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 15,
             ),
           ),
@@ -214,7 +247,7 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white24, width: 1),
       ),
@@ -223,11 +256,20 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
         children: [
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: isResident ? null : () {
-                Navigator.pop(context, 'Approved');
+              onPressed: _isApproveLoading ? null : () {
+                context.read<TechnicianHomeBloc>().add(ApproveResolution(resolutionId: widget.data['complaint'].resolution!.id!));
               },
-              icon: const Icon(Icons.check_circle_outline, size: 20),
-              label: const Text('Approve'),
+              icon: _isApproveLoading
+                  ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+                  : const Icon(Icons.check_circle_outline, size: 20),
+              label: Text(_isApproveLoading ? 'Approving...' : 'Approve'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryButtonColor,
                 foregroundColor: AppColors.buttonTextColor,
@@ -242,7 +284,7 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
           const SizedBox(width: 16),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: isResident ? null : () {
+              onPressed: () {
                 setState(() {
                   _isReworking = true;
                 });
@@ -269,7 +311,7 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white24, width: 1),
       ),
@@ -284,7 +326,7 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
               labelText: 'Improvements Required',
               labelStyle: const TextStyle(color: Colors.white70),
               hintText: 'Describe what needs to be improved...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: Colors.white24),
@@ -298,7 +340,7 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
                 borderSide: const BorderSide(color: Colors.white70),
               ),
               filled: true,
-              fillColor: Colors.black.withOpacity(0.2),
+              fillColor: Colors.black.withValues(alpha: 0.2),
             ),
           ),
           const SizedBox(height: 16),
@@ -321,13 +363,22 @@ class _WorkApprovalScreenState extends State<WorkApprovalScreen> with SingleTick
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: _isRejectLoading ? null : () {
                     if (_reworkController.text.trim().isNotEmpty) {
-                      Navigator.pop(context, 'Rework');
+                      context.read<TechnicianHomeBloc>().add(RejectResolution(resolutionId: widget.data['complaint'].resolution!.id!, rejectedNote: _reworkController.text));
                     }
                   },
-                  icon: const Icon(Icons.send, size: 20),
-                  label: const Text('Submit'),
+                  icon: _isRejectLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : const Icon(Icons.send, size: 20),
+                  label: Text(_isRejectLoading ? 'Submitting...' : 'Submit'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryButtonColor,
                     foregroundColor: AppColors.buttonTextColor,

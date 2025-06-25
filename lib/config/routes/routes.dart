@@ -72,7 +72,7 @@ import 'package:gloria_connect/features/notice_board/screens/notice_detail_page.
 import 'package:gloria_connect/features/resident_profile/screens/resident_members_screen.dart';
 import 'package:gloria_connect/features/resident_profile/screens/resident_edit_profile_screen.dart';
 import 'package:gloria_connect/features/setting/screens/change_password_screen.dart';
-import 'package:gloria_connect/features/setting/screens/complaint_details_screen.dart';
+import 'package:gloria_connect/features/setting/screens/admin_complaint_details_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_form_screen.dart';
 import 'package:gloria_connect/features/setting/screens/complaint_screen.dart';
 import 'package:gloria_connect/features/setting/screens/setting_screen.dart';
@@ -82,6 +82,11 @@ import 'package:gloria_connect/common_widgets/gradient_color.dart';
 import 'package:gloria_connect/features/administration/screens/manage_technician_screen.dart';
 import 'package:gloria_connect/features/administration/screens/add_technician_screen.dart';
 import 'package:gloria_connect/features/setting/screens/resident_complaint_details_screen.dart';
+import 'package:gloria_connect/features/setting/screens/technician_selection_screen.dart';
+import 'package:gloria_connect/features/setting/screens/work_approval_screen.dart';
+import 'package:gloria_connect/features/technician_home/models/resolution_model.dart';
+import 'package:gloria_connect/features/technician_home/screens/technician_complaint_details_screen.dart';
+import 'package:gloria_connect/features/technician_profile/screens/technician_setting_screen.dart';
 class AppRoutes {
 
   static Route onGenerateRoutes(RouteSettings settings){
@@ -313,7 +318,7 @@ class AppRoutes {
       case '/complaint-form-screen':
         return _animatedRoute(const ComplaintFormScreen(), name: '/complaint-form-screen');
       case '/complaint-details-screen':
-        return _animatedRoute(ComplaintDetailsScreen(data: args as Map<String, dynamic>), name: '/complaint-details-screen');
+        return _animatedRoute(AdminComplaintDetailsScreen(data: args as Map<String, dynamic>), name: '/complaint-details-screen');
       case '/resident-complaint-details-screen':
         return _animatedRoute(ResidentComplaintDetailsScreen(data: args as Map<String, dynamic>), name: '/resident-complaint-details-screen');
       case '/notice-board-screen':
@@ -368,6 +373,14 @@ class AppRoutes {
         return _animatedRoute(const AddTechnicianScreen(), name: '/add-technician-screen');
       case '/technician-home-screen':
         return _animatedRoute(const TechnicianHomeScreen(), name: '/technician-home-screen');
+      case '/tech-complaint-details-screen':
+        return _animatedRoute(TechnicianComplaintDetailsScreen(data: args as ResolutionElement), name: '/tech-complaint-details-screen');
+      case '/tech-selection-screen':
+        return _animatedRoute(TechnicianSelectionScreen(), name: '/tech-selection-screen');
+      case '/work-approval-screen':
+        return _animatedRoute(WorkApprovalScreen(data: args as Map<String, dynamic>), name: '/work-approval-screen');
+      case '/technician-setting-screen':
+        return _animatedRoute(const TechnicianSettingScreen(), name: '/technician-setting-screen');
       default:
         return _animatedRoute(const SplashScreen(), name: '/');
     }

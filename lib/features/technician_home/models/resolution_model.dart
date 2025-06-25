@@ -213,6 +213,7 @@ class ResolutionResolution {
   final String? complaintId;
   final String? resolutionAttachment;
   final String? resolutionNote;
+  final String? rejectedNote;
   final AssignedBy? resolvedBy;
   final DateTime? resolutionSubmittedAt;
   final String? status;
@@ -225,6 +226,7 @@ class ResolutionResolution {
     this.complaintId,
     this.resolutionAttachment,
     this.resolutionNote,
+    this.rejectedNote,
     this.resolvedBy,
     this.resolutionSubmittedAt,
     this.status,
@@ -238,6 +240,7 @@ class ResolutionResolution {
     complaintId: json["complaintId"],
     resolutionAttachment: json["resolutionAttachment"],
     resolutionNote: json["resolutionNote"],
+    rejectedNote: json["rejectedNote"],
     resolvedBy: json["resolvedBy"] == null ? null : AssignedBy.fromJson(json["resolvedBy"]),
     resolutionSubmittedAt: json["resolutionSubmittedAt"] == null ? null : DateTime.parse(json["resolutionSubmittedAt"]),
     status: json["status"],
@@ -251,6 +254,7 @@ class ResolutionResolution {
     "complaintId": complaintId,
     "resolutionAttachment": resolutionAttachment,
     "resolutionNote": resolutionNote,
+    "rejectedNote": rejectedNote,
     "resolvedBy": resolvedBy?.toJson(),
     "resolutionSubmittedAt": resolutionSubmittedAt?.toIso8601String(),
     "status": status,
