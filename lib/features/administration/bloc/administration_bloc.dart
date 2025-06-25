@@ -258,7 +258,7 @@ class AdministrationBloc extends Bloc<AdministrationEvent, AdministrationState>{
     on<AssignTechnician>((event, emit) async {
       emit(AssignTechnicianLoading());
       try{
-        final Map<String, dynamic> response = await _administrationRepository.assignTechnician(complaintId: event.complaintId, technicianId: event.technicianId);
+        final Complaint response = await _administrationRepository.assignTechnician(complaintId: event.complaintId, technicianId: event.technicianId);
         emit(AssignTechnicianSuccess(response: response));
       }catch(e){
         if (e is ApiError) {

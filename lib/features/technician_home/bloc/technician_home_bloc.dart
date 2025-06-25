@@ -28,6 +28,34 @@ class TechnicianHomeBloc extends Bloc<TechnicianHomeEvent, TechnicianHomeState>{
       }
     });
 
+    on<GetResolvedComplaint>((event, emit) async {
+      emit(GetResolvedComplaintLoading());
+      try{
+        final List<ResolutionElement> response = await _technicianHomeRepository.getResolvedComplaints();
+        emit(GetResolvedComplaintSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(GetResolvedComplaintFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(GetResolvedComplaintFailure(message: e.toString()));
+        }
+      }
+    });
+
+    on<GetTechnicianDetails>((event, emit) async {
+      emit(GetTechnicianDetailsLoading());
+      try{
+        final ResolutionElement response = await _technicianHomeRepository.getTechnicianDetails(complaintId: event.complaintId);
+        emit(GetTechnicianDetailsSuccess(response: response));
+      }catch(e){
+        if (e is ApiError) {
+          emit(GetTechnicianDetailsFailure(message: e.message.toString(), status: e.statusCode));
+        }else{
+          emit(GetTechnicianDetailsFailure(message: e.toString()));
+        }
+      }
+    });
+
     on<AddComplaintResolution>((event, emit) async {
       emit(AddComplaintResolutionLoading());
       try{

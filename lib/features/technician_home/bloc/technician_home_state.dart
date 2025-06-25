@@ -20,6 +20,36 @@ final class GetAssignComplaintFailure extends TechnicianHomeState{
   GetAssignComplaintFailure( {required this.message, this.status});
 }
 
+/// Get resolved complaint
+final class GetResolvedComplaintLoading extends TechnicianHomeState{}
+
+final class GetResolvedComplaintSuccess extends TechnicianHomeState{
+  final List<ResolutionElement> response;
+  GetResolvedComplaintSuccess({required this.response});
+}
+
+final class GetResolvedComplaintFailure extends TechnicianHomeState{
+  final String message;
+  final int? status;
+
+  GetResolvedComplaintFailure( {required this.message, this.status});
+}
+
+/// Add complaint Resolution.
+final class GetTechnicianDetailsLoading extends TechnicianHomeState{}
+
+final class GetTechnicianDetailsSuccess extends TechnicianHomeState{
+  final ResolutionElement response;
+  GetTechnicianDetailsSuccess({required this.response});
+}
+
+final class GetTechnicianDetailsFailure extends TechnicianHomeState{
+  final String message;
+  final int? status;
+
+  GetTechnicianDetailsFailure( {required this.message, this.status});
+}
+
 /// Add complaint Resolution.
 final class AddComplaintResolutionLoading extends TechnicianHomeState{}
 

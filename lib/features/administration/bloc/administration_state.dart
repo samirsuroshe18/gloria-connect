@@ -264,7 +264,7 @@ final class AdminRemoveTechnicianFailure extends AdministrationState{
 final class AssignTechnicianLoading extends AdministrationState{}
 
 final class AssignTechnicianSuccess extends AdministrationState{
-  final Map<String, dynamic> response;
+  final Complaint response;
   AssignTechnicianSuccess({required this.response});
 }
 

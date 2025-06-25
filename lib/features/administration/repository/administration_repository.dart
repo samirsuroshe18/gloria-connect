@@ -620,7 +620,7 @@ class AdministrationRepository {
     }
   }
 
-  Future<Map<String, dynamic>> assignTechnician({required String complaintId, required String technicianId}) async {
+  Future<Complaint> assignTechnician({required String complaintId, required String technicianId}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -630,7 +630,7 @@ class AdministrationRepository {
         'technicianId': technicianId,
       };
 
-      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/reject-resolution';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/assign-technician';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -642,7 +642,7 @@ class AdministrationRepository {
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return jsonBody;
+        return Complaint.fromJson(jsonBody['data']);
       } else {
         throw ApiError(
             statusCode: response.statusCode, message: jsonBody['message']);

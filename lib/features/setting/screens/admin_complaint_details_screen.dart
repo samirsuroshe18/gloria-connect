@@ -4,9 +4,9 @@ import 'package:gloria_connect/common_widgets/build_error_state.dart';
 import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
 import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
 import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
-import 'package:gloria_connect/features/setting/screens/work_approval_screen.dart';
 import 'package:gloria_connect/features/setting/widgets/build_detail_item.dart';
 import 'package:gloria_connect/features/setting/widgets/build_message_bubble.dart';
 import 'package:gloria_connect/features/setting/widgets/pending_bottom_section.dart';
@@ -18,18 +18,17 @@ import 'package:intl/intl.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/config/theme/app_colors.dart';
 import 'package:gloria_connect/features/administration/models/technician_model.dart';
-import 'package:gloria_connect/features/setting/screens/technician_selection_screen.dart';
 
-class ComplaintDetailsScreen extends StatefulWidget {
+class AdminComplaintDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> data;
 
-  const ComplaintDetailsScreen({super.key, required this.data});
+  const AdminComplaintDetailsScreen({super.key, required this.data});
 
   @override
-  State<ComplaintDetailsScreen> createState() => _ComplaintDetailsScreenState();
+  State<AdminComplaintDetailsScreen> createState() => _AdminComplaintDetailsScreenState();
 }
 
-class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
+class _AdminComplaintDetailsScreenState extends State<AdminComplaintDetailsScreen> {
   final TextEditingController _messageController = TextEditingController();
   bool isResolved = false;
   final ScrollController _scrollController = ScrollController();
@@ -37,17 +36,14 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   Complaint? complaintModel;
   late String userId;
   bool _isLoading = false;
+  bool _isSaveLoading = false;
   bool _isActionLoading = false;
   bool _isMessageLoading = false;
   int? statusCode;
   String complaintId = "...";
   DateTime? complaintDate;
-  String? _selectedTechnician;
-  final List<String> _technicians = ['Technician 1', 'Technician 2', 'Technician 3'];
-  String _complaintStatus = 'Pending';
-  String? _userRole;
   Technician? _assignedTechnician;
-  String _statusMessage = '';
+  String? resolutionStatus;
 
   @override
   void initState() {
@@ -55,9 +51,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthGetUserSuccess) {
       userId = authState.response.id!;
-      _userRole = authState.response.role ?? 'resident';
     } else {
-      _userRole = 'resident'; // Default value if auth state is not successful
     }
     context.read<SettingBloc>().add(SettingGetResponse(id: widget.data['id']));
   }
@@ -94,30 +88,17 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
   }
 
   void _navigateAndSelectTechnician() async {
-    final selected = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TechnicianSelectionScreen(),
-      ),
-    );
+    final selected = await Navigator.pushNamed(context, '/tech-selection-screen');
     if (selected != null && selected is Technician) {
       setState(() {
         _assignedTechnician = selected;
-        _complaintStatus = 'Assigned';
-        _statusMessage = 'Technician assigned. Awaiting work approval.';
       });
-      CustomSnackBar.show(
-        context: context,
-        message: 'Complaint assigned to \\${selected.userName}',
-        type: SnackBarType.success,
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.black.withValues(alpha: 0.2),
         title: Column(
@@ -154,34 +135,52 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
       body: BlocConsumer<SettingBloc, SettingState>(
         listener: _blocListener,
         builder: (context, state) {
-          if (complaintModel != null && _isLoading == false) {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(child: _buildComplaintDetails()),
-                  SliverPadding(
-                    padding: const EdgeInsets.all(16),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                            (context, index) => BuildMessageBubble(
-                          message: messages![index].toJson(),
-                          userId: userId,
+          return BlocConsumer<AdministrationBloc, AdministrationState>(
+            listener: (context, state) {
+              if (state is AssignTechnicianLoading) {
+                _isSaveLoading = true;
+              }
+              if (state is AssignTechnicianSuccess) {
+                _isSaveLoading = false;
+                complaintModel = state.response;
+                resolutionStatus = complaintModel?.resolution?.status ?? 'pending';
+              }
+              if (state is AssignTechnicianFailure) {
+                _isSaveLoading = false;
+                CustomSnackBar.show(context: context, message: state.message, type: SnackBarType.error);
+              }
+            },
+            builder: (context, state) {
+              if (complaintModel != null && _isLoading == false) {
+                return RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(child: _buildComplaintDetails()),
+                      SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                                (context, index) => BuildMessageBubble(
+                              message: messages![index].toJson(),
+                              userId: userId,
+                            ),
+                            childCount: messages?.length,
+                          ),
                         ),
-                        childCount: messages?.length,
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          } else if (_isLoading) {
-            return const CustomLoader();
-          } else {
-            return BuildErrorState(onRefresh: _onRefresh);
-          }
+                );
+              } else if (_isLoading) {
+                return const CustomLoader();
+              } else {
+                return BuildErrorState(onRefresh: _onRefresh);
+              }
+            }
+          );
         },
       ),
       bottomNavigationBar: _buildBottomSection(),
@@ -314,40 +313,22 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
         children: [
           _buildAssignedTechnicianInfo(),
           const SizedBox(height: 10),
-          ElevatedButton.icon(
-            onPressed: () async {
-              final userRole = _userRole ?? 'resident';
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => WorkApprovalScreen(
-                      userRole: userRole,
-                    )),
-              );
-              if (result != null) {
-                setState(() {
-                  _complaintStatus = result;
-                  if (result == 'Approved') {
-                    _statusMessage = 'Work approved. Complaint resolved.';
-                  } else if (result == 'Rework') {
-                    _statusMessage = 'Rework requested. Awaiting technician action.';
-                  } else {
-                    _statusMessage = 'Technician assigned. Awaiting work approval.';
-                  }
-                });
-              }
-            },
-            icon: const Icon(Icons.visibility, size: 18),
-            label: const Text('View'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryButtonColor,
-              foregroundColor: AppColors.buttonTextColor,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          if(resolutionStatus != 'pending')
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.pushNamed(context, '/work-approval-screen', arguments: {'userRole':'admin', 'complaint': complaintModel});
+              },
+              icon: const Icon(Icons.visibility, size: 18),
+              label: const Text('View'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryButtonColor,
+                foregroundColor: AppColors.buttonTextColor,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -357,7 +338,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_assignedTechnician == null)
+        if (complaintModel?.assignStatus == 'unassigned') ...[
           ElevatedButton.icon(
             onPressed: _navigateAndSelectTechnician,
             icon: const Icon(Icons.person_add, size: 18),
@@ -371,7 +352,85 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
               ),
             ),
           ),
-        if (_assignedTechnician != null) ...[
+          if (_assignedTechnician != null) ...[
+            const Text(
+              'Assigned to:',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                CustomCachedNetworkImage(
+                  isCircular: true,
+                  size: 20,
+                  imageUrl: _assignedTechnician?.profile,
+                  errorImage: Icons.person,
+                  borderWidth: 1,
+                  onTap: ()=> CustomFullScreenImageViewer.show(context, _assignedTechnician?.profile, errorImage: Icons.person),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _assignedTechnician?.userName ?? 'NA',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _assignedTechnician?.role ?? 'NA',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _isSaveLoading ? null : () {
+                    context.read<AdministrationBloc>().add(
+                      AssignTechnician(
+                        complaintId: complaintModel!.id!,
+                        technicianId: _assignedTechnician!.id!,
+                      ),
+                    );
+                  },
+                  icon: _isSaveLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : const Icon(Icons.save),
+                  label: Text(_isSaveLoading ? 'Saving...' : 'Save'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryButtonColor,
+                    foregroundColor: AppColors.buttonTextColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+
+        if (complaintModel?.assignStatus == 'assigned') ...[
           const Text(
             'Assigned to:',
             style: TextStyle(
@@ -383,16 +442,13 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.white24,
-                child: Text(
-                  _assignedTechnician!.userName?[0].toUpperCase() ?? 'T',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              CustomCachedNetworkImage(
+                isCircular: true,
+                size: 20,
+                imageUrl: complaintModel?.technicianId?.profile,
+                errorImage: Icons.person,
+                borderWidth: 1,
+                onTap: ()=> CustomFullScreenImageViewer.show(context, _assignedTechnician?.profile, errorImage: Icons.person),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -400,7 +456,7 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _assignedTechnician!.userName ?? 'Not assigned',
+                      complaintModel?.technicianId?.userName ?? 'NA',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -409,9 +465,9 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _assignedTechnician!.role ?? 'Role not specified',
+                      complaintModel?.technicianId?.role ?? 'NA',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 13,
                       ),
                     ),
@@ -420,22 +476,22 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
               ),
             ],
           ),
-          if (_statusMessage.isNotEmpty)
-            Padding(
+          if(complaintModel?.status != 'resolved')
+          Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Row(
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: _getStatusColorForText(_complaintStatus),
+                    color: _getStatusColorForText(complaintModel?.resolution?.status ?? 'pending'),
                     size: 18,
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      _statusMessage,
+                      _getStatusMessage(complaintModel?.resolution?.status ?? 'pending'),
                       style: TextStyle(
-                        color: _getStatusColorForText(_complaintStatus),
+                        color: _getStatusColorForText(complaintModel?.resolution?.status ?? 'pending'),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -451,14 +507,31 @@ class _ComplaintDetailsScreenState extends State<ComplaintDetailsScreen> {
 
   Color _getStatusColorForText(String status) {
     switch (status) {
-      case 'Approved':
-        return Colors.green;
-      case 'Rework':
-        return Colors.red;
-      case 'Assigned':
-        return Colors.orange;
+      case 'approved':
+        return Colors.green; // Success
+      case 'rejected':
+        return Colors.red; // Error or Rejected
+      case 'under_review':
+        return Colors.orange; // In Review
+      case 'pending':
+        return Colors.amber; // Waiting on action
       default:
-        return Colors.orange;
+        return Colors.grey; // Unknown or default
+    }
+  }
+
+  String _getStatusMessage(String status) {
+    switch (status) {
+      case 'approved':
+        return 'Complaint resolution approved. Awaiting resident action.';
+      case 'rejected':
+        return 'Rework requested. Awaiting technician action.';
+      case 'under_review':
+        return 'Complaint resolution pending review.';
+      case 'pending':
+        return 'Awaiting complaint resolution from technician.';
+      default:
+        return 'Awaiting complaint resolution from technician.';
     }
   }
 

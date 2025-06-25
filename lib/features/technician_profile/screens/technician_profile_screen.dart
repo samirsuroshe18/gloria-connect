@@ -6,7 +6,6 @@ import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.da
 import 'package:gloria_connect/common_widgets/custom_loader.dart';
 import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/resident_profile/widgets/build_action_button.dart';
-import 'package:gloria_connect/features/resident_profile/widgets/build_resident_info_tile.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,7 +65,7 @@ class _TechnicianProfileScreenState extends State<TechnicianProfileScreen> {
         builder: (context, state) {
           if(data != null && _isLoading == false) {
             return RefreshIndicator(
-              onRefresh: _refreshUserData,
+              onRefresh: _onRefresh,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
@@ -107,6 +106,23 @@ class _TechnicianProfileScreenState extends State<TechnicianProfileScreen> {
                                     fontSize: 16,
                                   ),
                                 ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    data?.role?.toUpperCase() ?? "ROLE",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white70,
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                                ),
                                 const SizedBox(height: 16),
                                 ElevatedButton.icon(
                                   onPressed: () {
@@ -135,40 +151,6 @@ class _TechnicianProfileScreenState extends State<TechnicianProfileScreen> {
                           ),
                           const SizedBox(height: 24),
 
-                          // Resident Details Card
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Residence Details',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                BuildResidentInfoTile(
-                                  icon: Icons.apartment,
-                                  label: 'Block & Apartment',
-                                  value: 'Block ${data?.societyBlock?.toUpperCase() ?? "NA"}, Apartment ${data?.apartment ?? "NA"}',
-                                ),
-                                const Divider(height: 24),
-                                BuildResidentInfoTile(
-                                  icon: Icons.password,
-                                  label: 'Passcode',
-                                  value: data?.checkInCode ?? "NA",
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-
                           // Actions Grid
                           Container(
                             padding: const EdgeInsets.all(20),
@@ -188,24 +170,10 @@ class _TechnicianProfileScreenState extends State<TechnicianProfileScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 BuildActionButton(
-                                  title: 'Apartment Members',
-                                  icon: Icons.group_outlined,
-                                  color: const Color(0xFF4A90E2),
-                                  onTap: () => Navigator.pushNamed(context, '/apartment-member-screen'),
-                                ),
-                                const SizedBox(height: 12),
-                                BuildActionButton(
-                                  title: 'Manage GatePass',
-                                  icon: Icons.vpn_key,
-                                  color: const Color(0xFF4A90E2),
-                                  onTap: () => Navigator.pushNamed(context, '/gate-pass-resident-screen'),
-                                ),
-                                const SizedBox(height: 12),
-                                BuildActionButton(
                                   title: 'Settings',
                                   icon: Icons.settings_outlined,
                                   color: Colors.white60,
-                                  onTap: () => Navigator.pushNamed(context, '/setting-screen', arguments: data),
+                                  onTap: () => Navigator.pushNamed(context, '/technician-setting-screen'),
                                 ),
                                 const SizedBox(height: 12),
                                 BuildActionButton(
@@ -228,14 +196,14 @@ class _TechnicianProfileScreenState extends State<TechnicianProfileScreen> {
           } else if (_isLoading) {
             return const CustomLoader();
           } else {
-            return BuildErrorState(onRefresh: _refreshUserData);
+            return BuildErrorState(onRefresh: _onRefresh);
           }
         },
       ),
     );
   }
 
-  Future<void> _refreshUserData() async {
+  Future<void> _onRefresh() async {
     context.read<AuthBloc>().add(AuthGetUser());
   }
 

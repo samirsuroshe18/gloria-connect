@@ -5,6 +5,8 @@ sealed class TechnicianHomeEvent{}
 
 final class GetAssignComplaint extends TechnicianHomeEvent{}
 
+final class GetResolvedComplaint extends TechnicianHomeEvent{}
+
 final class AddComplaintResolution extends TechnicianHomeEvent{
   final String complaintId;
   final String resolutionNote;
@@ -21,4 +23,9 @@ final class RejectResolution extends TechnicianHomeEvent{
   final String resolutionId;
   final String rejectedNote;
   RejectResolution({required this.resolutionId, required this.rejectedNote});
+}
+
+final class GetTechnicianDetails extends TechnicianHomeEvent{
+  final String complaintId;
+  GetTechnicianDetails({required this.complaintId});
 }

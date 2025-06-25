@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gloria_connect/features/setting/models/complaint_model.dart';
+import 'package:gloria_connect/constants/server_constant.dart';
 import 'package:gloria_connect/features/technician_home/models/resolution_model.dart';
+import 'package:gloria_connect/utils/api_error.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../constants/server_constant.dart';
-import '../../../utils/api_error.dart';
 
 class TechnicianHomeRepository{
 
@@ -44,6 +42,75 @@ class TechnicianHomeRepository{
     }
   }
 
+  Future<List<ResolutionElement>> getResolvedComplaints() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/get-resolved-complaints';
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      final jsonBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return (jsonBody['data'] as List)
+            .map((data) => ResolutionElement.fromJson(data))
+            .toList();
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode,
+            message: jsonDecode(response.body)['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
+  Future<ResolutionElement> getTechnicianDetails({required String complaintId}) async {
+    try {
+      Map<String, dynamic> payload = {
+        'complaintId': complaintId,
+      };
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/get-technician-details';
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(payload),
+      );
+
+      final jsonBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return ResolutionElement.fromJson(jsonBody['data']);
+      } else {
+        throw ApiError(
+            statusCode: response.statusCode,
+            message: jsonDecode(response.body)['message']);
+      }
+    } catch (e) {
+      if (e is ApiError) {
+        throw ApiError(statusCode: e.statusCode, message: e.message);
+      } else {
+        throw ApiError(message: e.toString());
+      }
+    }
+  }
+
   Future<ResolutionElement> addComplaintResolution({required String complaintId, required String resolutionNote, required File file}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -52,7 +119,7 @@ class TechnicianHomeRepository{
       final apiUrlFile = '${ServerConstant.baseUrl}/api/v1/technician/add-complaint-resolution';
 
       // Multipart request for both file and text fields
-      var request = http.MultipartRequest('PUT', Uri.parse(apiUrlFile))
+      var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
         ..headers['Authorization'] = 'Bearer $accessToken';
 
       request.fields['complaintId'] = complaintId;
@@ -91,7 +158,7 @@ class TechnicianHomeRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/approve-resolution';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/approve-resolution';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -128,7 +195,7 @@ class TechnicianHomeRepository{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/reject-resolution';
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/reject-resolution';
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -139,6 +206,7 @@ class TechnicianHomeRepository{
       );
 
       final jsonBody = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         return jsonBody['data'];
       } else {

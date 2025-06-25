@@ -4,6 +4,8 @@ import 'package:gloria_connect/common_widgets/build_error_state.dart';
 import 'package:gloria_connect/common_widgets/custom_cached_network_image.dart';
 import 'package:gloria_connect/common_widgets/custom_full_screen_image_viewer.dart';
 import 'package:gloria_connect/common_widgets/custom_loader.dart';
+import 'package:gloria_connect/config/theme/app_colors.dart';
+import 'package:gloria_connect/features/auth/bloc/auth_bloc.dart';
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
 import 'package:gloria_connect/features/setting/widgets/build_detail_item.dart';
@@ -11,8 +13,8 @@ import 'package:gloria_connect/features/setting/widgets/build_message_bubble.dar
 import 'package:gloria_connect/features/setting/widgets/pending_bottom_section.dart';
 import 'package:gloria_connect/features/setting/widgets/resolved_bottom_section.dart';
 import 'package:gloria_connect/utils/custom_snackbar.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
-import 'package:gloria_connect/config/theme/app_colors.dart';
 import 'package:gloria_connect/features/administration/models/technician_model.dart';
 
 class ResidentComplaintDetailsScreen extends StatefulWidget {
@@ -37,7 +39,6 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
   String complaintId = "...";
   DateTime? complaintDate;
   Technician? _assignedTechnician;
-  String _statusMessage = '';
 
   // Mock work done data
   final String workDonePhoto = '';
@@ -46,17 +47,11 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
   @override
   void initState() {
     super.initState();
-    // Mock userId and assigned technician for demo
-    userId = 'resident123';
-    _assignedTechnician = Technician(
-      id: '1',
-      userName: 'Alex Johnson',
-      profile: '',
-      email: 'alex.johnson@example.com',
-      phoneNo: '9876543210',
-      role: 'Electrician',
-      technicianPassword: '',
-    );
+    final complaintBloc = context.read<AuthBloc>();
+    final currentState = complaintBloc.state;
+    if (currentState is AuthGetUserSuccess) {
+      userId = currentState.response.id!;
+    }
     context.read<SettingBloc>().add(SettingGetResponse(id: widget.data['id']));
   }
 
@@ -139,7 +134,6 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   SliverToBoxAdapter(child: _buildComplaintDetails()),
-                  SliverToBoxAdapter(child: _buildWorkDoneSection()),
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
                     sliver: SliverList(
@@ -211,6 +205,24 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
           _buildDetailContent(),
           const Divider(height: 1),
           _buildAssignedTechnicianInfo(),
+          if(complaintModel?.assignStatus == 'assigned')
+            _buildResolutionStatus(),
+          if(complaintModel?.resolution?.status == 'approved')
+              ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pushNamed(context, '/work-approval-screen', arguments: {'userRole':'resident', 'complaint': complaintModel});
+                },
+                icon: const Icon(Icons.visibility, size: 18),
+                label: const Text('View'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryButtonColor,
+                  foregroundColor: AppColors.buttonTextColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
         ],
       ),
     );
@@ -284,6 +296,66 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
     );
   }
 
+  Widget _buildResolutionStatus(){
+    final statusData = _getStatusDetails(complaintModel?.resolution?.status);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: statusData.color.withValues(alpha: 0.1),
+          child: Icon(statusData.icon, color: statusData.color),
+        ),
+        title: Text(
+          statusData.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: statusData.color,
+          ),
+        ),
+        subtitle: Text(
+          statusData.message,
+          style: const TextStyle(fontSize: 14),
+        ),
+      ),
+    );
+  }
+
+  _StatusDetails _getStatusDetails(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return _StatusDetails(
+          title: 'Approved',
+          message: 'The resolution has been approved by the administrator.',
+          icon: Icons.check_circle_outline,
+          color: Colors.green,
+        );
+      case 'rejected':
+        return _StatusDetails(
+          title: 'Rejected',
+          message: 'The resolution was rejected and needs rework.',
+          icon: Icons.cancel_outlined,
+          color: Colors.red,
+        );
+      case 'under_review':
+        return _StatusDetails(
+          title: 'Under Review',
+          message: 'The resolution is currently being reviewed by the administrator.',
+          icon: Icons.sync_problem,
+          color: Colors.orange,
+        );
+      case 'pending':
+      default:
+        return _StatusDetails(
+          title: 'Pending',
+          message: 'The resolution is pending admin review.',
+          icon: Icons.hourglass_top,
+          color: Colors.grey,
+        );
+    }
+  }
+
   Widget _buildAssignedTechnicianInfo() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -299,19 +371,16 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
             ),
           ),
           const SizedBox(height: 8),
-          if (_assignedTechnician != null)
+          if (complaintModel?.assignStatus == 'assigned')
             Row(
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.white24,
-                  child: Text(
-                    _assignedTechnician!.userName?[0].toUpperCase() ?? 'T',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                CustomCachedNetworkImage(
+                  isCircular: true,
+                  size: 40,
+                  imageUrl: complaintModel?.technicianId?.profile,
+                  errorImage: Icons.person,
+                  borderWidth: 1,
+                  onTap: ()=> CustomFullScreenImageViewer.show(context, _assignedTechnician?.profile, errorImage: Icons.person),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -319,7 +388,7 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _assignedTechnician!.userName ?? 'Not assigned',
+                        complaintModel?.technicianId?.userName ?? 'Not assigned',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -328,9 +397,9 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        _assignedTechnician!.role ?? 'Role not specified',
+                        complaintModel?.technicianId?.role ?? 'Role not specified',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 13,
                         ),
                       ),
@@ -341,124 +410,13 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
             )
           else
             const Text(
-              'No technician assigned',
+              'No technician assigned yet',
               style: TextStyle(
                 color: Colors.white54,
                 fontSize: 14,
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildWorkDoneSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Work Done',
-              style: TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                workDonePhoto.isNotEmpty
-                    ? GestureDetector(
-                  onTap: () {
-                    final rootContext = Navigator.of(context, rootNavigator: true).context;
-                    CustomFullScreenImageViewer.show(
-                      rootContext,
-                      workDonePhoto,
-                      errorImage: Icons.photo,
-                    );
-                  },
-                  child: ClipOval(
-                    child: Image.network(
-                      workDonePhoto,
-                      height: 100,
-                      width: 100,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-                    : GestureDetector(
-                  onTap: () {
-                    final rootContext = Navigator.of(context, rootNavigator: true).context;
-                    showDialog(
-                      context: rootContext,
-                      barrierColor: Colors.black.withOpacity(0.9),
-                      barrierDismissible: true,
-                      builder: (context) {
-                        return GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: Stack(
-                            children: [
-                              Center(
-                                child: Icon(
-                                  Icons.photo,
-                                  color: Colors.white24,
-                                  size: 120,
-                                ),
-                              ),
-                              Positioned(
-                                top: 20,
-                                right: 20,
-                                child: GestureDetector(
-                                  onTap: () => Navigator.of(context).pop(),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    padding: const EdgeInsets.all(8),
-                                    child: const Icon(Icons.close, color: Colors.white, size: 24),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.photo, color: Colors.white24, size: 40),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      workDoneDescription,
-                      style: const TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -584,4 +542,18 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
   void _showErrorSnackBar(String message) {
     CustomSnackBar.show(context: context, message: message, type: SnackBarType.error);
   }
+}
+
+class _StatusDetails {
+  final String title;
+  final String message;
+  final IconData icon;
+  final Color color;
+
+  _StatusDetails({
+    required this.title,
+    required this.message,
+    required this.icon,
+    required this.color,
+  });
 }
