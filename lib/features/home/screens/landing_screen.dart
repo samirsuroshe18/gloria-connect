@@ -101,6 +101,8 @@ class _LandingScreenState extends State<LandingScreen> with SingleTickerProvider
         Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: {'id': payload?['id']});
       }else if (notificationAppLaunchDetails != null && payload?['action'] == 'NOTIFY_ADMIN_REPLIED') {
         Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: {'id': payload?['id']});
+      }else if (notificationAppLaunchDetails != null && payload?['action'] == 'REVIEW_RESOLUTION') {
+        Navigator.pushNamedAndRemoveUntil(context, '/complaint-details-screen', (route) => route.isFirst, arguments: {'id': payload?['id']});
       } else {
         context.read<MyVisitorsBloc>().add(GetServiceRequest());
       }
