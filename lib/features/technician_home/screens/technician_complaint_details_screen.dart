@@ -20,9 +20,10 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 
 class TechnicianComplaintDetailsScreen extends StatefulWidget {
-  final ResolutionElement data;
+  final Map<String, dynamic>? notificationPayload;
+  final ResolutionElement? data;
 
-  const TechnicianComplaintDetailsScreen({super.key, required this.data});
+  const TechnicianComplaintDetailsScreen({super.key, this.data, this.notificationPayload});
 
   @override
   State<TechnicianComplaintDetailsScreen> createState() =>
@@ -47,13 +48,19 @@ class _TechnicianComplaintDetailsScreenState extends State<TechnicianComplaintDe
   @override
   void initState() {
     super.initState();
-    response = widget.data;
-    isResolved = response?.resolution?.status == 'approved';
+    if(widget.data != null){
+      response = widget.data;
+      isResolved = response?.resolution?.status == 'approved';
+    }
+    if(widget.notificationPayload != null){
+      context.read<TechnicianHomeBloc>().add(GetTechnicianDetails(complaintId: widget.notificationPayload!['id']));
+    }
   }
 
   Future<void> _onRefresh() async {
-    context.read<TechnicianHomeBloc>().add(
-        GetTechnicianDetails(complaintId: widget.data.id!));
+    if(response != null){
+      context.read<TechnicianHomeBloc>().add(GetTechnicianDetails(complaintId: response!.id!));
+    }
   }
 
   @override
@@ -302,7 +309,7 @@ class _TechnicianComplaintDetailsScreenState extends State<TechnicianComplaintDe
               onPressed: () {
                 // Optionally disable button when loading
                 if (tenantAgreement!=null && resolutionNoteController.text.isNotEmpty) {
-                  context.read<TechnicianHomeBloc>().add(AddComplaintResolution(complaintId: widget.data.id!, resolutionNote: resolutionNoteController.text, file: tenantAgreement!));
+                  context.read<TechnicianHomeBloc>().add(AddComplaintResolution(complaintId: response!.id!, resolutionNote: resolutionNoteController.text, file: tenantAgreement!));
                 }else{
                   CustomSnackBar.show(context: context, message: "Please fill all the fields", type: SnackBarType.error);
                 }
@@ -390,7 +397,7 @@ class _TechnicianComplaintDetailsScreenState extends State<TechnicianComplaintDe
               onPressed: () {
                 // Optionally disable button when loading
                 if (tenantAgreement!=null && resolutionNoteController.text.isNotEmpty) {
-                  context.read<TechnicianHomeBloc>().add(AddComplaintResolution(complaintId: widget.data.id!, resolutionNote: resolutionNoteController.text, file: tenantAgreement!));
+                  context.read<TechnicianHomeBloc>().add(AddComplaintResolution(complaintId: response!.id!, resolutionNote: resolutionNoteController.text, file: tenantAgreement!));
                 }else{
                   CustomSnackBar.show(context: context, message: "Please fill all the fields", type: SnackBarType.error);
                 }

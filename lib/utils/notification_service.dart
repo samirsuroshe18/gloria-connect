@@ -373,6 +373,18 @@ class NotificationController {
       case "REMOVE_APARTMENT_FROM_GATE_PASS":
         return payload['title'];
 
+      case "ASSIGN_COMPLAINT":
+        return payload['title'];
+
+      case "REVIEW_RESOLUTION":
+        return payload['title'];
+
+      case "RESOLUTION_APPROVED":
+        return payload['title'];
+
+      case "RESOLUTION_REJECTED":
+        return payload['title'];
+
       default:
         return payload['title'] ?? "Notification";
     }
@@ -512,6 +524,18 @@ class NotificationController {
         return payload['message'];
 
       case "REMOVE_APARTMENT_FROM_GATE_PASS":
+        return payload['message'];
+
+      case "ASSIGN_COMPLAINT":
+        return payload['message'];
+
+      case "REVIEW_RESOLUTION":
+        return payload['message'];
+
+      case "RESOLUTION_APPROVED":
+        return payload['message'];
+
+      case "RESOLUTION_REJECTED":
         return payload['message'];
 
       default:

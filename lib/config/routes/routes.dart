@@ -374,7 +374,11 @@ class AppRoutes {
       case '/technician-home-screen':
         return _animatedRoute(const TechnicianHomeScreen(), name: '/technician-home-screen');
       case '/tech-complaint-details-screen':
-        return _animatedRoute(TechnicianComplaintDetailsScreen(data: args as ResolutionElement), name: '/tech-complaint-details-screen');
+        if (args != null && args is ResolutionElement) {
+          return _animatedRoute(TechnicianComplaintDetailsScreen(data: args), name: '/tech-complaint-details-screen');
+        }else{
+          return _animatedRoute(TechnicianComplaintDetailsScreen(notificationPayload: args as Map<String, dynamic>), name: '/tech-complaint-details-screen');
+        }
       case '/tech-selection-screen':
         return _animatedRoute(TechnicianSelectionScreen(), name: '/tech-selection-screen');
       case '/work-approval-screen':
