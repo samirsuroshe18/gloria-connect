@@ -396,32 +396,35 @@ class _AdminComplaintDetailsScreenState extends State<AdminComplaintDetailsScree
                     ],
                   ),
                 ),
-                ElevatedButton.icon(
-                  onPressed: _isSaveLoading ? null : () {
-                    context.read<AdministrationBloc>().add(
-                      AssignTechnician(
-                        complaintId: complaintModel!.id!,
-                        technicianId: _assignedTechnician!.id!,
+                SizedBox(
+                  width: 100,
+                  child: ElevatedButton.icon(
+                    onPressed: _isSaveLoading ? null : () {
+                      context.read<AdministrationBloc>().add(
+                        AssignTechnician(
+                          complaintId: complaintModel!.id!,
+                          technicianId: _assignedTechnician!.id!,
+                        ),
+                      );
+                    },
+                    icon: _isSaveLoading
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
-                    );
-                  },
-                  icon: _isSaveLoading
-                      ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                      : const Icon(Icons.save),
-                  label: Text(_isSaveLoading ? 'Saving...' : 'Save'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryButtonColor,
-                    foregroundColor: AppColors.buttonTextColor,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    )
+                        : const Icon(Icons.save),
+                    label: Text(_isSaveLoading ? 'Saving...' : 'Save'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryButtonColor,
+                      foregroundColor: AppColors.buttonTextColor,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),
@@ -474,24 +477,63 @@ class _AdminComplaintDetailsScreenState extends State<AdminComplaintDetailsScree
                   ],
                 ),
               ),
+              if (complaintModel?.assignStatus == 'unassigned' && _assignedTechnician != null)
+                SizedBox(
+                  width: 100,
+                  child: ElevatedButton.icon(
+                    onPressed: _isSaveLoading ? null : () {
+                      context.read<AdministrationBloc>().add(
+                        AssignTechnician(
+                          complaintId: complaintModel!.id!,
+                          technicianId: _assignedTechnician!.id!,
+                        ),
+                      );
+                    },
+                    icon: _isSaveLoading
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                        : const Icon(Icons.save),
+                    label: Text(_isSaveLoading ? 'Saving...' : 'Save'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryButtonColor,
+                      foregroundColor: AppColors.buttonTextColor,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
           if(complaintModel?.status != 'resolved')
-          Padding(
-              padding: const EdgeInsets.only(top: 10),
+            Container(
+              margin: const EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _getStatusColorForText(complaintModel?.resolution?.status ?? 'pending').withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
                     Icons.info_outline,
                     color: _getStatusColorForText(complaintModel?.resolution?.status ?? 'pending'),
-                    size: 18,
+                    size: 20,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _getStatusMessage(complaintModel?.resolution?.status ?? 'pending'),
-                      style: TextStyle(
-                        color: _getStatusColorForText(complaintModel?.resolution?.status ?? 'pending'),
+                      style: const TextStyle(
+                        color: Colors.white, // Override: set text color to white
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -500,6 +542,7 @@ class _AdminComplaintDetailsScreenState extends State<AdminComplaintDetailsScree
                 ],
               ),
             ),
+
         ],
       ],
     );

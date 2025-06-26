@@ -207,10 +207,15 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
           _buildAssignedTechnicianInfo(),
           if(complaintModel?.assignStatus == 'assigned')
             _buildResolutionStatus(),
-          if(complaintModel?.resolution?.status == 'approved')
-              ElevatedButton.icon(
-                onPressed: () async {
-                  Navigator.pushNamed(context, '/work-approval-screen', arguments: {'userRole':'resident', 'complaint': complaintModel});
+          if (complaintModel?.resolution?.status == 'approved')
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0), // Adjust left margin
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/work-approval-screen', arguments: {
+                    'userRole': 'resident',
+                    'complaint': complaintModel
+                  });
                 },
                 icon: const Icon(Icons.visibility, size: 18),
                 label: const Text('View'),
@@ -223,6 +228,7 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
                   ),
                 ),
               ),
+            ),
         ],
       ),
     );
@@ -296,31 +302,53 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
     );
   }
 
-  Widget _buildResolutionStatus(){
+  Widget _buildResolutionStatus() {
     final statusData = _getStatusDetails(complaintModel?.resolution?.status);
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: statusData.color.withValues(alpha: 0.1),
-          child: Icon(statusData.icon, color: statusData.color),
-        ),
-        title: Text(
-          statusData.title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.2), // darker semi-transparent container
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            statusData.icon,
             color: statusData.color,
+            size: 24,
           ),
-        ),
-        subtitle: Text(
-          statusData.message,
-          style: const TextStyle(fontSize: 14),
-        ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  statusData.title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: statusData.color,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  statusData.message,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white, // make message white for high contrast
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+
+
 
   _StatusDetails _getStatusDetails(String? status) {
     switch (status?.toLowerCase()) {

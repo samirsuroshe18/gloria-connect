@@ -30,7 +30,7 @@ class QuickActionButton extends StatelessWidget {
               height: 56,
               width: 56,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
