@@ -248,6 +248,46 @@ class NotificationController {
           currentState?.pushNamed('/complaint-details-screen', arguments: {'id': payload['id']});
         });
       }
+    } else if (payload['action'] == 'REVIEW_RESOLUTION' && isInForeground == true) {
+      if(getCurrentRouteName() == '/complaint-details-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }
+    } else if (payload['action'] == 'ASSIGN_COMPLAINT' && isInForeground == true) {
+      if(getCurrentRouteName() == '/tech-complaint-details-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/tech-complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/tech-complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }
+    } else if (payload['action'] == 'RESOLUTION_APPROVED' && isInForeground == true) {
+      if(getCurrentRouteName() == '/tech-complaint-details-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/tech-complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/tech-complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }
+    } else if (payload['action'] == 'RESOLUTION_REJECTED' && isInForeground == true) {
+      if(getCurrentRouteName() == '/tech-complaint-details-screen'){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushReplacementNamed('/tech-complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }else{
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          currentState?.pushNamed('/tech-complaint-details-screen', arguments: {'id': payload['id']});
+        });
+      }
     }
   }
 
