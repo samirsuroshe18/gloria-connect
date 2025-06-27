@@ -209,7 +209,7 @@ class _ResidentComplaintDetailsScreenState extends State<ResidentComplaintDetail
             _buildResolutionStatus(),
           if (complaintModel?.resolution?.status == 'approved')
             Padding(
-              padding: const EdgeInsets.only(left: 16.0), // Adjust left margin
+              padding: const EdgeInsets.only(left: 16.0, bottom: 16.0), // Adjust left margin
               child: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pushNamed(context, '/work-approval-screen', arguments: {

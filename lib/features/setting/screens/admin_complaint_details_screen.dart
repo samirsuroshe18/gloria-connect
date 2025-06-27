@@ -143,7 +143,6 @@ class _AdminComplaintDetailsScreenState extends State<AdminComplaintDetailsScree
               if (state is AssignTechnicianSuccess) {
                 _isSaveLoading = false;
                 complaintModel = state.response;
-                resolutionStatus = complaintModel?.resolution?.status ?? 'pending';
               }
               if (state is AssignTechnicianFailure) {
                 _isSaveLoading = false;
@@ -517,7 +516,7 @@ class _AdminComplaintDetailsScreenState extends State<AdminComplaintDetailsScree
               margin: const EdgeInsets.only(top: 10),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _getStatusColorForText(complaintModel?.resolution?.status ?? 'pending').withOpacity(0.3),
+                color: _getStatusColorForText(complaintModel?.resolution?.status ?? 'pending').withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -660,6 +659,7 @@ class _AdminComplaintDetailsScreenState extends State<AdminComplaintDetailsScree
     if (state is SettingGetResponseSuccess) {
       complaintModel = state.response;
       messages = complaintModel!.responses;
+      resolutionStatus = complaintModel?.resolution?.status ?? 'pending';
       isResolved = complaintModel!.status != 'pending';
       setState(() {
         complaintId = complaintModel!.complaintId!;
