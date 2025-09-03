@@ -64,7 +64,7 @@ class _GuardProfileScreenState extends State<GuardProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CustomCachedNetworkImage(
-                                imageUrl: data!.profile!,
+                                imageUrl: data?.profile,
                                 isCircular: true,
                                 size: 100,
                                 errorImage: Icons.person,

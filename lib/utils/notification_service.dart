@@ -15,11 +15,13 @@ import '../constants/server_constant.dart';
 import '../main.dart';
 import '../constants/notification_constant.dart';
 
+@pragma('vm:entry-point')
 class NotificationController {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static NotificationAppLaunchDetails? notificationAppLaunchDetails;
   static bool isInForeground = false;
 
+  @pragma('vm:entry-point')
   static Future<void> initializeLocalNotifications() async {
     const androidInit = AndroidInitializationSettings('ic_notification');
 
@@ -50,6 +52,7 @@ class NotificationController {
     });
   }
 
+  @pragma('vm:entry-point')
   static Future<void> _createChannels() async {
     final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
@@ -76,6 +79,7 @@ class NotificationController {
     }
   }
 
+  @pragma('vm:entry-point')
   static Future<void> showLocalNotification({required RemoteMessage message}) async {
     final payload = jsonDecode(message.data['payload']);
     final action = message.data['action'];
@@ -135,11 +139,14 @@ class NotificationController {
     await _plugin.show(id, title, body, details, payload: message.data['payload']);
   }
 
+  @pragma('vm:entry-point')
   static Future<void> cancelLocalNotification(int id) => _plugin.cancel(id);
 
+  @pragma('vm:entry-point')
   static Future<void> cancelAllLocalNotification() => _plugin.cancelAll();
 
   // Internal callbacks
+  @pragma('vm:entry-point')
   static void _onResponse(NotificationResponse response) {
     _handleAction(response);
   }
@@ -149,6 +156,7 @@ class NotificationController {
     _handleAction(response);
   }
 
+  @pragma('vm:entry-point')
   static void _handleAction(NotificationResponse response) async {
     String? actionId = response.actionId;
     Map<String, dynamic>? payload = response.payload!=null ? jsonDecode(response.payload!) : null;
@@ -291,6 +299,7 @@ class NotificationController {
     }
   }
 
+  @pragma('vm:entry-point')
   static bool shouldShowActions(String action) {
     // Define which notification types should have actions
     switch (action) {
@@ -301,6 +310,7 @@ class NotificationController {
     }
   }
 
+  @pragma('vm:entry-point')
   static String getTitle(String action, Map<String, dynamic> payload) {
     switch (action) {
       case "VERIFY_RESIDENT_PROFILE_TYPE":
@@ -430,6 +440,7 @@ class NotificationController {
     }
   }
 
+  @pragma('vm:entry-point')
   static String getBody(String action, Map<String, dynamic> payload) {
     switch (action) {
       case "VERIFY_RESIDENT_PROFILE_TYPE":
@@ -583,6 +594,7 @@ class NotificationController {
     }
   }
 
+  @pragma('vm:entry-point')
   Future<void> requestNotificationPermission() async {
     NotificationSettings settings = await FirebaseMessaging.instance
         .requestPermission(
@@ -604,16 +616,19 @@ class NotificationController {
     }
   }
 
+  @pragma('vm:entry-point')
   Future<String?> getDeviceToken() async {
     return await FirebaseMessaging.instance.getToken();
   }
 
+  @pragma('vm:entry-point')
   Future<void> getDeviceTokenAndSaveToDb(BuildContext context) async {
     final token = await FirebaseMessaging.instance.getToken();
     // ignore: use_build_context_synchronously
     context.read<AuthBloc>().add(AuthUpdateFCM(FCMToken: token!));
   }
 
+  @pragma('vm:entry-point')
   Future<void> updateDeviceToken(BuildContext context,) async {
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
       // ignore: use_build_context_synchronously
@@ -622,6 +637,7 @@ class NotificationController {
   }
 
   // Helper method to generate a message based on entryType
+  @pragma('vm:entry-point')
   static Map<String, String> getVerifyNotification(String entryType, String gate) {
     if (entryType == 'delivery') {
       return {'title': 'Verify delivery', 'body': 'You have got a Delivery at the $gate.'};
@@ -635,6 +651,7 @@ class NotificationController {
   }
 
   // Helper method to generate a message based on entryType
+  @pragma('vm:entry-point')
   static String deliveryEntryApprovedNotificationMessage(String entryType, String userName, String visitorName, String? serviceName, String? companyName, ) {
     if (entryType == 'delivery') {
       return 'The delivery entry for $companyName ($visitorName) has been approved by $userName.';
@@ -647,6 +664,7 @@ class NotificationController {
     }
   }
 
+  @pragma('vm:entry-point')
   static String deliveryEntryDeniedNotificationMessage(String entryType, String userName, String visitorName, String? serviceName, String? companyName) {
     if (entryType == 'delivery') {
       return 'The delivery entry for $companyName ($visitorName) has been rejected by $userName.';
@@ -660,6 +678,7 @@ class NotificationController {
   }
 
   // Helper method to generate a message based on action
+  @pragma('vm:entry-point')
   static String _getBody(String action) {
     if (action == 'RESIDENT_APPROVE') {
       return "Congratulations! Your resident profile has been successfully approved.";
@@ -673,6 +692,7 @@ class NotificationController {
   }
 
 // Helper method to generate a message based on action
+  @pragma('vm:entry-point')
   static String _getTitle(String action) {
     if (action == 'RESIDENT_APPROVE') {
       return "Resident Profile Approved";

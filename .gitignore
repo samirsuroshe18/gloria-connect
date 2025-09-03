@@ -44,3 +44,5 @@ app.*.map.json
 .cxx/
 
 
+android/app/google-services.json
+firebase.json

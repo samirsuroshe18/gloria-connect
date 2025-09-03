@@ -254,13 +254,11 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
           title: const Text(
             'Confirm Logout',
             style: TextStyle(
-              color: Color(0xFF2D3142),
               fontWeight: FontWeight.bold,
             ),
           ),
           content: const Text(
             'Are you sure you want to logout?',
-            style: TextStyle(color: Color(0xFF4F4F4F)),
           ),
           actions: [
             TextButton(

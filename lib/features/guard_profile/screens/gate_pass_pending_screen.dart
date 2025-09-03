@@ -50,7 +50,7 @@ class _GatePassPendingScreenState extends State<GatePassPendingScreen> with Auto
             _isError = false;
           }
           if (state is GetPendingGatePassSuccess) {
-            data.addAll(state.response);
+            data = state.response;
             _isError = false;
             _isLoading = false;
           }
