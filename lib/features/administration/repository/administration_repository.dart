@@ -6,8 +6,7 @@ import 'package:gloria_connect/features/administration/models/society_guard.dart
 import 'package:gloria_connect/features/administration/models/society_member.dart';
 import 'package:gloria_connect/features/administration/models/technician_model.dart';
 import 'package:gloria_connect/features/setting/models/complaint_model.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 
 import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
@@ -16,18 +15,10 @@ class AdministrationRepository {
 
   Future<List<ResidentRequestsModel>> getPendingResidentRequest() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/profile-verification/get-pending-resident-req';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/profile-verification/get-pending-resident-req';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
@@ -48,18 +39,9 @@ class AdministrationRepository {
 
   Future<List<GuardRequestsModel>> getPendingGuardRequest() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/profile-verification/get-pending-guard-req';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/profile-verification/get-pending-guard-req';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
 
       final jsonBody = jsonDecode(response.body);
 
@@ -82,25 +64,22 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> verifyResidentRequest({required String requestId, required String user, required String residentStatus}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'requestId': requestId,
         'user': user,
         'residentStatus': residentStatus
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/profile-verification/verify-resident-req';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/profile-verification/verify-resident-req';
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -120,25 +99,22 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> verifyGuardRequest({required String requestId, required String user, required String guardStatus}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'requestId': requestId,
         'user': user,
         'guardStatus': guardStatus
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/profile-verification/verify-guard-req';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/profile-verification/verify-guard-req';
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -158,23 +134,14 @@ class AdministrationRepository {
 
   Future<SocietyMemberModel> getAllResidents({required Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-resident';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -194,18 +161,10 @@ class AdministrationRepository {
 
   Future<List<SocietyGuard>> getAllGuards() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-guards';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/admin/get-guards';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -227,18 +186,10 @@ class AdministrationRepository {
 
   Future<List<SocietyMember>> getAllAdmin() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-admins';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/admin/get-admins';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -260,22 +211,20 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> createAdmin({required String email}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'email': email,
       };
 
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/make-admin';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -295,23 +244,20 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> removeAdmin({required String email}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'email': email,
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/admin/remove-admin';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/remove-admin';
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -331,23 +277,20 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> removeResident({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'id': id,
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/admin/remove-resident';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/remove-resident';
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -367,23 +310,20 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> removeGuard({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'id': id,
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/admin/remove-guard';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/remove-guard';
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -403,23 +343,14 @@ class AdministrationRepository {
 
   Future<ComplaintModel> getComplaints({required Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-complaints';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -439,23 +370,14 @@ class AdministrationRepository {
 
   Future<ComplaintModel> getPendingComplaints({required Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-pending-complaints';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -475,23 +397,14 @@ class AdministrationRepository {
 
   Future<ComplaintModel> getResolvedComplaints({required Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-resolved-complaints';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -511,9 +424,6 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> addTechnicians({required String userName, required String email, required String phoneNo, required String role}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> payload = {
         'userName': userName,
         'email': email,
@@ -523,14 +433,14 @@ class AdministrationRepository {
 
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/create-technician';
 
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(payload),
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(payload),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -550,23 +460,14 @@ class AdministrationRepository {
 
   Future<TechnicianModel> getTechnician({required Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/get-technicians';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -586,23 +487,20 @@ class AdministrationRepository {
 
   Future<Map<String, dynamic>> removeTechnician({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'id': id,
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/admin/remove-technician';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/remove-technician';
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -622,23 +520,21 @@ class AdministrationRepository {
 
   Future<Complaint> assignTechnician({required String complaintId, required String technicianId}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'complaintId': complaintId,
         'technicianId': technicianId,
       };
 
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/admin/assign-technician';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {

@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:gloria_connect/features/auth/models/get_user_model.dart';
 import 'package:gloria_connect/features/auth/models/society_model.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,13 +24,16 @@ class AuthRepository {
         'password': password,
         'confirmPassword': confirmPassword,
       };
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(data),
+
+      final response = await AuthHttpClient.instance.post(
+          apiUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
+          requiresAuth: false
       );
+
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -56,12 +60,13 @@ class AuthRepository {
         'FCMToken': FCMToken
       };
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/login';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(data),
+      final response = await AuthHttpClient.instance.post(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
+          requiresAuth: false
       );
 
       final jsonBody = jsonDecode(response.body);
@@ -98,8 +103,7 @@ class AuthRepository {
       final GoogleSignIn googleSignIn = GoogleSignIn();
       String? FCMToken = await FirebaseMessaging.instance.getToken();
 
-      final GoogleSignInAccount? googleSignInAccount =
-          await googleSignIn.signIn();
+      final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
 
       if (googleSignInAccount == null) {
         throw ApiError(message: 'Sign-in was canceled by the user.');
@@ -113,12 +117,13 @@ class AuthRepository {
       };
 
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/google-signin';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(data),
+      final response = await AuthHttpClient.instance.post(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
+          requiresAuth: false
       );
 
       final jsonBody = jsonDecode(response.body);
@@ -167,12 +172,13 @@ class AuthRepository {
       };
 
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/link-google';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(data),
+      final response = await AuthHttpClient.instance.post(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
+          requiresAuth: false
       );
 
       final jsonBody = jsonDecode(response.body);
@@ -197,15 +203,17 @@ class AuthRepository {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      String? refreshToken = prefs.getString('refreshToken');
 
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/logout';
-      final response = await http.get(
-        Uri.parse(apiKey),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
+
+      final response = await AuthHttpClient.instance.get(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $refreshToken',
+          },
+          requiresAuth: false
       );
 
       final jsonBody = jsonDecode(response.body);
@@ -231,17 +239,9 @@ class AuthRepository {
 
   Future<GetUserModel> getUser() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/get-current-user';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -261,41 +261,45 @@ class AuthRepository {
 
   Future<GetUserModel> addCompleteProfile({required String phoneNo, required String profileType, required String societyName, String? blockName, String? apartment, String? ownershipStatus, String? gateName, String? startDate, String? endDate, File? tenantAgreement, File? ownershipDocument}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/extra-info';
-      var request = http.MultipartRequest('POST', Uri.parse(apiKey));
-      request.headers['Authorization'] = 'Bearer $accessToken';
+      final Map<String, String> fields = {};
+      List<http.MultipartFile> files = [];
 
       if (profileType == 'Resident' && ownershipStatus == 'Owner') {
-        request.fields['phoneNo'] = phoneNo;
-        request.fields['profileType'] = profileType;
-        request.fields['societyName'] = societyName;
-        request.fields['societyBlock'] = blockName!;
-        request.fields['apartment'] = apartment!;
-        request.fields['ownership'] = ownershipStatus!;
-        request.files.add(await http.MultipartFile.fromPath('file', ownershipDocument!.path));
+        fields['phoneNo'] = phoneNo;
+        fields['profileType'] = profileType;
+        fields['societyName'] = societyName;
+        fields['societyBlock'] = blockName!;
+        fields['apartment'] = apartment!;
+        fields['ownership'] = ownershipStatus!;
+        if (ownershipDocument != null) {
+          files.add(await http.MultipartFile.fromPath('file', ownershipDocument.path));
+        }
       } else if (profileType == 'Resident' && ownershipStatus == 'Tenant') {
-        request.fields['phoneNo'] = phoneNo;
-        request.fields['profileType'] = profileType;
-        request.fields['societyName'] = societyName;
-        request.fields['societyBlock'] = blockName!;
-        request.fields['apartment'] = apartment!;
-        request.fields['ownership'] = ownershipStatus!;
-        request.fields['startDate'] = startDate!; // Assuming startDate is a DateTime object
-        request.fields['endDate'] = endDate!;     // Assuming endDate is a DateTime object
-        request.files.add(await http.MultipartFile.fromPath('file', tenantAgreement!.path));
+        fields['phoneNo'] = phoneNo;
+        fields['profileType'] = profileType;
+        fields['societyName'] = societyName;
+        fields['societyBlock'] = blockName!;
+        fields['apartment'] = apartment!;
+        fields['ownership'] = ownershipStatus!;
+        fields['startDate'] = startDate!; // Assuming startDate is a DateTime object
+        fields['endDate'] = endDate!;     // Assuming endDate is a DateTime object
+        if (tenantAgreement != null) {
+          files.add(await http.MultipartFile.fromPath('file', tenantAgreement.path));
+        }
       } else {
-        request.fields['phoneNo'] = phoneNo;
-        request.fields['profileType'] = profileType;
-        request.fields['societyName'] = societyName;
-        request.fields['gateAssign'] = gateName!;
+        fields['phoneNo'] = phoneNo;
+        fields['profileType'] = profileType;
+        fields['societyName'] = societyName;
+        fields['gateAssign'] = gateName!;
       }
 
-      // Send the multipart request and get the response
-      var streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
+      final response = await AuthHttpClient.instance.multipartRequest(
+        'POST',
+        apiKey,
+        fields: fields,
+        files: files,
+      );
 
       final jsonBody = jsonDecode(response.body);
 
@@ -317,9 +321,6 @@ class AuthRepository {
 
   Future<Map<String, dynamic>> addApartment({required String societyName, required String societyBlock, required String apartment, required String role}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'societyName': societyName,
         'societyBlock': societyBlock,
@@ -328,13 +329,13 @@ class AuthRepository {
       };
 
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/add-apartment';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+
+      final response = await AuthHttpClient.instance.post(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
 
       final jsonBody = jsonDecode(response.body);
@@ -355,22 +356,19 @@ class AuthRepository {
 
   Future<Map<String, dynamic>> addGate({required String societyName, required String gateAssign}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'societyName': societyName,
         'gateAssign': gateAssign,
       };
 
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/add-gate';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+
+      final response = await AuthHttpClient.instance.post(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
 
       final jsonBody = jsonDecode(response.body);
@@ -393,21 +391,18 @@ class AuthRepository {
 
   Future<Map<String, dynamic>> updateFCM({required String FCMToken}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'FCMToken': FCMToken,
       };
 
       const apiKey = '${ServerConstant.baseUrl}/api/v1/users/update-fcm';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode(data),
+
+      final response = await AuthHttpClient.instance.post(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
       );
 
       final jsonBody = jsonDecode(response.body);
@@ -430,14 +425,10 @@ class AuthRepository {
 
   Future<List<Society>> getSocietyDetails() async {
     try {
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/society/get-all-societies';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/society/get-all-societies';
+
+      final response = await AuthHttpClient.instance.get(apiUrl, requiresAuth: false);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -463,16 +454,19 @@ class AuthRepository {
         'email': email,
       };
 
-      const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/forgot-password';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(data),
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/users/forgot-password';
+
+      final response = await AuthHttpClient.instance.post(
+          apiKey,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(data),
+          requiresAuth: false
       );
 
       final jsonBody = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         return jsonBody;
       } else {
@@ -491,17 +485,10 @@ class AuthRepository {
 
   Future<Map<String, dynamic>> getContactEmail() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/users/get-contact-email';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {

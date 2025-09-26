@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,13 +43,12 @@ class InviteVisitorsRepository {
         'checkInCodeExpiry': checkInCodeExpiry,
       };
 
-      const apiKey =
-          '${ServerConstant.baseUrl}/api/v1/invite-visitors/add-pre-approval';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/invite-visitors/add-pre-approval';
+
+      final response = await AuthHttpClient.instance.post(
+        apiKey,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(data),
       );

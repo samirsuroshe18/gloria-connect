@@ -162,7 +162,7 @@ class NotificationController {
     Map<String, dynamic>? payload = response.payload!=null ? jsonDecode(response.payload!) : null;
     if (actionId == null || payload == null) return;
 
-    NavigatorState? currentState = MyApp.navigatorKey.currentState;
+    NavigatorState? currentState = navigatorKey.currentState;
 
     if (payload['action'] == 'VERIFY_RESIDENT_PROFILE_TYPE' && isInForeground == true) {
       currentState?.pushNamed('/resident-approval');

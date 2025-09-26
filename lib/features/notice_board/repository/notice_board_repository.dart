@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:gloria_connect/features/notice_board/models/notice_board_model.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
@@ -11,24 +11,22 @@ import '../../../utils/api_error.dart';
 class NoticeBoardRepository {
 
   Future<Notice> createNotice({required String title, required String description, required String category, File? file}) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
     try {
       const apiUrlFile = '${ServerConstant.baseUrl}/api/v1/notice/create-notice';
+      final Map<String, String> fields = {};
+      List<http.MultipartFile> files = [];
 
-      // Multipart request for both file and text fields
-      var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
-        ..headers['Authorization'] = 'Bearer $accessToken';
+      fields['title'] = title;
+      fields['description'] = description;
+      fields['category'] = category;
+      if (file != null) files.add(await http.MultipartFile.fromPath('file', file.path));
 
-      request.fields['title'] = title;
-      request.fields['description'] = description;
-      request.fields['category'] = category;
-      if (file != null)request.files.add(await http.MultipartFile.fromPath('file', file.path));
-
-      // Send the request
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
+      final response = await AuthHttpClient.instance.multipartRequest(
+        'POST',
+        apiUrlFile,
+        fields: fields,
+        files: files,
+      );
 
       // Handle the response
       final jsonResponse = jsonDecode(response.body);
@@ -50,25 +48,22 @@ class NoticeBoardRepository {
   }
 
   Future<NoticeBoardModel> updateNotice({required String id, required String title, required String description, File? file, String? image}) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
     try {
-      final apiUrlFile =
-          '${ServerConstant.baseUrl}/api/v1/notice/update-notice/$id';
+      final apiUrlFile = '${ServerConstant.baseUrl}/api/v1/notice/update-notice/$id';
+      final Map<String, String> fields = {};
+      List<http.MultipartFile> files = [];
 
-      // Multipart request for both file and text fields
-      var request = http.MultipartRequest('PUT', Uri.parse(apiUrlFile))
-        ..headers['Authorization'] = 'Bearer $accessToken';
+      fields['title'] = title;
+      fields['description'] = description;
+      if(image!=null)fields['image'] = image;
+      if (file != null) files.add(await http.MultipartFile.fromPath('file', file.path));
 
-      request.fields['title'] = title;
-      request.fields['description'] = description;
-      if (image != null) request.fields['image'] = image;
-      if (file != null) request.files.add(await http.MultipartFile.fromPath('file', file.path));
-
-      // Send the request
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
+      final response = await AuthHttpClient.instance.multipartRequest(
+        'PUT',
+        apiUrlFile,
+        fields: fields,
+        files: files,
+      );
 
       // Handle the response
       final jsonResponse = jsonDecode(response.body);
@@ -91,23 +86,14 @@ class NoticeBoardRepository {
 
   Future<NoticeBoardModel> getAllNotices({ required Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/notice/get-notices';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -127,17 +113,10 @@ class NoticeBoardRepository {
 
   Future<NoticeBoardModel> getNotice({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final apiUrl = '${ServerConstant.baseUrl}/api/v1/notice/get-notice/$id';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -157,18 +136,10 @@ class NoticeBoardRepository {
 
   Future<NoticeBoardModel> deleteNotice({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      final apiUrl = '${ServerConstant.baseUrl}/api/v1/notice/delete-notice/$id';
 
-      final apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/notice/delete-notice/$id';
-      final response = await http.delete(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.delete(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -188,18 +159,10 @@ class NoticeBoardRepository {
 
   Future<List<NoticeBoardModel>> unreadNotice() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/notice/is-unread-notice';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/notice/is-unread-notice';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {

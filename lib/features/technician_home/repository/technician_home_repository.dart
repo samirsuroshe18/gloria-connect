@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:gloria_connect/constants/server_constant.dart';
 import 'package:gloria_connect/features/technician_home/models/resolution_model.dart';
 import 'package:gloria_connect/utils/api_error.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,19 +12,12 @@ class TechnicianHomeRepository{
 
   Future<List<ResolutionElement>> getAssignComplaints() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/get-assigned-complaints';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+
+      final response = await AuthHttpClient.instance.get(apiUrl);
 
       final jsonBody = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
             .map((data) => ResolutionElement.fromJson(data))
@@ -44,17 +38,9 @@ class TechnicianHomeRepository{
 
   Future<List<ResolutionElement>> getResolvedComplaints() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/get-resolved-complaints';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+
+      final response = await AuthHttpClient.instance.get(apiUrl);
 
       final jsonBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -81,15 +67,12 @@ class TechnicianHomeRepository{
         'complaintId': complaintId,
       };
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/get-technician-details';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
+
+      final response = await AuthHttpClient.instance.post(
+        apiUrl,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(payload),
       );
@@ -117,20 +100,20 @@ class TechnicianHomeRepository{
       String? accessToken = prefs.getString('accessToken');
 
       final apiUrlFile = '${ServerConstant.baseUrl}/api/v1/technician/add-complaint-resolution';
+      final Map<String, String> fields = {};
+      List<http.MultipartFile> files = [];
 
-      // Multipart request for both file and text fields
-      var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
-        ..headers['Authorization'] = 'Bearer $accessToken';
+      fields['resolutionNote'] = resolutionNote;
+      fields['complaintId'] = complaintId;
+      files.add(await http.MultipartFile.fromPath('file', file.path));
 
-      request.fields['complaintId'] = complaintId;
-      request.fields['resolutionNote'] = resolutionNote;
-      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      final response = await AuthHttpClient.instance.multipartRequest(
+        'POST',
+        apiUrlFile,
+        fields: fields,
+        files: files,
+      );
 
-      // Send the request
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-
-      // Handle the response
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -155,15 +138,12 @@ class TechnicianHomeRepository{
         'resolutionId': resolutionId,
       };
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/approve-resolution';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
+
+      final response = await AuthHttpClient.instance.post(
+        apiUrl,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(payload),
       );
@@ -192,15 +172,12 @@ class TechnicianHomeRepository{
         'rejectedNote': rejectedNote,
       };
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       const apiUrl = '${ServerConstant.baseUrl}/api/v1/technician/reject-resolution';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
+
+      final response = await AuthHttpClient.instance.post(
+        apiUrl,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(payload),
       );

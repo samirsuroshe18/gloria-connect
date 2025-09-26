@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gloria_connect/constants/server_constant.dart';
 import 'package:gloria_connect/features/administration/bloc/administration_bloc.dart';
 import 'package:gloria_connect/features/check_in/bloc/check_in_bloc.dart';
 import 'package:gloria_connect/features/gate_pass/bloc/gate_pass_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:gloria_connect/features/resident_profile/bloc/resident_profile_b
 import 'package:gloria_connect/features/setting/bloc/setting_bloc.dart';
 import 'package:gloria_connect/features/technician_home/bloc/technician_home_bloc.dart';
 import 'package:gloria_connect/init_dependencies.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 import 'package:gloria_connect/utils/notification_service.dart';
 import 'package:gloria_connect/utils/route_observer_with_stack.dart';
 
@@ -26,6 +28,9 @@ import 'config/routes/routes.dart';
 import 'config/theme/app_themes.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'firebase_options.dart';
+
+final RouteObserverWithStack routeObserver = RouteObserverWithStack();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
 Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
@@ -60,6 +65,13 @@ void main() async {
 
   ///Dependency Injection.
   await initDependencies();
+
+  /// AuthHttpClient Initialization
+  AuthHttpClient.initialize(
+    serverBaseUrl: ServerConstant.baseUrl,
+    refreshEndpoint: ServerConstant.refreshTokenEndpoint,
+    navKey: navigatorKey,
+  );
 
   runApp(
       MultiBlocProvider(
@@ -115,11 +127,7 @@ void main() async {
   );
 }
 
-final RouteObserverWithStack routeObserver = RouteObserverWithStack();
-
 class MyApp extends StatefulWidget {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
   const MyApp({super.key});
 
   @override
@@ -160,7 +168,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorObservers: [routeObserver],
-      navigatorKey: MyApp.navigatorKey,
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Gloria Connect',
       theme: theme(),

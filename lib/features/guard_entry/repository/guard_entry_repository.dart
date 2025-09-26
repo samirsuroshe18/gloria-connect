@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:gloria_connect/utils/auth_http_client.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
@@ -25,9 +25,6 @@ class GuardEntryRepository {
     required List<Map<String, String>> societyApartments,
     required String societyGates,
   }) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
     final Map<String, dynamic> data = {
       'name': name,
       'mobNumber': mobNumber,
@@ -50,68 +47,51 @@ class GuardEntryRepository {
 
     try {
       // Determine which API URL to use based on whether it's a multipart request
-      const apiUrlString =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/add-delivery-entry-2';
-      const apiUrlFile =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/add-delivery-entry';
+      const apiUrlString = '${ServerConstant.baseUrl}/api/v1/delivery-entry/add-delivery-entry-2';
+      const apiUrlFile = '${ServerConstant.baseUrl}/api/v1/delivery-entry/add-delivery-entry';
 
       http.Response response;
 
       if (profileImg is String) {
-        // Normal POST request
         data['profileImg'] = profileImg;
 
-        response = await http.post(
-          Uri.parse(apiUrlString),
-          headers: <String, String>{
+        response = await AuthHttpClient.instance.post(
+          apiUrlString,
+          headers: {
             'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $accessToken',
           },
           body: jsonEncode(data),
         );
       } else if (profileImg is File) {
-        // Multipart request for uploading the image file
-        var request = http.MultipartRequest('POST', Uri.parse(apiUrlFile))
-          ..headers['Authorization'] = 'Bearer $accessToken';
+        final Map<String, String> fields = {};
+        List<http.MultipartFile> files = [];
 
-        // Add fields (convert complex objects to JSON strings)
-        request.fields['name'] = name;
-        request.fields['mobNumber'] = mobNumber;
-        companyName != null
-            ? request.fields['companyName'] = companyName
-            : null;
-        companyLogo != null
-            ? request.fields['companyLogo'] = companyLogo
-            : null;
-        serviceName != null
-            ? request.fields['serviceName'] = serviceName
-            : null;
-        serviceLogo != null
-            ? request.fields['serviceLogo'] = serviceLogo
-            : null;
-        accompanyingGuest != null
-            ? request.fields['accompanyingGuest'] = accompanyingGuest
-            : null;
-        request.fields['entryType'] = entryType;
-
-        // Convert vehicleDetails and societyDetails to JSON strings
-        request.fields['vehicleDetails'] = jsonEncode({
+        fields['name'] = name;
+        fields['mobNumber'] = mobNumber;
+        if(companyName!=null) fields['companyName'] = companyName;
+        if(companyLogo!=null) fields['companyLogo'] = companyLogo;
+        if(serviceName!=null) fields['serviceName'] = serviceName;
+        if(serviceLogo!=null) fields['serviceLogo'] = serviceLogo;
+        if(accompanyingGuest != null ) fields['accompanyingGuest'] = accompanyingGuest;
+        fields['societyName'] = societyName;
+        fields['entryType'] = entryType;
+        fields['vehicleDetails'] = jsonEncode({
           'vehicleType': vehicleType,
           'vehicleNumber': vehicleNumber,
         });
-        request.fields['societyDetails'] = jsonEncode({
+        fields['societyDetails'] = jsonEncode({
           'societyName': societyName,
           'societyApartments': societyApartments,
           'societyGates': societyGates,
         });
+        files.add(await http.MultipartFile.fromPath('profileImg', profileImg.path));
 
-        // Add the profile image file
-        request.files.add(
-            await http.MultipartFile.fromPath('profileImg', profileImg.path));
-
-        // Send the multipart request and get the response
-        var streamedResponse = await request.send();
-        response = await http.Response.fromStream(streamedResponse);
+        response = await AuthHttpClient.instance.multipartRequest(
+          'POST',
+          apiUrlFile,
+          fields: fields,
+          files: files,
+        );
       } else {
         throw ApiError(message: 'Invalid profileImg type.');
       }
@@ -136,19 +116,16 @@ class GuardEntryRepository {
 
   Future<Map<String, dynamic>> approveDeliveryEntry({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'id': id,
       };
-      const apiKey =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/approve-delivery';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
+
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/delivery-entry/approve-delivery';
+
+      final response = await AuthHttpClient.instance.post(
+        apiKey,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(data),
       );
@@ -173,19 +150,15 @@ class GuardEntryRepository {
 
   Future<Map<String, dynamic>> rejectDeliveryEntry({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'id': id,
       };
-      const apiKey =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/reject-delivery';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/delivery-entry/reject-delivery';
+
+      final response = await AuthHttpClient.instance.post(
+        apiKey,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(data),
       );
@@ -208,22 +181,17 @@ class GuardEntryRepository {
     }
   }
 
-  Future<Map<String, dynamic>> checkInByCode(
-      {required String checkInCode}) async {
+  Future<Map<String, dynamic>> checkInByCode({required String checkInCode}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'checkInCode': checkInCode,
       };
-      const apiKey =
-          '${ServerConstant.baseUrl}/api/v1/check-in-by-code/add-entry';
-      final response = await http.post(
-        Uri.parse(apiKey),
-        headers: <String, String>{
+      const apiKey = '${ServerConstant.baseUrl}/api/v1/check-in-by-code/add-entry';
+
+      final response = await AuthHttpClient.instance.post(
+        apiKey,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(data),
       );

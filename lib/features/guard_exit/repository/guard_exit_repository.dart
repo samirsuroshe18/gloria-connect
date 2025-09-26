@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:gloria_connect/constants/server_constant.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 
 import '../../../utils/api_error.dart';
 import '../../guard_waiting/models/entry.dart';
@@ -10,18 +9,10 @@ import '../../guard_waiting/models/entry.dart';
 class GuardExitRepository {
   Future<List<VisitorEntries>> getAllowedEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-entries';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-entries';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -43,18 +34,10 @@ class GuardExitRepository {
 
   Future<List<VisitorEntries>> getGuestEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-guest-entries';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-guest-entries';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -76,18 +59,10 @@ class GuardExitRepository {
 
   Future<List<VisitorEntries>> getCabEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-cab-entries';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-cab-entries';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -109,18 +84,10 @@ class GuardExitRepository {
 
   Future<List<VisitorEntries>> getDeliveryEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-delivery-entries';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-delivery-entries';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -142,18 +109,10 @@ class GuardExitRepository {
 
   Future<List<VisitorEntries>> getServiceEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-other-entries';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-allowed-other-entries';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -173,26 +132,22 @@ class GuardExitRepository {
     }
   }
 
-  Future<Map<String, dynamic>> exitEntry(
-      {required String id, required String entryType}) async {
+  Future<Map<String, dynamic>> exitEntry({required String id, required String entryType}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {'id': id};
 
       String apiUrl = entryType == 'delivery'
           ? '${ServerConstant.baseUrl}/api/v1/delivery-entry/exit-entry'
           : '${ServerConstant.baseUrl}/api/v1/invite-visitors/exit-entry';
 
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
+      final response = await AuthHttpClient.instance.post(
+        apiUrl,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {

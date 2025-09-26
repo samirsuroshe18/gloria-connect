@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 
 import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
@@ -10,18 +9,10 @@ import '../models/entry.dart';
 class GuardWaitingRepository {
   Future<List<VisitorEntries>> getEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-delivery-waiting-entries';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-delivery-waiting-entries';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return (jsonBody['data'] as List)
@@ -42,17 +33,10 @@ class GuardWaitingRepository {
 
   Future<VisitorEntries> getEntry({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final apiUrl ='${ServerConstant.baseUrl}/api/v1/delivery-entry/get-waiting-entry/$id';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return VisitorEntries.fromJson(jsonBody['data']);
@@ -69,26 +53,22 @@ class GuardWaitingRepository {
     }
   }
 
-  Future<Map<String, dynamic>> allowEntryBySecurity(
-      {required String id}) async {
+  Future<Map<String, dynamic>> allowEntryBySecurity({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'id': id,
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/allow-delivery-entries';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/allow-delivery-entries';
+
+      final response = await AuthHttpClient.instance.post(
+        apiUrl,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -108,23 +88,20 @@ class GuardWaitingRepository {
 
   Future<Map<String, dynamic>> denyEntryBySecurity({required String id}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final Map<String, dynamic> data = {
         'id': id,
       };
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/deny-delivery-entries';
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/deny-delivery-entries';
+
+      final response = await AuthHttpClient.instance.post(
+        apiUrl,
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode(data),
       );
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {

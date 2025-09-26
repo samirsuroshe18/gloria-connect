@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:gloria_connect/features/guard_waiting/models/entry.dart';
 import 'package:gloria_connect/features/invite_visitors/models/pre_approved_banner.dart';
 import 'package:gloria_connect/features/my_visitors/models/past_delivery_model.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gloria_connect/utils/auth_http_client.dart';
 
 import '../../../constants/server_constant.dart';
 import '../../../utils/api_error.dart';
@@ -12,18 +11,10 @@ import '../../../utils/api_error.dart';
 class MyVisitorsRepository {
   Future<List<VisitorEntries>> getCurrentEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-current';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-current';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -45,23 +36,14 @@ class MyVisitorsRepository {
 
   Future<PastDeliveryModel> getPastEntries({ required final Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-past';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -81,23 +63,14 @@ class MyVisitorsRepository {
 
   Future<PastDeliveryModel> getDeniedEntries({ required final Map<String, dynamic> queryParams}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      // Build query string using the same 'queryParams' name
       String queryString = Uri(queryParameters: queryParams).query;
       String apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-denied';
       if (queryString.isNotEmpty) {
         apiUrl += '?$queryString';
       }
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -117,18 +90,10 @@ class MyVisitorsRepository {
 
   Future<List<PreApprovedBanner>> getExpectedEntries() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/invite-visitors/get-expected';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/invite-visitors/get-expected';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -150,18 +115,10 @@ class MyVisitorsRepository {
 
   Future<VisitorEntries> getServiceRequest() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      const apiUrl = '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-service-entries';
 
-      const apiUrl =
-          '${ServerConstant.baseUrl}/api/v1/delivery-entry/get-service-entries';
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
+      final response = await AuthHttpClient.instance.get(apiUrl);
+
       final jsonBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {

@@ -574,11 +574,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         context.read<AuthBloc>().add(
               AuthCompleteProfile(
                   phoneNo: mobileController.text,
-                  profileType: '$profileType',
-                  societyName: '$societyName',
-                  blockName: '$blockName',
-                  apartment: '$apartment',
-                  ownershipStatus: '$ownershipStatus',
+                  profileType: profileType ?? '',
+                  societyName: societyName ?? '',
+                  blockName: blockName ?? '',
+                  apartment: apartment ?? '',
+                  ownershipStatus: ownershipStatus ?? '',
                   startDate: startDate?.toIso8601String(),
                   endDate: endDate?.toIso8601String(),
                   tenantAgreement: tenantAgreement,
@@ -590,9 +590,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         context.read<AuthBloc>().add(
               AuthCompleteProfile(
                 phoneNo: mobileController.text,
-                profileType: '$profileType',
-                societyName: '$societyName',
-                gateName: '$gateName',
+                profileType: profileType ?? '',
+                societyName: societyName ?? '',
+                gateName: gateName ?? '',
               ),
             );
       } else {
