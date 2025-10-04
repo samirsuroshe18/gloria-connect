@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '37312603811',
     projectId: 'gateguard-65994',
     storageBucket: 'gateguard-65994.firebasestorage.app',
-    androidClientId: '37312603811-fgq13801npbtdf52d3j3b7gej4l9eba5.apps.googleusercontent.com',
+    androidClientId: '37312603811-63ggg4n0el2p7lmsodt4hhllv1p6o1v6.apps.googleusercontent.com',
     iosClientId: '37312603811-6fij9b7uhtirejm9329smvgn42cb76o8.apps.googleusercontent.com',
     iosBundleId: 'in.smartdwelliot.gloriaconnect.gloriaConnect',
   );

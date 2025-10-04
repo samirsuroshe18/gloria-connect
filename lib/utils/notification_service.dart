@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import '../constants/server_constant.dart';
 import '../main.dart';
 import '../constants/notification_constant.dart';
+import 'download_and_store_img.dart';
 
 @pragma('vm:entry-point')
 class NotificationController {
@@ -25,15 +26,30 @@ class NotificationController {
   static Future<void> initializeLocalNotifications() async {
     const androidInit = AndroidInitializationSettings('ic_notification');
 
-    const iosInit = DarwinInitializationSettings(
+    final iosInit = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
-      notificationCategories: [/* ... */],
+      notificationCategories: [
+        DarwinNotificationCategory(
+          'actionable',
+          actions: <DarwinNotificationAction>[
+            DarwinNotificationAction.plain(
+              'APPROVE',
+              'Approve',
+            ),
+            DarwinNotificationAction.plain(
+              'REJECT',
+              'Reject',
+              options: {DarwinNotificationActionOption.destructive},
+            ),
+          ],
+        ),
+      ],
     );
 
     await _plugin.initialize(
-      const InitializationSettings(android: androidInit, iOS: iosInit),
+      InitializationSettings(android: androidInit, iOS: iosInit),
       onDidReceiveNotificationResponse: _onResponse,
       onDidReceiveBackgroundNotificationResponse: _onResponseBackground,
     );
@@ -42,11 +58,18 @@ class NotificationController {
 
     notificationAppLaunchDetails = await _plugin.getNotificationAppLaunchDetails();
 
+    // Allow iOS to show banners in foreground
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       final int? id = jsonDecode(message.data['payload'])['notificationId'];
-      if(message.data['action']=='CANCEL' && id!=null){
+      if (message.data['action'] == 'CANCEL' && id != null) {
         cancelLocalNotification(id);
-      }else{
+      } else {
         NotificationController.showLocalNotification(message: message);
       }
     });
@@ -58,23 +81,25 @@ class NotificationController {
 
     if (android != null) {
       await android.createNotificationChannel(const AndroidNotificationChannel(
-          NotificationConstant.actionChannelId, NotificationConstant.actionChannelName,
-          description: NotificationConstant.actionChannelDesc,
-          importance: Importance.max,
-          playSound: true,
-          sound: RawResourceAndroidNotificationSound('res_emergency_sound'),
-          enableLights: true,
-          enableVibration: true
+        NotificationConstant.actionChannelId,
+        NotificationConstant.actionChannelName,
+        description: NotificationConstant.actionChannelDesc,
+        importance: Importance.max,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('res_emergency_sound'),
+        enableLights: true,
+        enableVibration: true,
       ));
 
       await android.createNotificationChannel(const AndroidNotificationChannel(
-          NotificationConstant.basicChannelId, NotificationConstant.basicChannelName,
-          description: NotificationConstant.basicChannelDesc,
-          playSound: true,
-          sound: RawResourceAndroidNotificationSound('res_bell_sound'),
-          importance: Importance.max,
-          enableLights: true,
-          enableVibration: true
+        NotificationConstant.basicChannelId,
+        NotificationConstant.basicChannelName,
+        description: NotificationConstant.basicChannelDesc,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('res_bell_sound'),
+        importance: Importance.max,
+        enableLights: true,
+        enableVibration: true,
       ));
     }
   }
@@ -91,7 +116,7 @@ class NotificationController {
     final String? imageUrl = payload['profileImg'];
     final withActions = shouldShowActions(action);
 
-    if (imageUrl != null && imageUrl.isNotEmpty && withActions==true) {
+    if (imageUrl != null && imageUrl.isNotEmpty && withActions == true) {
       try {
         final resp = await http.get(Uri.parse(imageUrl));
         final bytes = resp.bodyBytes;
@@ -107,9 +132,15 @@ class NotificationController {
     }
 
     final androidDetails = AndroidNotificationDetails(
-      withActions ? NotificationConstant.actionChannelId : NotificationConstant.basicChannelId,
-      withActions ? NotificationConstant.actionChannelName : NotificationConstant.basicChannelName,
-      channelDescription: withActions ? NotificationConstant.actionChannelDesc : NotificationConstant.basicChannelDesc,
+      withActions
+          ? NotificationConstant.actionChannelId
+          : NotificationConstant.basicChannelId,
+      withActions
+          ? NotificationConstant.actionChannelName
+          : NotificationConstant.basicChannelName,
+      channelDescription: withActions
+          ? NotificationConstant.actionChannelDesc
+          : NotificationConstant.basicChannelDesc,
       playSound: true,
       enableVibration: true,
       enableLights: true,
@@ -127,23 +158,35 @@ class NotificationController {
           : null,
     );
 
+    String? localPath;
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      localPath = await downloadAndSaveImage(imageUrl, 'profile_$id.png');
+    }
+
+    final iosDetails = DarwinNotificationDetails(
+      // Attach iOS category for action buttons
+      categoryIdentifier: withActions ? 'actionable' : null,
+      sound: withActions ? 'emergency_sound.caf' : 'bell_sound.caf',
+      attachments: localPath != null
+          ? [DarwinNotificationAttachment(localPath)]
+          : null,
+    );
+
     final details = NotificationDetails(
       android: androidDetails,
-      iOS: DarwinNotificationDetails(
-        categoryIdentifier: 'actionable',
-        attachments:
-        imageUrl != null ? [DarwinNotificationAttachment(imageUrl)] : null,
-      ),
+      iOS: iosDetails,
     );
 
     await _plugin.show(id, title, body, details, payload: message.data['payload']);
   }
 
   @pragma('vm:entry-point')
-  static Future<void> cancelLocalNotification(int id) => _plugin.cancel(id);
+  static Future<void> cancelLocalNotification(int id) =>
+      _plugin.cancel(id);
 
   @pragma('vm:entry-point')
-  static Future<void> cancelAllLocalNotification() => _plugin.cancelAll();
+  static Future<void> cancelAllLocalNotification() =>
+      _plugin.cancelAll();
 
   // Internal callbacks
   @pragma('vm:entry-point')
